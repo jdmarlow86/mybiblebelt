@@ -93,9 +93,3 @@ npm run preview
 
 MIT (or your preferred license)
 
-```
-
----
-
-Do you want me to also make you a **GitHub Actions workflow file** (`.github/workflows/deploy.yml`) so it auto-deploys to GitHub Pages every time you push to `main`?
-```
