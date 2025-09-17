@@ -798,13 +798,22 @@ function MeetAndSchedule() {
 function BibleStudyPage() {
     return (
         <Page title="Bible Study" subtitle="Keep dated notes, create a Google Meet, and set simple schedules.">
-            <div className="grid md:grid-cols-2 gap-4">
-                <DatedNotes />
-                <MeetAndSchedule />
+            <div className="grid lg:grid-cols-3 gap-4">
+                {/* Main content (2 columns) */}
+                <div className="lg:col-span-2 grid md:grid-cols-2 gap-4">
+                    <DatedNotes />
+                    <MeetAndSchedule />
+                </div>
+
+                {/* Sidebar */}
+                <aside className="lg:col-span-1 space-y-4">
+                    <StudyBookmarkCard />
+                </aside>
             </div>
         </Page>
     );
 }
+
 
 // ------------------------------
 // Pay It Forward
@@ -866,6 +875,216 @@ function PayItForwardPage() {
         </Page>
     );
 }
+
+// ------------------------------
+// Study Bookmark Card (Option A)
+// ------------------------------
+function StudyBookmarkCard() {
+    // ----- Types removed for JS -----
+    const LS_KEY = "studyBookmarks";
+
+    const loadFromLocal = () => {
+        try {
+            const raw = localStorage.getItem(LS_KEY);
+            const data = raw ? JSON.parse(raw) : [];
+            return Array.isArray(data) ? data : [];
+        } catch {
+            return [];
+        }
+    };
+    const saveToLocal = (bookmarks) => {
+        localStorage.setItem(LS_KEY, JSON.stringify(bookmarks));
+    };
+
+    // Optional Electron IPC (auto-detect)
+    const isElectron =
+        typeof window !== "undefined" &&
+        window?.electron?.ipcRenderer;
+
+    const loadFromElectron = async () => {
+        const res = await window.electron.ipcRenderer.invoke("study-bookmarks:load");
+        return Array.isArray(res) ? res : [];
+    };
+    const saveToElectron = async (bookmarks) => {
+        await window.electron.ipcRenderer.invoke("study-bookmarks:save", bookmarks);
+    };
+
+    const useElectronStorage = !!isElectron;
+
+    const emptyForm = { title: "", schedule: "", notes: "" };
+    const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
+
+    const [bookmarks, setBookmarks] = React.useState([]);
+    const [form, setForm] = React.useState(emptyForm);
+    const [editingId, setEditingId] = React.useState(null);
+    const [search, setSearch] = React.useState("");
+
+    React.useEffect(() => {
+        (async () => {
+            if (useElectronStorage) {
+                setBookmarks(await loadFromElectron());
+            } else {
+                setBookmarks(loadFromLocal());
+            }
+        })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    React.useEffect(() => {
+        (async () => {
+            if (useElectronStorage) {
+                await saveToElectron(bookmarks);
+            } else {
+                saveToLocal(bookmarks);
+            }
+        })();
+    }, [bookmarks]); // persist whenever bookmarks change
+
+    const filtered = React.useMemo(() => {
+        const q = search.trim().toLowerCase();
+        const sorted = [...bookmarks].sort((a, b) => b.updatedAt - a.updatedAt);
+        if (!q) return sorted;
+        return sorted.filter(
+            (b) =>
+                b.title.toLowerCase().includes(q) ||
+                b.schedule.toLowerCase().includes(q) ||
+                b.notes.toLowerCase().includes(q)
+        );
+    }, [bookmarks, search]);
+
+    const resetForm = () => {
+        setForm(emptyForm);
+        setEditingId(null);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const now = Date.now();
+
+        if (editingId) {
+            setBookmarks((prev) =>
+                prev.map((b) => (b.id === editingId ? { ...b, ...form, updatedAt: now } : b))
+            );
+        } else {
+            const item = {
+                id: uid(),
+                title: form.title.trim(),
+                schedule: form.schedule.trim(),
+                notes: form.notes.trim(),
+                createdAt: now,
+                updatedAt: now,
+            };
+            setBookmarks((prev) => [item, ...prev]);
+        }
+        resetForm();
+    };
+
+    const handleEdit = (id) => {
+        const b = bookmarks.find((x) => x.id === id);
+        if (!b) return;
+        setForm({ title: b.title, schedule: b.schedule, notes: b.notes });
+        setEditingId(id);
+    };
+
+    const handleDelete = (id) => {
+        setBookmarks((prev) => prev.filter((b) => b.id !== id));
+        if (editingId === id) resetForm();
+    };
+
+    return (
+        <Card className="space-y-4">
+            <div className="flex items-center justify-between gap-3">
+                <h2 className="text-lg sm:text-xl font-semibold">Study Bookmark</h2>
+                <Input
+                    placeholder="Search…"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-40 sm:w-56"
+                />
+            </div>
+
+            {/* Add / Edit Form */}
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-3">
+                <div className="grid sm:grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-medium text-gray-600 dark:text-gray-300">Title</label>
+                        <Input
+                            required
+                            value={form.title}
+                            onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                            placeholder="e.g., Gospel of John — Ch. 3"
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-medium text-gray-600 dark:text-gray-300">Schedule</label>
+                        <Input
+                            required
+                            value={form.schedule}
+                            onChange={(e) => setForm((f) => ({ ...f, schedule: e.target.value }))}
+                            placeholder="e.g., Daily 6:30 AM"
+                        />
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-medium text-gray-600 dark:text-gray-300">Notes</label>
+                    <Textarea
+                        rows={3}
+                        value={form.notes}
+                        onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
+                        placeholder="Key verses, questions, cross-references…"
+                    />
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <PrimaryButton type="submit">
+                        {editingId ? "Update Bookmark" : "Add Bookmark"}
+                    </PrimaryButton>
+                    {editingId && (
+                        <Button type="button" onClick={resetForm}>
+                            Cancel
+                        </Button>
+                    )}
+                </div>
+            </form>
+
+            {/* List */}
+            <div className="divide-y divide-gray-200 dark:divide-gray-800">
+                {filtered.length === 0 ? (
+                    <p className="text-sm text-gray-500 dark:text-gray-400 py-2">
+                        No bookmarks yet. Add your first study above.
+                    </p>
+                ) : (
+                    filtered.map((b) => (
+                        <article key={b.id} className="py-3 flex flex-col sm:flex-row sm:items-start gap-3">
+                            <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold truncate">{b.title}</h3>
+                                <p className="text-xs text-gray-600 dark:text-gray-300 mt-0.5">
+                                    Schedule: {b.schedule}
+                                </p>
+                                {!!b.notes && (
+                                    <p className="text-sm mt-1 whitespace-pre-wrap break-words">{b.notes}</p>
+                                )}
+                                <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">
+                                    Updated {new Date(b.updatedAt).toLocaleString()}
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                                <Button onClick={() => handleEdit(b.id)} className="text-amber-700 dark:text-amber-300">
+                                    Edit
+                                </Button>
+                                <Button onClick={() => handleDelete(b.id)} className="text-red-700 dark:text-red-300">
+                                    Delete
+                                </Button>
+                            </div>
+                        </article>
+                    ))
+                )}
+            </div>
+        </Card>
+    );
+}
+
 
 // ------------------------------
 // Root App
