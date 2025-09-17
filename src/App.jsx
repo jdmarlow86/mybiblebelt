@@ -818,35 +818,262 @@ function BibleStudyPage() {
 // ------------------------------
 // Pay It Forward
 // ------------------------------
-function Donations() {
-    const [amount, setAmount] = useState(25);
-    const [purpose, setPurpose] = useState("General Support");
-    const [raised, setRaised] = useState(() => storage.get("raised", 0));
-    const [goal, setGoal] = useState(() => storage.get("goal", 2000));
-    useEffect(() => storage.set("raised", raised), [raised]);
-    useEffect(() => storage.set("goal", goal), [goal]);
+function CopyButton({ value, children = "Copy" }) {
+    const [ok, setOk] = React.useState(false);
+    const copy = async () => {
+        try {
+            await navigator.clipboard.writeText(value || "");
+            setOk(true);
+            setTimeout(() => setOk(false), 1200);
+        } catch {
+            setOk(false);
+            alert("Copy failed—select and copy manually.");
+        }
+    };
+    return (
+        <Button onClick={copy} className={ok ? "bg-green-600 text-white" : ""}>
+            {ok ? "Copied!" : children}
+        </Button>
+    );
+}
 
+function Donations() {
+    // --- FUNDRAISING BAR (kept from your original) ---
+    const [raised, setRaised] = React.useState(() => storage.get("raised", 0));
+    const [goal, setGoal] = React.useState(() => storage.get("goal", 2000));
+    React.useEffect(() => storage.set("raised", raised), [raised]);
+    React.useEffect(() => storage.set("goal", goal), [goal]);
     const pct = Math.min(100, Math.round((raised / Math.max(1, goal)) * 100));
 
-    const checkout = () => {
-        const url = `https://buy.stripe.com/test_1234567890abcdef?amount=${Math.max(1, Number(amount) || 1)}&purpose=${encodeURIComponent(purpose)}`;
-        window.open(url, "_blank");
-    };
+    // --- PAYMENT METHODS ---
+    const [method, setMethod] = React.useState(() => storage.get("pay.method", "cashapp"));
+    React.useEffect(() => storage.set("pay.method", method), [method]);
+
+    // Editable handles/addresses persisted locally
+    const [pay, setPay] = React.useState(() =>
+        storage.get("pay.handles", {
+            cashappTag: "YourCashtag",                 // without the $
+            venmoHandle: "your-venmo",                 // no @, just handle
+            paypalLink: "https://paypal.me/yourname",  // full PayPal.me or checkout link
+            btcAddress: "bc1qexampleexampleexample",   // your BTC address
+            mailingAddress:
+                "Your Name\n123 Example St\nLaFollette, TN 37766\nUnited States",
+            showQR: true,
+        })
+    );
+    React.useEffect(() => storage.set("pay.handles", pay), [pay]);
+
+    // Helpers
+    const update = (k, v) => setPay((p) => ({ ...p, [k]: v }));
+    const cashAppUrl = `https://cash.app/$${encodeURIComponent(pay.cashappTag || "")}`;
+    const venmoUrl = `https://venmo.com/u/${encodeURIComponent(pay.venmoHandle || "")}`;
+    const paypalUrl = pay.paypalLink || "https://paypal.me/";
+    const btcURI = `bitcoin:${encodeURIComponent(pay.btcAddress || "")}`;
+
+    // Simple, dependency-free QR via external image API (optional)
+    const qr = (data) =>
+        `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
+            data || ""
+        )}`;
 
     return (
         <Card>
             <SectionTitle>Donate / Pay It Forward</SectionTitle>
-            <div className="mt-2 grid md:grid-cols-4 gap-3">
-                <Input type="number" min={1} value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Amount (USD)" />
-                <Input value={purpose} onChange={(e) => setPurpose(e.target.value)} placeholder="Purpose" />
-                <PrimaryButton onClick={checkout}>Donate</PrimaryButton>
-                <Button onClick={() => alert("In production: receipts & recurring giving")}>More Options</Button>
+
+            {/* Method selector */}
+            <div className="mt-3 flex flex-wrap gap-2">
+                {[
+                    ["cashapp", "Cash App"],
+                    ["venmo", "Venmo"],
+                    ["paypal", "PayPal"],
+                    ["btc", "Bitcoin (BTC)"],
+                    ["mail", "Mailing Address"],
+                ].map(([id, label]) => (
+                    <Button
+                        key={id}
+                        onClick={() => setMethod(id)}
+                        className={clsx(
+                            "text-sm",
+                            method === id
+                                ? "bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300"
+                                : ""
+                        )}
+                    >
+                        {label}
+                    </Button>
+                ))}
+                <label className="ml-auto text-sm flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        checked={!!pay.showQR}
+                        onChange={(e) => update("showQR", e.target.checked)}
+                    />
+                    Show QR
+                </label>
             </div>
 
-            <div className="mt-5">
+            {/* Panels */}
+            <div className="mt-4 grid md:grid-cols-2 gap-4">
+                {/* Left: inputs / details */}
+                <div className="space-y-3">
+                    {method === "cashapp" && (
+                        <>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                Set your <b>Cashtag</b> (no dollar sign).
+                            </div>
+                            <Input
+                                value={pay.cashappTag}
+                                onChange={(e) => update("cashappTag", e.target.value)}
+                                placeholder="YourCashtag"
+                            />
+                            <div className="flex flex-wrap gap-2">
+                                <PrimaryButton onClick={() => window.open(cashAppUrl, "_blank")}>
+                                    Open Cash App link
+                                </PrimaryButton>
+                                <CopyButton value={cashAppUrl}>Copy Link</CopyButton>
+                                <CopyButton value={`$${pay.cashappTag || ""}`}>Copy $Cashtag</CopyButton>
+                            </div>
+                        </>
+                    )}
+
+                    {method === "venmo" && (
+                        <>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                Set your <b>Venmo handle</b> (no @).
+                            </div>
+                            <Input
+                                value={pay.venmoHandle}
+                                onChange={(e) => update("venmoHandle", e.target.value)}
+                                placeholder="your-venmo"
+                            />
+                            <div className="flex flex-wrap gap-2">
+                                <PrimaryButton onClick={() => window.open(venmoUrl, "_blank")}>
+                                    Open Venmo link
+                                </PrimaryButton>
+                                <CopyButton value={venmoUrl}>Copy Link</CopyButton>
+                                <CopyButton value={`@${pay.venmoHandle || ""}`}>Copy @Handle</CopyButton>
+                            </div>
+                        </>
+                    )}
+
+                    {method === "paypal" && (
+                        <>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                Set a full PayPal link (e.g., <code>https://paypal.me/yourname/25</code>).
+                            </div>
+                            <Input
+                                value={pay.paypalLink}
+                                onChange={(e) => update("paypalLink", e.target.value)}
+                                placeholder="https://paypal.me/yourname"
+                            />
+                            <div className="flex flex-wrap gap-2">
+                                <PrimaryButton onClick={() => window.open(paypalUrl, "_blank")}>
+                                    Open PayPal link
+                                </PrimaryButton>
+                                <CopyButton value={paypalUrl}>Copy Link</CopyButton>
+                            </div>
+                        </>
+                    )}
+
+                    {method === "btc" && (
+                        <>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                Paste your <b>Bitcoin address</b>.
+                            </div>
+                            <Input
+                                value={pay.btcAddress}
+                                onChange={(e) => update("btcAddress", e.target.value)}
+                                placeholder="bc1q…"
+                            />
+                            <div className="flex flex-wrap gap-2">
+                                <CopyButton value={pay.btcAddress}>Copy BTC Address</CopyButton>
+                                <CopyButton value={btcURI}>Copy bitcoin: URI</CopyButton>
+                            </div>
+                        </>
+                    )}
+
+                    {method === "mail" && (
+                        <>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                Enter your mailing address for checks/cash.
+                            </div>
+                            <Textarea
+                                rows={4}
+                                value={pay.mailingAddress}
+                                onChange={(e) => update("mailingAddress", e.target.value)}
+                                placeholder={"Your Name\n123 Example St\nCity, ST ZIP\nCountry"}
+                            />
+                            <div className="flex flex-wrap gap-2">
+                                <CopyButton value={pay.mailingAddress}>Copy Address</CopyButton>
+                                <Button onClick={() => window.print()}>Print</Button>
+                            </div>
+                        </>
+                    )}
+                </div>
+
+                {/* Right: Preview / QR */}
+                <div className="space-y-3">
+                    <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border dark:border-gray-700">
+                        <div className="font-medium mb-1">Share / Preview</div>
+                        {method === "cashapp" && (
+                            <>
+                                <div className="text-sm">Link: {cashAppUrl}</div>
+                                <div className="text-sm">Cashtag: ${pay.cashappTag || ""}</div>
+                            </>
+                        )}
+                        {method === "venmo" && (
+                            <>
+                                <div className="text-sm">Link: {venmoUrl}</div>
+                                <div className="text-sm">Handle: @{pay.venmoHandle || ""}</div>
+                            </>
+                        )}
+                        {method === "paypal" && <div className="text-sm break-all">Link: {paypalUrl}</div>}
+                        {method === "btc" && (
+                            <>
+                                <div className="text-sm break-all">Address: {pay.btcAddress || ""}</div>
+                                <div className="text-sm break-all mt-1">URI: {btcURI}</div>
+                            </>
+                        )}
+                        {method === "mail" && (
+                            <pre className="text-sm whitespace-pre-wrap mt-1">{pay.mailingAddress}</pre>
+                        )}
+                    </div>
+
+                    {pay.showQR && (method !== "mail") && (
+                        <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border dark:border-gray-700">
+                            <div className="font-medium mb-2">QR Code (optional)</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                This uses a public QR image endpoint. Replace with your own QR generator if preferred.
+                            </div>
+                            <div className="grid place-items-center">
+                                <img
+                                    alt="QR"
+                                    className="rounded-lg border dark:border-gray-700"
+                                    src={qr(
+                                        method === "cashapp"
+                                            ? cashAppUrl
+                                            : method === "venmo"
+                                                ? venmoUrl
+                                                : method === "paypal"
+                                                    ? paypalUrl
+                                                    : method === "btc"
+                                                        ? btcURI
+                                                        : ""
+                                    )}
+                                />
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Fundraising bar (unchanged UI, still editable) */}
+            <div className="mt-6">
                 <div className="flex items-center justify-between">
                     <div className="font-medium">Fundraising Progress</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300">${"{raised}"} / ${"{goal}"}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
+                        ${raised} / ${goal}
+                    </div>
                 </div>
                 <div className="mt-2 h-3 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden border dark:border-gray-700">
                     <div className="h-full bg-indigo-600" style={{ width: pct + "%" }} />
@@ -859,9 +1086,16 @@ function Donations() {
                     </div>
                     <div className="flex gap-2 items-center">
                         <span className="text-sm">Goal:</span>
-                        <Input type="number" min={100} value={goal} onChange={(e) => setGoal(Number(e.target.value) || goal)} />
+                        <Input
+                            type="number"
+                            min={100}
+                            value={goal}
+                            onChange={(e) => setGoal(Number(e.target.value) || goal)}
+                        />
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">Use these controls while you integrate a real payment backend.</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                        Use these controls while you integrate a real backend.
+                    </div>
                 </div>
             </div>
         </Card>
