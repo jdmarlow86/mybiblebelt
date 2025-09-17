@@ -299,7 +299,11 @@ function WelcomePage() {
         <Page
             title="Welcome to mybiblebelt.org"
             subtitle="Bible-focused study with a warm invitation to worship in a local church of your preference."
-            actions={<PrimaryButton onClick={() => window.alert("Coming soon: church finder!")}>Find a Local Church</PrimaryButton>}
+            actions={
+                <PrimaryButton onClick={() => window.open("https://www.churchfinder.com", "_blank")}>
+                    Find a Local Church
+                </PrimaryButton>
+            }
         >
             <Card>
                 <p className="text-gray-700 dark:text-gray-200 leading-relaxed">
