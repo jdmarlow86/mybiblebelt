@@ -567,6 +567,10 @@ function CommunityPage() {
     return (
         <Page title="Community" subtitle="Local information and lightweight chats with your contacts.">
             <LocalInfo />
+
+            {/* New neighbors presence section */}
+            <NeighborsOnline />
+
             <div className="grid md:grid-cols-2 gap-4">
                 <Contacts />
                 <ChatThreads />
@@ -574,6 +578,7 @@ function CommunityPage() {
         </Page>
     );
 }
+
 
 // ------------------------------
 // Personal Growth
@@ -1315,6 +1320,112 @@ function StudyBookmarkCard() {
                     ))
                 )}
             </div>
+        </Card>
+    );
+}
+
+// ------------------------------
+// Neighbors Online (reads "contacts")
+// ------------------------------
+function NeighborsOnline() {
+    const [contacts, setContacts] = React.useState(() => storage.get("contacts", []));
+    const [refreshTick, setRefreshTick] = React.useState(0);
+    const [showOnlyOnline, setShowOnlyOnline] = React.useState(() => storage.get("neighbors.onlyOnline", false));
+
+    // Keep in sync if contacts list changes elsewhere
+    React.useEffect(() => {
+        const id = setInterval(() => {
+            // re-hash once per 20s to keep UI lively
+            setRefreshTick((x) => x + 1);
+            // also pull latest contacts from storage (in case user added in another tab/section)
+            setContacts(storage.get("contacts", []));
+        }, 20000);
+        return () => clearInterval(id);
+    }, []);
+
+    React.useEffect(() => storage.set("neighbors.onlyOnline", showOnlyOnline), [showOnlyOnline]);
+
+    // Hash helper for pseudo-presence
+    const hash = (s) => {
+        let h = 2166136261;
+        for (let i = 0; i < s.length; i++) {
+            h ^= s.charCodeAt(i);
+            h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
+        }
+        return Math.abs(h >>> 0);
+    };
+
+    const minuteKey = Math.floor(Date.now() / 60000); // changes every minute
+    const isOnline = (name) => {
+        // ~55% chance online, stable for the current minute per name
+        const val = hash(`${name}::${minuteKey}`) % 100;
+        return val < 55;
+    };
+
+    const enriched = contacts.map((c) => ({ ...c, online: isOnline(c.name || String(c.id)) }));
+    const shown = showOnlyOnline ? enriched.filter((c) => c.online) : enriched;
+    const onlineCount = enriched.filter((c) => c.online).length;
+
+    return (
+        <Card>
+            <div className="flex items-center justify-between">
+                <SectionTitle>Neighbors Online</SectionTitle>
+                <div className="flex items-center gap-3 text-sm">
+                    <span className="text-gray-600 dark:text-gray-400">
+                        {onlineCount}/{enriched.length} online
+                    </span>
+                    <label className="flex items-center gap-2">
+                        <input
+                            type="checkbox"
+                            checked={showOnlyOnline}
+                            onChange={(e) => setShowOnlyOnline(e.target.checked)}
+                        />
+                        Only online
+                    </label>
+                    <Button onClick={() => setRefreshTick((x) => x + 1)}>Refresh</Button>
+                </div>
+            </div>
+
+            {enriched.length === 0 ? (
+                <p className="mt-2 text-gray-500 dark:text-gray-400">
+                    No contacts yet. Add some in the Contacts section below.
+                </p>
+            ) : shown.length === 0 ? (
+                <p className="mt-2 text-gray-500 dark:text-gray-400">No neighbors online right now.</p>
+            ) : (
+                <div className="mt-3 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {shown.map((c) => (
+                        <div
+                            key={c.id}
+                            className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border dark:border-gray-700"
+                        >
+                            <div className="flex items-center gap-3 min-w-0">
+                                <div className="relative">
+                                    <div className="h-9 w-9 rounded-full bg-indigo-600 text-white grid place-items-center font-semibold">
+                                        {(c.name || "?").slice(0, 2).toUpperCase()}
+                                    </div>
+                                    <span
+                                        className={
+                                            "absolute -right-0 -bottom-0 h-3 w-3 rounded-full ring-2 ring-white dark:ring-gray-900 " +
+                                            (c.online ? "bg-emerald-500" : "bg-gray-400")
+                                        }
+                                        title={c.online ? "Online" : "Offline"}
+                                    />
+                                </div>
+                                <div className="truncate">
+                                    <div className="font-medium truncate">{c.name}</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                        {c.online ? "Online now" : "Offline"}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="shrink-0">
+                                <Button onClick={() => startChatWith(c.name)}>Chat</Button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </Card>
     );
 }
