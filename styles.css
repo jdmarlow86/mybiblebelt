@@ -425,3 +425,7 @@ body {
         .footer-links a:hover {
             text-decoration: underline
         }
+/* Make icon-only buttons look tidy */
+#themeToggle svg, #themeToggleMobile svg {
+    vertical-align: middle;
+}

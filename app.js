@@ -7,15 +7,55 @@ const storage = {
     },
     set(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch { } }
 };
+/* ========= Theme (SVG icons) ========= */
+const sunSVG = `
+<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+  <circle cx="12" cy="12" r="4"></circle>
+  <line x1="12" y1="2" x2="12" y2="5"></line>
+  <line x1="12" y1="19" x2="12" y2="22"></line>
+  <line x1="4.22" y1="4.22" x2="6.34" y2="6.34"></line>
+  <line x1="17.66" y1="17.66" x2="19.78" y2="19.78"></line>
+  <line x1="2" y1="12" x2="5" y2="12"></line>
+  <line x1="19" y1="12" x2="22" y2="12"></line>
+  <line x1="4.22" y1="19.78" x2="6.34" y2="17.66"></line>
+  <line x1="17.66" y1="6.34" x2="19.78" y2="4.22"></line>
+</svg>`;
+
+const moonSVG = `
+<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+  <!-- Crescent moon -->
+  <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+</svg>`;
+
+// Apply theme and set the right icon
 const setTheme = (mode /* 'light' | 'dark' */) => {
     const root = document.documentElement;
-    if (mode === "dark") root.classList.add("dark"); else root.classList.remove("dark");
+    if (mode === "dark") root.classList.add("dark");
+    else root.classList.remove("dark");
     try { localStorage.setItem("theme", mode); } catch { }
-    // Update buttons
-    const icon = root.classList.contains("dark") ? "??" : "??";
-    const t1 = $("#themeToggle"); if (t1) t1.textContent = icon;
-    const t2 = $("#themeToggleMobile"); if (t2) t2.textContent = icon;
+
+    const iconHTML = root.classList.contains("dark") ? sunSVG : moonSVG;
+    const t1 = document.getElementById("themeToggle");
+    const t2 = document.getElementById("themeToggleMobile");
+    if (t1) t1.innerHTML = iconHTML;
+    if (t2) t2.innerHTML = iconHTML;
 };
+
+const toggleTheme = () => {
+    const isDark = document.documentElement.classList.contains("dark");
+    setTheme(isDark ? "light" : "dark");
+};
+
+// Initialize the buttons with the correct icon on load
+(() => {
+    const isDark = document.documentElement.classList.contains("dark");
+    const iconHTML = isDark ? sunSVG : moonSVG;
+    const t1 = document.getElementById("themeToggle");
+    const t2 = document.getElementById("themeToggleMobile");
+    if (t1) t1.innerHTML = iconHTML;
+    if (t2) t2.innerHTML = iconHTML;
+})();
+
 const toggleTheme = () => setTheme(document.documentElement.classList.contains("dark") ? "light" : "dark");
 
 const pad = (n) => String(n).padStart(2, "0");
