@@ -7,6 +7,18 @@ const storage = {
     },
     set(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch { } }
 };
+const pad = (n) => String(n).padStart(2, "0");
+const nowLocalDateTimeStr = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+const toGoogleCalendarDateRange = (startISO, minutes = 60) => {
+    const start = new Date(startISO);
+    const end = new Date(start.getTime() + minutes * 60000);
+    const toCal = (dt) => dt.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+    return `${toCal(start)}/${toCal(end)}`;
+};
+
 /* ========= Theme (SVG icons) ========= */
 const sunSVG = `
 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -20,20 +32,15 @@ const sunSVG = `
   <line x1="4.22" y1="19.78" x2="6.34" y2="17.66"></line>
   <line x1="17.66" y1="6.34" x2="19.78" y2="4.22"></line>
 </svg>`;
-
 const moonSVG = `
 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-  <!-- Crescent moon -->
   <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
 </svg>`;
 
-// Apply theme and set the right icon
 const setTheme = (mode /* 'light' | 'dark' */) => {
     const root = document.documentElement;
-    if (mode === "dark") root.classList.add("dark");
-    else root.classList.remove("dark");
+    if (mode === "dark") root.classList.add("dark"); else root.classList.remove("dark");
     try { localStorage.setItem("theme", mode); } catch { }
-
     const iconHTML = root.classList.contains("dark") ? sunSVG : moonSVG;
     const t1 = document.getElementById("themeToggle");
     const t2 = document.getElementById("themeToggleMobile");
@@ -46,66 +53,48 @@ const toggleTheme = () => {
     setTheme(isDark ? "light" : "dark");
 };
 
-// Initialize the buttons with the correct icon on load
+// Initialize icon once on load (the dark class may already be set by your inline <script> in index.html)
 (() => {
     const isDark = document.documentElement.classList.contains("dark");
     const iconHTML = isDark ? sunSVG : moonSVG;
-    const t1 = document.getElementById("themeToggle");
-    const t2 = document.getElementById("themeToggleMobile");
-    if (t1) t1.innerHTML = iconHTML;
-    if (t2) t2.innerHTML = iconHTML;
+    document.getElementById("themeToggle")?.insertAdjacentHTML("afterbegin", iconHTML);
+    document.getElementById("themeToggleMobile")?.insertAdjacentHTML("afterbegin", iconHTML);
 })();
-
-const toggleTheme = () => setTheme(document.documentElement.classList.contains("dark") ? "light" : "dark");
-
-const pad = (n) => String(n).padStart(2, "0");
-const nowLocalDateTimeStr = () => {
-    const d = new Date();
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-};
-const toGoogleCalendarDateRange = (startISO, minutes = 60) => {
-    const start = new Date(startISO);
-    const end = new Date(start.getTime() + minutes * 60000);
-    const toCal = (dt) => dt.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
-    return `${toCal(start)}/${toCal(end)}`;
-};
 
 /* ========= Nav / Tabs ========= */
 const sections = $$(".tab-section");
-const navBtns = $$(".nav-btn");
+// Only tab buttons (exclude theme button)
+const navBtns = $$(".nav-btn[data-tab]");
 const mobileNav = $("#mobileNav");
+
 function showTab(id) {
     sections.forEach(s => s.classList.toggle("hidden", s.id !== id));
     navBtns.forEach(b => b.classList.toggle("active", b.dataset.tab === id));
     if (mobileNav) mobileNav.value = id;
     history.replaceState(null, "", `#${id}`);
 }
+
 navBtns.forEach(btn => btn.addEventListener("click", () => showTab(btn.dataset.tab)));
-if (mobileNav) mobileNav.addEventListener("change", () => showTab(mobileNav.value));
+mobileNav?.addEventListener("change", () => showTab(mobileNav.value));
+
 document.addEventListener("click", (e) => {
     const t = e.target.closest("[data-jump]");
     if (!t) return;
     e.preventDefault();
     showTab(t.getAttribute("data-jump"));
 });
+
 const initial = location.hash?.slice(1) || "welcome";
 showTab(initial);
 
 /* ========= Footer Year ========= */
 $("#year").textContent = new Date().getFullYear();
 
-/* ========= Theme Toggle ========= */
+/* ========= Theme Toggle Bindings ========= */
 const themeBtn = $("#themeToggle");
 const themeBtnMobile = $("#themeToggleMobile");
 themeBtn?.addEventListener("click", toggleTheme);
 themeBtnMobile?.addEventListener("click", toggleTheme);
-// Initialize button icon
-(() => {
-    const isDark = document.documentElement.classList.contains("dark");
-    const icon = isDark ? "??" : "??";
-    themeBtn && (themeBtn.textContent = icon);
-    themeBtnMobile && (themeBtnMobile.textContent = icon);
-})();
 
 /* ========= Welcome ========= */
 $("#findChurchBtn").addEventListener("click", () => {
@@ -115,52 +104,84 @@ $("#findChurchBtn").addEventListener("click", () => {
 /* ========= Resources (Starter Kits) ========= */
 const SEED_STARTER_KITS = [
     {
-        id: "baptist", title: "Baptist — Starter Kit", intro: "Overview of Baptist beliefs: believer's baptism, congregational governance, and emphasis on Scripture.",
-        studies: [{ title: "History & Distinctives", content: "Origins in 17th-century English Separatism; local church autonomy." },
-        { title: "Baptism & Communion", content: "Believer's baptism by immersion; Lord's Supper as ordinance." },
-        { title: "Study Path", content: "Read Gospel of John, Acts; explore Baptist Faith & Message." }]
+        id: "baptist",
+        title: "Baptist — Starter Kit",
+        intro: "Overview of Baptist beliefs: believer's baptism, congregational governance, and emphasis on Scripture.",
+        studies: [
+            { title: "History & Distinctives", content: "Origins in 17th-century English Separatism; local church autonomy." },
+            { title: "Baptism & Communion", content: "Believer's baptism by immersion; Lord's Supper as ordinance." },
+            { title: "Study Path", content: "Read Gospel of John, Acts; explore Baptist Faith & Message." },
+        ],
     },
     {
-        id: "methodist", title: "Methodist — Starter Kit", intro: "Methodism emphasizes grace (prevenient, justifying, sanctifying), connectionalism, and practical holiness.",
-        studies: [{ title: "Wesleyan Heritage", content: "John & Charles Wesley; small groups; disciplined devotional life." },
-        { title: "Grace & Discipleship", content: "Explore grace in Romans; practices of mercy and piety." },
-        { title: "Study Path", content: "Gospels, Romans; Wesley's sermons; Book of Discipline overview." }]
+        id: "methodist",
+        title: "Methodist — Starter Kit",
+        intro: "Methodism emphasizes grace (prevenient, justifying, sanctifying), connectionalism, and practical holiness.",
+        studies: [
+            { title: "Wesleyan Heritage", content: "John & Charles Wesley; small groups; disciplined devotional life." },
+            { title: "Grace & Discipleship", content: "Explore grace in Romans; practices of mercy and piety." },
+            { title: "Study Path", content: "Gospels, Romans; Wesley's sermons; Book of Discipline overview." },
+        ],
     },
     {
-        id: "catholic", title: "Catholic — Starter Kit", intro: "Catholicism: Scripture and Tradition, sacramental life, and communion with the historic Church.",
-        studies: [{ title: "Tradition & Magisterium", content: "How teaching authority functions; ecumenical councils." },
-        { title: "Sacraments", content: "Seven sacraments; grace in ordinary life; liturgical calendar." },
-        { title: "Study Path", content: "Synoptic Gospels; Catechism selections; early Church Fathers." }]
+        id: "catholic",
+        title: "Catholic — Starter Kit",
+        intro: "Catholicism: Scripture and Tradition, sacramental life, and communion with the historic Church.",
+        studies: [
+            { title: "Tradition & Magisterium", content: "How teaching authority functions; ecumenical councils." },
+            { title: "Sacraments", content: "Seven sacraments; grace in ordinary life; liturgical calendar." },
+            { title: "Study Path", content: "Synoptic Gospels; Catechism selections; early Church Fathers." },
+        ],
     },
     {
-        id: "sda", title: "Seventh-day Adventist — Starter Kit", intro: "SDA distinctives include Sabbath observance, holistic health, and the blessed hope of Christ's return.",
-        studies: [{ title: "Sabbath & Creation", content: "Genesis 1-2; Exodus 20; rhythm of rest and worship." },
-        { title: "Advent Hope", content: "Study Daniel & Revelation themes; focus on hope and mission." },
-        { title: "Study Path", content: "Gospels, Hebrews; thematic studies on sanctuary & mission." }]
+        id: "sda",
+        title: "Seventh-day Adventist — Starter Kit",
+        intro: "SDA distinctives include Sabbath observance, holistic health, and the blessed hope of Christ's return.",
+        studies: [
+            { title: "Sabbath & Creation", content: "Genesis 1-2; Exodus 20; rhythm of rest and worship." },
+            { title: "Advent Hope", content: "Study Daniel & Revelation themes; focus on hope and mission." },
+            { title: "Study Path", content: "Gospels, Hebrews; thematic studies on sanctuary & mission." },
+        ],
     },
     {
-        id: "pentecostal", title: "Pentecostal — Starter Kit", intro: "Pentecostalism highlights the work of the Holy Spirit, spiritual gifts, and vibrant worship.",
-        studies: [{ title: "Acts & the Spirit", content: "Read Acts; gifts listed in 1 Cor 12-14 and Romans 12." },
-        { title: "Prayer & Worship", content: "Cultivate prayer, praise, and openness to the Spirit." },
-        { title: "Study Path", content: "Gospels, Acts; resources on gifts and fruit of the Spirit." }]
+        id: "pentecostal",
+        title: "Pentecostal — Starter Kit",
+        intro: "Pentecostalism highlights the work of the Holy Spirit, spiritual gifts, and vibrant worship.",
+        studies: [
+            { title: "Acts & the Spirit", content: "Read Acts; gifts listed in 1 Cor 12-14 and Romans 12." },
+            { title: "Prayer & Worship", content: "Cultivate prayer, praise, and openness to the Spirit." },
+            { title: "Study Path", content: "Gospels, Acts; resources on gifts and fruit of the Spirit." },
+        ],
     },
     {
-        id: "nondenom", title: "Non-Denominational — Starter Kit", intro: "Focus on biblical essentials, discipleship, and simple church expressions.",
-        studies: [{ title: "Core Beliefs", content: "Jesus-centered gospel; authority of Scripture; community life." },
-        { title: "Practices", content: "Small groups, service, local mission, simple liturgy." },
-        { title: "Study Path", content: "Gospels, Acts; read a whole Gospel; memorize key passages." }]
+        id: "nondenom",
+        title: "Non-Denominational — Starter Kit",
+        intro: "Focus on biblical essentials, discipleship, and simple church expressions.",
+        studies: [
+            { title: "Core Beliefs", content: "Jesus-centered gospel; authority of Scripture; community life." },
+            { title: "Practices", content: "Small groups, service, local mission, simple liturgy." },
+            { title: "Study Path", content: "Gospels, Acts; read a whole Gospel; memorize key passages." },
+        ],
     },
     {
-        id: "judaism", title: "Judaism — Starter Kit", intro: "Explore Torah, Prophets, and Writings; synagogue life; cycles of prayer and festival.",
-        studies: [{ title: "Tanakh Overview", content: "Structure and themes; covenant; wisdom literature." },
-        { title: "Life & Practice", content: "Shabbat, kosher, prayer services; Hebrew calendar." },
-        { title: "Study Path", content: "Genesis, Exodus; Psalms; explore rabbinic commentary." }]
+        id: "judaism",
+        title: "Judaism — Starter Kit",
+        intro: "Explore Torah, Prophets, and Writings; synagogue life; cycles of prayer and festival.",
+        studies: [
+            { title: "Tanakh Overview", content: "Structure and themes; covenant; wisdom literature." },
+            { title: "Life & Practice", content: "Shabbat, kosher, prayer services; Hebrew calendar." },
+            { title: "Study Path", content: "Genesis, Exodus; Psalms; explore rabbinic commentary." },
+        ],
     },
     {
-        id: "islam", title: "Islam — Starter Kit", intro: "Overview of Qur'an, Prophetic tradition, Five Pillars, and diverse schools of thought.",
-        studies: [{ title: "Scripture & Prophethood", content: "Qur'an structure; role of hadith; prophets in Islam." },
-        { title: "Five Pillars", content: "Shahada, Salat, Zakat, Sawm, Hajj; daily life rhythms." },
-        { title: "Study Path", content: "Introductory surahs; biographies; comparative faith studies." }]
+        id: "islam",
+        title: "Islam — Starter Kit",
+        intro: "Overview of Qur'an, Prophetic tradition, Five Pillars, and diverse schools of thought.",
+        studies: [
+            { title: "Scripture & Prophethood", content: "Qur'an structure; role of hadith; prophets in Islam." },
+            { title: "Five Pillars", content: "Shahada, Salat, Zakat, Sawm, Hajj; daily life rhythms." },
+            { title: "Study Path", content: "Introductory surahs; biographies; comparative faith studies." },
+        ],
     },
 ];
 let kits = storage.get("starterKits", SEED_STARTER_KITS);
