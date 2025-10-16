@@ -6,7 +6,21 @@
     --border: #e5e7eb;
     --brand: #4f46e5;
     --brand-2: #4338ca;
+    --tile: #f9fafb;
+    --panel: #f9fafb;
+    --bar-base: #edf2f7;
     --radius: 14px;
+}
+/* Dark theme overrides */
+.dark {
+    --bg: #0b0e14;
+    --card: #121826;
+    --text: #e5e7eb;
+    --muted: #94a3b8;
+    --border: #1f2937;
+    --tile: #0f1623;
+    --panel: #0f1623;
+    --bar-base: #111827;
 }
 
 * {
@@ -44,7 +58,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 20;
-    background: rgba(255,255,255,.9);
+    background: color-mix(in oklab, var(--card) 90%, transparent);
     backdrop-filter: saturate(150%) blur(6px);
     border-bottom: 1px solid var(--border);
 }
@@ -85,7 +99,8 @@ body {
 
 .nav-btn {
     border: 1px solid var(--border);
-    background: #fff;
+    background: var(--card);
+    color: var(--text);
     border-radius: 10px;
     padding: 8px 12px;
     cursor: pointer;
@@ -96,6 +111,12 @@ body {
         border-color: #c7d2fe;
         color: #3730a3
     }
+
+.dark .nav-btn.active {
+    background: #1f2a5a;
+    border-color: #2c3a7a;
+    color: #dbe4ff
+}
 
 .nav-select-wrap {
     display: none;
@@ -116,7 +137,8 @@ body {
         padding: 10px;
         border: 1px solid var(--border);
         border-radius: 10px;
-        background: #fff
+        background: var(--card);
+        color: var(--text)
     }
 }
 
@@ -126,7 +148,7 @@ body {
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 18px;
-    box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    box-shadow: 0 1px 2px color-mix(in oklab, var(--bg) 60%, #000 5%);
 }
 
 .page-title {
@@ -186,6 +208,8 @@ body {
     border: 1px solid var(--border);
     border-radius: 10px;
     outline: 0;
+    background: var(--card);
+    color: var(--text);
 }
 
     .input.small {
@@ -196,7 +220,8 @@ body {
     padding: 10px 14px;
     border: 1px solid var(--border);
     border-radius: 10px;
-    background: #fff;
+    background: var(--card);
+    color: var(--text);
     cursor: pointer;
 }
 
@@ -225,10 +250,10 @@ body {
 
 /* Info tiles */
 .info-tile {
-    background: #f9fafb;
+    background: var(--tile);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 12px;
+    padding: 12px
 }
 
 .info-title {
@@ -236,7 +261,8 @@ body {
 }
 
 .info-body {
-    color: #374151;
+    color: var(--text);
+    opacity: .85;
     font-size: 14px;
     margin-top: 4px
 }
@@ -252,7 +278,7 @@ body {
     border: 1px solid var(--border);
     border-radius: 12px;
     overflow: hidden;
-    background: #fff
+    background: var(--card)
 }
 
 .chat-item {
@@ -262,12 +288,16 @@ body {
 }
 
     .chat-item:hover {
-        background: #f9fafb
+        background: var(--tile)
     }
 
     .chat-item.active {
         background: #eef2ff
     }
+
+.dark .chat-item.active {
+    background: #1f2a5a
+}
 
 .chat-main {
     display: flex;
@@ -275,7 +305,7 @@ body {
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 10px;
-    background: #fff
+    background: var(--card)
 }
 
 .chat-header {
@@ -293,7 +323,7 @@ body {
     height: 260px;
     border: 1px solid var(--border);
     border-radius: 10px;
-    background: #f9fafb;
+    background: var(--panel);
     padding: 10px;
     overflow: auto;
     display: flex;
@@ -302,7 +332,7 @@ body {
 }
 
 .msg {
-    background: #fff;
+    background: var(--card);
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 8px;
@@ -311,7 +341,7 @@ body {
 
 .msg-meta {
     font-size: 10px;
-    color: #6b7280;
+    color: var(--muted);
     margin-top: 4px
 }
 
@@ -323,10 +353,15 @@ body {
     padding: 12px
 }
 
+.dark .devotional {
+    border-color: #334155;
+    background: #0f1623
+}
+
 /* Lists */
 .list .item {
     border: 1px solid var(--border);
-    background: #f9fafb;
+    background: var(--panel);
     border-radius: 10px;
     padding: 10px;
     margin-top: 8px
@@ -350,7 +385,7 @@ body {
 
 .bar {
     height: 12px;
-    background: #edf2f7;
+    background: var(--bar-base);
     border: 1px solid var(--border);
     border-radius: 999px;
     overflow: hidden
@@ -365,7 +400,8 @@ body {
 .site-footer {
     border-top: 1px solid var(--border);
     margin-top: 28px;
-    background: #fff
+    background: var(--card);
+    color: var(--text)
 }
 
 .footer-inner {
@@ -381,7 +417,8 @@ body {
 }
 
     .footer-links a {
-        color: #374151;
+        color: var(--text);
+        opacity: .85;
         text-decoration: none
     }
 

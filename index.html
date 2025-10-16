@@ -4,6 +4,19 @@
     <meta charset="utf-8" />
     <title>mybiblebelt.org</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Set theme BEFORE CSS to prevent flash -->
+    <script>
+        (function () {
+            try {
+                const stored = localStorage.getItem("theme"); // 'dark' | 'light' | null
+                const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                const useDark = stored ? stored === "dark" : prefersDark;
+                if (useDark) document.documentElement.classList.add("dark");
+            } catch { }
+        })();
+    </script>
+
     <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
@@ -15,6 +28,7 @@
                 <div class="brand-sub">Bible-focused study • Find community • Grow daily</div>
             </div>
         </div>
+
         <nav class="nav">
             <button data-tab="welcome" class="nav-btn active">Welcome</button>
             <button data-tab="resources" class="nav-btn">Resources</button>
@@ -22,16 +36,23 @@
             <button data-tab="growth" class="nav-btn">Personal Growth</button>
             <button data-tab="study" class="nav-btn">Bible Study</button>
             <button data-tab="payit" class="nav-btn">Pay it Forward</button>
+            <!-- Dark mode toggle (desktop) -->
+            <button id="themeToggle" class="nav-btn" aria-label="Toggle dark mode">🌙</button>
         </nav>
+
         <div class="nav-select-wrap">
-            <select id="mobileNav">
-                <option value="welcome">Welcome</option>
-                <option value="resources">Resources</option>
-                <option value="community">Community</option>
-                <option value="growth">Personal Growth</option>
-                <option value="study">Bible Study</option>
-                <option value="payit">Pay it Forward</option>
-            </select>
+            <div class="row gap">
+                <select id="mobileNav">
+                    <option value="welcome">Welcome</option>
+                    <option value="resources">Resources</option>
+                    <option value="community">Community</option>
+                    <option value="growth">Personal Growth</option>
+                    <option value="study">Bible Study</option>
+                    <option value="payit">Pay it Forward</option>
+                </select>
+                <!-- Dark mode toggle (mobile) -->
+                <button id="themeToggleMobile" class="btn" aria-label="Toggle dark mode">🌙</button>
+            </div>
         </div>
     </header>
 
