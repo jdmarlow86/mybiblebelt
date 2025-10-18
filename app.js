@@ -547,3 +547,71 @@ $("#donDonateBtn").addEventListener("click", () => {
     window.open(url, "_blank");
 });
 $("#donMoreBtn").addEventListener("click", () => alert("In production: receipts & recurring giving"));
+
+
+// ==== Recovery: remember which steps are open ====
+(function () {
+    const KEY = "recovery-open-steps-v1";
+    const wrap = document.getElementById("recoverySteps");
+    if (wrap) {
+        // Restore
+        try {
+            const openSet = new Set(JSON.parse(localStorage.getItem(KEY) || "[]"));
+            wrap.querySelectorAll("details.re-step[data-step]").forEach(d => {
+                const no = d.getAttribute("data-step");
+                if (openSet.has(no)) d.setAttribute("open", "");
+                else d.removeAttribute("open");
+            });
+        } catch (e) { }
+
+        // Save on toggle (event bubbles from <details>)
+        wrap.addEventListener("toggle", () => {
+            const open = [];
+            wrap.querySelectorAll("details.re-step[data-step]").forEach(d => {
+                if (d.open) open.push(d.getAttribute("data-step"));
+            });
+            try { localStorage.setItem(KEY, JSON.stringify(open)); } catch (e) { }
+        });
+    }
+
+    // ==== Recovery: print just the section ====
+    const printBtn = document.getElementById("recoveryPrintBtn");
+    if (printBtn) {
+        printBtn.addEventListener("click", () => {
+            const node = document.getElementById("recovery");
+            if (!node) return window.print();
+
+            const clone = node.cloneNode(true);
+            const w = window.open("", "_blank", "noopener,noreferrer,width=900,height=1200");
+            if (!w) return;
+
+            // Pull through any linked stylesheets (best-effort)
+            const styles = Array.from(document.styleSheets)
+                .map(s => {
+                    try { return s.href ? `<link rel="stylesheet" href="${s.href}">` : ""; }
+                    catch { return ""; }
+                })
+                .join("");
+
+            w.document.write(`
+        <html>
+          <head>
+            <title>Recovery Power in Christ</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            ${styles}
+            <style>
+              body{font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; padding:24px;}
+              #recovery .card{page-break-inside:avoid;}
+            </style>
+          </head>
+          <body></body>
+        </html>
+      `);
+            w.document.body.appendChild(clone);
+            w.document.close();
+            w.focus();
+            w.print();
+            w.close();
+        });
+    }
+})();

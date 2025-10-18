@@ -429,3 +429,54 @@ body {
 #themeToggle svg, #themeToggleMobile svg {
     vertical-align: middle;
 }
+
+/* ==== Recovery (scoped) ==== */
+.re-sum {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    cursor: pointer;
+    list-style: none;
+}
+
+    .re-sum::-webkit-details-marker {
+        display: none;
+    }
+
+.re-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    border: 1px solid var(--border, #e5e7eb);
+    font-size: .8rem;
+}
+
+.re-title {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.re-verse {
+    margin: .15rem 0 0;
+    color: var(--muted, #6b7280);
+    font-size: .9rem;
+}
+
+.re-body {
+    margin-top: .6rem;
+    padding-left: 40px;
+}
+
+.re-goal {
+    color: var(--muted, #6b7280);
+}
+
+/* Print just cleans up page breaks inside cards */
+@media print {
+    #recovery .card {
+        page-break-inside: avoid;
+    }
+}
