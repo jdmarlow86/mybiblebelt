@@ -429,15 +429,33 @@
                 <div class="row gap spread">
                     <h2 class="section-title">Recovery Sign Ups</h2>
                     <div class="row gap">
+                        <!-- NEW: Admin toggle -->
+                        <button id="recoveryAdminBtn" class="btn">Admin</button>
+                        <span id="recoveryAdminBadge" class="admin-badge hidden">ADMIN</span>
+
                         <button id="recoverySignUpBtn" class="btn primary">Sign Up</button>
                         <button id="recoveryDownloadCsvBtn" class="btn">Download CSV</button>
+                        <button id="recoveryAdminBtn" class="btn">Admin</button>
+                        <span id="recoveryAdminBadge" class="admin-badge hidden">ADMIN</span>
+
                     </div>
                 </div>
+
+                <!-- NEW: Admin-only controls bar -->
+                <div id="recoveryAdminBar" class="row gap mt hidden">
+                    <label class="switch">
+                        <input id="recoveryHidePublic" type="checkbox">
+                        <span>Hide signups from public</span>
+                    </label>
+                    <button id="recoveryClearAllBtn" class="btn">Clear All</button>
+                </div>
+
                 <p class="muted">Join the “Recovery Power in Christ” journey. We’ll follow up using your preferred contact method.</p>
 
                 <!-- Where submissions render -->
                 <div id="recoverySignupList" class="list mt"></div>
             </div>
+
 
 
             <div class="card">
