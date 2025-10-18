@@ -45,8 +45,9 @@ body {
     padding: 24px
 }
 
+/* Unified hidden helper (ensure it always wins) */
 .hidden {
-    display: none
+    display: none !important;
 }
 
 .mt {
@@ -94,10 +95,9 @@ body {
     display: flex;
     gap: 8px;
     align-items: center;
-    justify-content: center; /* ? centers all nav buttons horizontally */
+    justify-content: center; /* centered nav */
     padding: 0 16px 12px 16px;
 }
-
 
 .nav-btn {
     border: 1px solid var(--border);
@@ -427,6 +427,7 @@ body {
         .footer-links a:hover {
             text-decoration: underline
         }
+
 /* Make icon-only buttons look tidy */
 #themeToggle svg, #themeToggleMobile svg {
     vertical-align: middle;
@@ -484,8 +485,9 @@ body {
 }
 
 /* ===== Modal base ===== */
+/* Important: ensure hidden wins so the modal never blocks clicks when closed */
 .modal.hidden {
-    display: none;
+    display: none !important;
 }
 
 .modal {
@@ -642,11 +644,7 @@ html.dark .signup-table th, html.dark .signup-table td {
     border-color: #26282b;
 }
 
-/* Admin badge and show/hide helper */
-.hidden {
-    display: none !important;
-}
-
+/* Admin badge */
 .admin-badge {
     display: inline-flex;
     align-items: center;
