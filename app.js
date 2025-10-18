@@ -615,3 +615,180 @@ $("#donMoreBtn").addEventListener("click", () => alert("In production: receipts 
         });
     }
 })();
+
+// =============================
+// Recovery Signups (no backend)
+// =============================
+(function () {
+    const LS_KEY = "RECOVERY_SIGNUPS_V1";
+    const btnOpen = document.getElementById("recoverySignUpBtn");
+    const btnCsv = document.getElementById("recoveryDownloadCsvBtn");
+    const listEl = document.getElementById("recoverySignupList");
+
+    const modal = document.getElementById("recoveryModal");
+    const modalClose = document.getElementById("recoveryModalClose");
+    const modalCancel = document.getElementById("recoveryCancel");
+    const modalBackdrop = modal && modal.querySelector("[data-close-modal]");
+    const form = document.getElementById("recoveryForm");
+
+    if (!listEl) return; // Recovery section not on this page
+
+    // ---- Storage helpers
+    function loadAll() {
+        try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); }
+        catch { return []; }
+    }
+    function saveAll(rows) {
+        try { localStorage.setItem(LS_KEY, JSON.stringify(rows)); } catch { }
+    }
+
+    // ---- Render signup table
+    function render() {
+        const rows = loadAll();
+        if (!rows.length) {
+            listEl.innerHTML = `<div class="muted">No sign ups yet. Be the first—click “Sign Up”.</div>`;
+            return;
+        }
+
+        const header = `
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th class="hide-sm">Phone</th>
+          <th>Preferred</th>
+          <th class="hide-sm">Notes</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+    `;
+
+        const body = rows.map(r => `
+      <tr>
+        <td>${escapeHtml(r.fullName)}</td>
+        <td>${r.email ? `<a href="mailto:${escapeAttr(r.email)}">${escapeHtml(r.email)}</a>` : "<span class='muted'>—</span>"}</td>
+        <td class="hide-sm">${r.phone ? `<a href="tel:${escapeAttr(r.phone)}">${escapeHtml(r.phone)}</a>` : "<span class='muted'>—</span>"}</td>
+        <td><span class="signup-badge">${escapeHtml(r.preferred)}</span></td>
+        <td class="hide-sm">${r.notes ? escapeHtml(r.notes) : "<span class='muted'>—</span>"}</td>
+        <td>${new Date(r.createdAt).toLocaleString()}</td>
+      </tr>
+    `).join("");
+
+        listEl.innerHTML = `
+      <div class="mt">
+        <table class="signup-table">${header}<tbody>${body}</tbody></table>
+      </div>
+    `;
+    }
+
+    // ---- CSV download
+    function toCsv(rows) {
+        const headers = ["Full Name", "Email", "Phone", "Preferred", "Notes", "Created At"];
+        const lines = [headers];
+        rows.forEach(r => {
+            lines.push([
+                r.fullName || "",
+                r.email || "",
+                r.phone || "",
+                r.preferred || "",
+                (r.notes || "").replace(/\r?\n/g, " "), // keep one line
+                new Date(r.createdAt).toISOString()
+            ]);
+        });
+        return lines.map(cols => cols.map(csvEscape).join(",")).join("\r\n");
+    }
+    function downloadCsv() {
+        const rows = loadAll();
+        const csv = toCsv(rows);
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "recovery_signups.csv";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    }
+
+    // ---- Modal controls (open/close/focus)
+    function openModal() {
+        if (!modal) return;
+        modal.classList.remove("hidden");
+        // focus first input
+        const first = form && form.querySelector("input, textarea, select, button");
+        if (first) first.focus();
+        document.addEventListener("keydown", onEsc, true);
+    }
+    function closeModal() {
+        if (!modal) return;
+        modal.classList.add("hidden");
+        document.removeEventListener("keydown", onEsc, true);
+        form && form.reset();
+    }
+    function onEsc(e) {
+        if (e.key === "Escape") {
+            e.preventDefault();
+            closeModal();
+        }
+    }
+
+    // ---- Form submit
+    function onSubmit(e) {
+        e.preventDefault();
+        const data = new FormData(form);
+        const fullName = (data.get("fullName") || "").toString().trim();
+        const email = (data.get("email") || "").toString().trim();
+        const phone = (data.get("phone") || "").toString().trim();
+        const preferred = (data.get("preferred") || "").toString();
+        const notes = (data.get("notes") || "").toString();
+        const consent = data.get("consent") ? true : false;
+
+        // Basic validation
+        if (!fullName) return alert("Please enter your full name.");
+        if (!preferred) return alert("Please choose a preferred contact method.");
+        if (!consent) return alert("Please consent to be contacted.");
+        if (!email && !phone) {
+            return alert("Please provide at least one contact detail (email or phone).");
+        }
+
+        const row = {
+            fullName, email, phone, preferred, notes,
+            createdAt: Date.now()
+        };
+        const rows = loadAll();
+        rows.push(row);
+        saveAll(rows);
+        render();
+        closeModal();
+    }
+
+    // ---- Small utils
+    function csvEscape(val) {
+        if (val == null) return "";
+        const s = String(val);
+        if (/[",\r\n]/.test(s)) {
+            return `"${s.replace(/"/g, '""')}"`;
+        }
+        return s;
+    }
+    function escapeHtml(s) {
+        return String(s)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+    }
+    function escapeAttr(s) {
+        return String(s).replace(/"/g, "&quot;");
+    }
+
+    // ---- Wire events
+    render();
+    btnOpen && btnOpen.addEventListener("click", openModal);
+    btnCsv && btnCsv.addEventListener("click", downloadCsv);
+    modalClose && modalClose.addEventListener("click", closeModal);
+    modalCancel && modalCancel.addEventListener("click", closeModal);
+    modalBackdrop && modalBackdrop.addEventListener("click", closeModal);
+    form && form.addEventListener("submit", onSubmit);
+})();

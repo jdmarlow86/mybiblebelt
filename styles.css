@@ -482,3 +482,162 @@ body {
         page-break-inside: avoid;
     }
 }
+
+/* ===== Modal base ===== */
+.modal.hidden {
+    display: none;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-items: center;
+}
+
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+}
+
+.modal-content {
+    position: relative;
+    width: min(720px, 92vw);
+    background: var(--surface, #fff);
+    color: var(--text, #1f2937);
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    padding: 0;
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.modal-body {
+    padding: 16px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.icon-btn {
+    border: 1px solid var(--border, #e5e7eb);
+    background: transparent;
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+    .icon-btn:hover {
+        background: var(--surface-2, #f7f7f8);
+    }
+
+/* Inputs */
+.input-block {
+    display: grid;
+    gap: 6px;
+    width: 100%;
+}
+
+    .input-block > span {
+        font-size: .9rem;
+        color: var(--muted, #6b7280);
+    }
+
+.fieldset {
+    border: 1px solid var(--border, #e5e7eb);
+    padding: 12px;
+    border-radius: 12px;
+}
+
+    .fieldset legend {
+        padding: 0 6px;
+        color: var(--muted, #6b7280);
+    }
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 999px;
+    padding: 6px 10px;
+}
+
+.wrap {
+    flex-wrap: wrap;
+}
+
+/* Signup list table-ish */
+.signup-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .signup-table th, .signup-table td {
+        border-bottom: 1px solid var(--border, #e5e7eb);
+        text-align: left;
+        padding: 10px 8px;
+        vertical-align: top;
+    }
+
+    .signup-table th {
+        font-weight: 600;
+        color: var(--muted, #6b7280);
+    }
+
+.signup-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 999px;
+    font-size: .8rem;
+}
+
+@media (max-width: 720px) {
+    .hide-sm {
+        display: none;
+    }
+
+    .signup-table th:nth-child(3), .signup-table td:nth-child(3) {
+        display: none;
+    }
+    /* hide phone col on small screens */
+}
+
+/* Dark mode fallbacks if you use .dark on <html> */
+html.dark .modal-content {
+    background: #0b0b0c;
+    color: #e6e6e7;
+    border-color: #26282b;
+}
+
+html.dark .icon-btn:hover {
+    background: #111214;
+}
+
+html.dark .fieldset {
+    border-color: #26282b;
+}
+
+html.dark .chip {
+    border-color: #26282b;
+}
+
+html.dark .signup-table th, html.dark .signup-table td {
+    border-color: #26282b;
+}

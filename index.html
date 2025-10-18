@@ -424,6 +424,22 @@
                 </details>
             </div>
 
+            <!-- Recovery Signups -->
+            <div class="card">
+                <div class="row gap spread">
+                    <h2 class="section-title">Recovery Sign Ups</h2>
+                    <div class="row gap">
+                        <button id="recoverySignUpBtn" class="btn primary">Sign Up</button>
+                        <button id="recoveryDownloadCsvBtn" class="btn">Download CSV</button>
+                    </div>
+                </div>
+                <p class="muted">Join the “Recovery Power in Christ” journey. We’ll follow up using your preferred contact method.</p>
+
+                <!-- Where submissions render -->
+                <div id="recoverySignupList" class="list mt"></div>
+            </div>
+
+
             <div class="card">
                 <h2 class="section-title">Guiding Principles</h2>
                 <ul class="list">
@@ -487,6 +503,62 @@
             </div>
         </div>
     </footer>
+    <!-- Recovery: Signup Modal -->
+    <div id="recoveryModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="recoveryModalTitle">
+        <div class="modal-backdrop" data-close-modal></div>
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <h3 id="recoveryModalTitle" class="section-title">Recovery Sign Up</h3>
+                <button class="icon-btn" id="recoveryModalClose" aria-label="Close">✕</button>
+            </div>
+
+            <form id="recoveryForm" class="modal-body">
+                <div class="row gap">
+                    <label class="input-block">
+                        <span>Full Name *</span>
+                        <input name="fullName" class="input" required placeholder="e.g., Jordan Smith">
+                    </label>
+                </div>
+
+                <div class="grid-2">
+                    <label class="input-block">
+                        <span>Email</span>
+                        <input name="email" type="email" class="input" placeholder="jordan@example.com">
+                    </label>
+
+                    <label class="input-block">
+                        <span>Phone</span>
+                        <input name="phone" class="input" placeholder="(555) 123-4567">
+                    </label>
+                </div>
+
+                <fieldset class="fieldset">
+                    <legend>Preferred Contact Method *</legend>
+                    <div class="row gap wrap">
+                        <label class="chip"><input type="radio" name="preferred" value="Email" required> Email</label>
+                        <label class="chip"><input type="radio" name="preferred" value="Phone Call" required> Phone Call</label>
+                        <label class="chip"><input type="radio" name="preferred" value="Text (SMS)" required> Text (SMS)</label>
+                        <label class="chip"><input type="radio" name="preferred" value="Other" required> Other</label>
+                    </div>
+                </fieldset>
+
+                <label class="input-block">
+                    <span>Notes (optional)</span>
+                    <textarea name="notes" rows="3" class="input" placeholder="Anything we should know to support you better?"></textarea>
+                </label>
+
+                <label class="row gap">
+                    <input type="checkbox" name="consent" required>
+                    <span>I consent to be contacted about Recovery Power in Christ.</span>
+                </label>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn" id="recoveryCancel">Cancel</button>
+                    <button type="submit" class="btn primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script src="./app.js"></script>
 </body>
