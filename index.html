@@ -94,6 +94,7 @@
             </div>
         </section>
 
+
         <!-- Resources -->
         <section id="resources" class="tab-section hidden">
             <h1 class="page-title">Resources</h1>
@@ -632,6 +633,8 @@
                     <input id="donPurpose" class="input" value="General Support" />
                     <button id="donDonateBtn" class="btn primary">Donate</button>
                     <button id="donMoreBtn" class="btn">More Options</button>
+                    <!-- === Support button added here (to the right) === -->
+                    <button id="btnSupport" class="btn">Support</button>
                 </div>
 
                 <div class="progress mt">
@@ -658,6 +661,73 @@
             </div>
         </section>
     </main>
+
+    <!-- ===== Support Modal (drop-in) ===== -->
+    <dialog id="supportDialog" class="pg-dialog">
+        <form method="dialog" class="pg-dialog-card" id="supportForm">
+            <header class="pg-dialog-header">
+                <h3>Support Jonathan</h3>
+                <button class="pg-icon-btn" value="cancel" aria-label="Close">×</button>
+            </header>
+
+            <!-- Amount / Note (optional) -->
+            <div class="pg-row">
+                <div class="pg-field">
+                    <label class="pg-label" for="supAmount">Amount (USD, optional)</label>
+                    <input id="supAmount" type="number" min="1" step="1" class="pg-input" placeholder="e.g., 25" />
+                </div>
+                <div class="pg-field">
+                    <label class="pg-label" for="supNote">Note (optional)</label>
+                    <input id="supNote" type="text" class="pg-input" placeholder="Thanks for your work!" />
+                </div>
+            </div>
+
+            <div class="pg-panel" style="margin-top:10px">
+                <h4 class="pg-panel-title">Choose a method</h4>
+
+                <!-- PayPal -->
+                <div class="pg-panel" style="margin-top:8px">
+                    <div class="pg-row" style="grid-template-columns: 1fr auto auto;">
+                        <div>
+                            <strong>PayPal</strong><br>
+                            <small>paypal.com/paypalme/<code>jdmarlow86</code></small>
+                        </div>
+                        <button class="pg-btn" type="button" id="ppWeb">Open on web</button>
+                        <button class="pg-btn subtle" type="button" id="ppCopy">Copy handle</button>
+                    </div>
+                </div>
+
+                <!-- Cash App -->
+                <div class="pg-panel" style="margin-top:8px">
+                    <div class="pg-row" style="grid-template-columns: 1fr auto auto;">
+                        <div>
+                            <strong>Cash App</strong><br>
+                            <small>cash.app/<code>$jdmarlow</code></small>
+                        </div>
+                        <button class="pg-btn" type="button" id="caWeb">Open on web</button>
+                        <button class="pg-btn subtle" type="button" id="caCopy">Copy $tag</button>
+                    </div>
+                </div>
+
+                <!-- Venmo -->
+                <div class="pg-panel" style="margin-top:8px">
+                    <div class="pg-row" style="grid-template-columns: 1fr auto auto auto;">
+                        <div>
+                            <strong>Venmo</strong><br>
+                            <small>venmo.com/u/<code>Jonathan-Marlow-19</code></small>
+                        </div>
+                        <button class="pg-btn" type="button" id="vmApp">Open in app</button>
+                        <button class="pg-btn" type="button" id="vmWeb">Open on web</button>
+                        <button class="pg-btn subtle" type="button" id="vmCopy">Copy @user</button>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="pg-dialog-footer">
+                <button class="pg-btn subtle" value="cancel">Close</button>
+            </footer>
+        </form>
+    </dialog>
 
     <!-- Recovery: Signup Modal -->
     <div id="recoveryModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="recoveryModalTitle">
@@ -728,6 +798,97 @@
             </div>
         </div>
     </footer>
+
+    <!-- Support modal behavior -->
+    <script>
+        (function () {
+            // Your tags
+            const TAGS = {
+                paypal: 'jdmarlow86',
+                cashapp: '$jdmarlow',
+                venmo: 'Jonathan-Marlow-19'
+            };
+
+            // Elements
+            const btnSupport = document.getElementById('btnSupport');
+            const dialog = document.getElementById('supportDialog');
+            const supAmount = document.getElementById('supAmount');
+            const supNote = document.getElementById('supNote');
+            const donAmount = document.getElementById('donAmount'); // prefill source
+
+            const ppWeb = document.getElementById('ppWeb');
+            const ppCopy = document.getElementById('ppCopy');
+
+            const caWeb = document.getElementById('caWeb');
+            const caCopy = document.getElementById('caCopy');
+
+            const vmApp = document.getElementById('vmApp');
+            const vmWeb = document.getElementById('vmWeb');
+            const vmCopy = document.getElementById('vmCopy');
+
+            // Open modal (prefill amount from Pay It Forward)
+            btnSupport.addEventListener('click', () => {
+                if (donAmount && donAmount.value) supAmount.value = donAmount.value;
+                if (typeof dialog.showModal === 'function') dialog.showModal();
+                else alert('Your browser does not support modals.');
+            });
+
+            // Helpers
+            const getAmount = () => {
+                const v = parseInt(supAmount.value, 10);
+                return Number.isFinite(v) && v > 0 ? v : null;
+            };
+            const getNote = () => (supNote.value || '').trim();
+            function openNew(url) { window.open(url, '_blank', 'noopener,noreferrer'); }
+            async function copy(text, el) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    const old = el.textContent;
+                    el.textContent = 'Copied!';
+                    setTimeout(() => el.textContent = old, 1200);
+                } catch {
+                    alert('Copy failed—please copy manually: ' + text);
+                }
+            }
+
+            // PayPal web
+            // Format: https://www.paypal.com/paypalme/<handle>/<amount>
+            ppWeb.addEventListener('click', () => {
+                const amt = getAmount();
+                const base = `https://www.paypal.com/paypalme/${encodeURIComponent(TAGS.paypal)}`;
+                const url = amt ? `${base}/${amt}` : base;
+                openNew(url);
+            });
+            ppCopy.addEventListener('click', (e) => copy(TAGS.paypal, e.currentTarget));
+
+            // Cash App web
+            caWeb.addEventListener('click', () => {
+                const amt = getAmount();
+                const clean = TAGS.cashapp.startsWith('$') ? TAGS.cashapp.slice(1) : TAGS.cashapp;
+                const base = `https://cash.app/$${encodeURIComponent(clean)}`;
+                const url = amt ? `${base}/${amt}` : base;
+                openNew(url);
+            });
+            caCopy.addEventListener('click', (e) => copy(TAGS.cashapp, e.currentTarget));
+
+            // Venmo deep link + web
+            vmApp.addEventListener('click', () => {
+                const amt = getAmount();
+                const note = getNote();
+                const qp = new URLSearchParams();
+                qp.set('recipients', TAGS.venmo);
+                if (amt) qp.set('amount', amt);
+                if (note) qp.set('note', note);
+                const deeplink = `venmo://paycharge?${qp.toString()}`;
+                window.location.href = deeplink; // best effort
+            });
+            vmWeb.addEventListener('click', () => {
+                const url = `https://venmo.com/u/${encodeURIComponent(TAGS.venmo)}`;
+                openNew(url);
+            });
+            vmCopy.addEventListener('click', (e) => copy(TAGS.venmo, e.currentTarget));
+        })();
+    </script>
 
     <script src="./app.js"></script>
 </body>

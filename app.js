@@ -1077,3 +1077,98 @@ Tips:
         if (!inDialog) prayerDialog.close();
     });
 })();
+
+(() => {
+    // Your tags
+    const TAGS = {
+        paypal: 'jdmarlow86',
+        cashapp: '$jdmarlow',
+        venmo: 'Jonathan-Marlow-19'
+    };
+
+    // Elements
+    const btnSupport = document.getElementById('btnSupport');
+    const dialog = document.getElementById('supportDialog');
+    const amountEl = document.getElementById('supAmount');
+    const noteEl = document.getElementById('supNote');
+
+    const ppWeb = document.getElementById('ppWeb');
+    const ppCopy = document.getElementById('ppCopy');
+
+    const caWeb = document.getElementById('caWeb');
+    const caCopy = document.getElementById('caCopy');
+
+    const vmApp = document.getElementById('vmApp');
+    const vmWeb = document.getElementById('vmWeb');
+    const vmCopy = document.getElementById('vmCopy');
+
+    // Open modal
+    btnSupport.addEventListener('click', () => {
+        if (typeof dialog.showModal === 'function') dialog.showModal();
+        else alert('Your browser does not support modals.');
+    });
+
+    // Helpers
+    const getAmount = () => {
+        const v = parseInt(amountEl.value, 10);
+        return Number.isFinite(v) && v > 0 ? v : null;
+    };
+    const getNote = () => (noteEl.value || '').trim();
+
+    function openNew(url) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+    }
+    async function copy(text, el) {
+        try {
+            await navigator.clipboard.writeText(text);
+            const old = el.textContent;
+            el.textContent = 'Copied!';
+            setTimeout(() => el.textContent = old, 1200);
+        } catch {
+            alert('Copy failed—please copy manually: ' + text);
+        }
+    }
+
+    // PayPal (web)
+    // Format: https://www.paypal.com/paypalme/<handle>/<amount>
+    ppWeb.addEventListener('click', () => {
+        const amt = getAmount();
+        const base = `https://www.paypal.com/paypalme/${encodeURIComponent(TAGS.paypal)}`;
+        const url = amt ? `${base}/${amt}` : base;
+        openNew(url);
+    });
+    ppCopy.addEventListener('click', (e) => copy(TAGS.paypal, e.currentTarget));
+
+    // Cash App (web)
+    // Common format supports trailing /<amount> for convenience.
+    caWeb.addEventListener('click', () => {
+        const amt = getAmount();
+        const clean = TAGS.cashapp.startsWith('$') ? TAGS.cashapp.slice(1) : TAGS.cashapp;
+        const base = `https://cash.app/$${encodeURIComponent(clean)}`;
+        const url = amt ? `${base}/${amt}` : base;
+        openNew(url);
+    });
+    caCopy.addEventListener('click', (e) => copy(TAGS.cashapp, e.currentTarget));
+
+    // Venmo
+    // App deep link (best effort on mobile): venmo://paycharge?recipients=<user>&amount=<amt>&note=<note>
+    vmApp.addEventListener('click', () => {
+        const amt = getAmount();
+        const note = getNote();
+        const qp = new URLSearchParams();
+        qp.set('recipients', TAGS.venmo);
+        if (amt) qp.set('amount', amt);
+        if (note) qp.set('note', note);
+        const deeplink = `venmo://paycharge?${qp.toString()}`;
+        // Attempt deep link
+        window.location.href = deeplink;
+        // Tip: user agents without Venmo will ignore; web fallback is provided below
+    });
+
+    // Web profile fallback
+    vmWeb.addEventListener('click', () => {
+        const url = `https://venmo.com/u/${encodeURIComponent(TAGS.venmo)}`;
+        openNew(url);
+    });
+    vmCopy.addEventListener('click', (e) => copy(TAGS.venmo, e.currentTarget));
+})();
