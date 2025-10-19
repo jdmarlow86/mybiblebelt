@@ -19,7 +19,7 @@ const toGoogleCalendarDateRange = (startISO, minutes = 60) => {
     return `${toCal(start)}/${toCal(end)}`;
 };
 
-/* ========= Theme (SVG icons) ========= */
+/* ========= Theme (icons) ========= */
 const sunSVG = `
 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
   <circle cx="12" cy="12" r="4"></circle>
@@ -42,54 +42,54 @@ const setTheme = (mode /* 'light' | 'dark' */) => {
     if (mode === "dark") root.classList.add("dark"); else root.classList.remove("dark");
     try { localStorage.setItem("theme", mode); } catch { }
     const iconHTML = root.classList.contains("dark") ? sunSVG : moonSVG;
-    const t1 = document.getElementById("themeToggle");
-    const t2 = document.getElementById("themeToggleMobile");
-    if (t1) t1.innerHTML = iconHTML;
-    if (t2) t2.innerHTML = iconHTML;
+    $("#themeToggle") && ($("#themeToggle").innerHTML = iconHTML);
+    $("#themeToggleMobile") && ($("#themeToggleMobile").innerHTML = iconHTML);
 };
-
 const toggleTheme = () => {
     const isDark = document.documentElement.classList.contains("dark");
     setTheme(isDark ? "light" : "dark");
 };
-
-// Initialize icon once on load (the dark class may already be set by inline script)
+// Initialize icons once
 (() => {
     const isDark = document.documentElement.classList.contains("dark");
     const iconHTML = isDark ? sunSVG : moonSVG;
-    document.getElementById("themeToggle")?.insertAdjacentHTML("afterbegin", iconHTML);
-    document.getElementById("themeToggleMobile")?.insertAdjacentHTML("afterbegin", iconHTML);
+    $("#themeToggle")?.insertAdjacentHTML("afterbegin", iconHTML);
+    $("#themeToggleMobile")?.insertAdjacentHTML("afterbegin", iconHTML);
 })();
 
-/* ========= Nav / Tabs ========= */
+/* ========= Tabs ========= */
 const sections = $$(".tab-section");
 const navBtns = $$(".nav-btn[data-tab]");
 const mobileNav = $("#mobileNav");
+const appendix = $("#recovery-steps-appendix"); // Show only on the Recovery tab
 
 function showTab(id) {
     sections.forEach(s => s.classList.toggle("hidden", s.id !== id));
     navBtns.forEach(b => b.classList.toggle("active", b.dataset.tab === id));
     if (mobileNav) mobileNav.value = id;
     history.replaceState(null, "", `#${id}`);
-}
 
+    // Only show the appendix (printable guidance + steps) on Recovery tab
+    if (appendix) {
+        if (id === "recovery") appendix.classList.remove("hidden");
+        else appendix.classList.add("hidden");
+    }
+}
 navBtns.forEach(btn => btn.addEventListener("click", () => showTab(btn.dataset.tab)));
 mobileNav?.addEventListener("change", () => showTab(mobileNav.value));
-
 document.addEventListener("click", (e) => {
-    const t = e.target.closest?.("[data-jump]");
+    const t = e.target.closest("[data-jump]");
     if (!t) return;
     e.preventDefault();
     showTab(t.getAttribute("data-jump"));
 });
-
 const initial = location.hash?.slice(1) || "welcome";
 showTab(initial);
 
 /* ========= Footer Year ========= */
 $("#year").textContent = new Date().getFullYear();
 
-/* ========= Theme Toggle Bindings ========= */
+/* ========= Theme toggle bindings ========= */
 $("#themeToggle")?.addEventListener("click", toggleTheme);
 $("#themeToggleMobile")?.addEventListener("click", toggleTheme);
 
@@ -101,68 +101,84 @@ $("#findChurchBtn")?.addEventListener("click", () => {
 /* ========= Resources (Starter Kits) ========= */
 const SEED_STARTER_KITS = [
     {
-        id: "baptist", title: "Baptist — Starter Kit", intro: "Overview of Baptist beliefs: believer's baptism, congregational governance, and emphasis on Scripture.",
+        id: "baptist",
+        title: "Baptist — Starter Kit",
+        intro: "Overview of Baptist beliefs: believer's baptism, congregational governance, and emphasis on Scripture.",
         studies: [
             { title: "History & Distinctives", content: "Origins in 17th-century English Separatism; local church autonomy." },
             { title: "Baptism & Communion", content: "Believer's baptism by immersion; Lord's Supper as ordinance." },
             { title: "Study Path", content: "Read Gospel of John, Acts; explore Baptist Faith & Message." },
-        ]
+        ],
     },
     {
-        id: "methodist", title: "Methodist — Starter Kit", intro: "Methodism emphasizes grace (prevenient, justifying, sanctifying), connectionalism, and practical holiness.",
+        id: "methodist",
+        title: "Methodist — Starter Kit",
+        intro: "Methodism emphasizes grace (prevenient, justifying, sanctifying), connectionalism, and practical holiness.",
         studies: [
             { title: "Wesleyan Heritage", content: "John & Charles Wesley; small groups; disciplined devotional life." },
             { title: "Grace & Discipleship", content: "Explore grace in Romans; practices of mercy and piety." },
             { title: "Study Path", content: "Gospels, Romans; Wesley's sermons; Book of Discipline overview." },
-        ]
+        ],
     },
     {
-        id: "catholic", title: "Catholic — Starter Kit", intro: "Catholicism: Scripture and Tradition, sacramental life, and communion with the historic Church.",
+        id: "catholic",
+        title: "Catholic — Starter Kit",
+        intro: "Catholicism: Scripture and Tradition, sacramental life, and communion with the historic Church.",
         studies: [
             { title: "Tradition & Magisterium", content: "How teaching authority functions; ecumenical councils." },
             { title: "Sacraments", content: "Seven sacraments; grace in ordinary life; liturgical calendar." },
             { title: "Study Path", content: "Synoptic Gospels; Catechism selections; early Church Fathers." },
-        ]
+        ],
     },
     {
-        id: "sda", title: "Seventh-day Adventist — Starter Kit", intro: "SDA distinctives include Sabbath observance, holistic health, and the blessed hope of Christ's return.",
+        id: "sda",
+        title: "Seventh-day Adventist — Starter Kit",
+        intro: "SDA distinctives include Sabbath observance, holistic health, and the blessed hope of Christ's return.",
         studies: [
             { title: "Sabbath & Creation", content: "Genesis 1-2; Exodus 20; rhythm of rest and worship." },
             { title: "Advent Hope", content: "Study Daniel & Revelation themes; focus on hope and mission." },
             { title: "Study Path", content: "Gospels, Hebrews; thematic studies on sanctuary & mission." },
-        ]
+        ],
     },
     {
-        id: "pentecostal", title: "Pentecostal — Starter Kit", intro: "Pentecostalism highlights the work of the Holy Spirit, spiritual gifts, and vibrant worship.",
+        id: "pentecostal",
+        title: "Pentecostal — Starter Kit",
+        intro: "Pentecostalism highlights the work of the Holy Spirit, spiritual gifts, and vibrant worship.",
         studies: [
             { title: "Acts & the Spirit", content: "Read Acts; gifts listed in 1 Cor 12-14 and Romans 12." },
             { title: "Prayer & Worship", content: "Cultivate prayer, praise, and openness to the Spirit." },
             { title: "Study Path", content: "Gospels, Acts; resources on gifts and fruit of the Spirit." },
-        ]
+        ],
     },
     {
-        id: "nondenom", title: "Non-Denominational — Starter Kit", intro: "Focus on biblical essentials, discipleship, and simple church expressions.",
+        id: "nondenom",
+        title: "Non-Denominational — Starter Kit",
+        intro: "Focus on biblical essentials, discipleship, and simple church expressions.",
         studies: [
             { title: "Core Beliefs", content: "Jesus-centered gospel; authority of Scripture; community life." },
             { title: "Practices", content: "Small groups, service, local mission, simple liturgy." },
             { title: "Study Path", content: "Gospels, Acts; read a whole Gospel; memorize key passages." },
-        ]
+        ],
     },
     {
-        id: "judaism", title: "Judaism — Starter Kit", intro: "Explore Torah, Prophets, and Writings; synagogue life; cycles of prayer and festival.",
+        id: "judaism",
+        title: "Judaism — Starter Kit",
+        intro: "Explore Torah, Prophets, and Writings; synagogue life; cycles of prayer and festival.",
         studies: [
             { title: "Tanakh Overview", content: "Structure and themes; covenant; wisdom literature." },
             { title: "Life & Practice", content: "Shabbat, kosher, prayer services; Hebrew calendar." },
             { title: "Study Path", content: "Genesis, Exodus; Psalms; explore rabbinic commentary." },
-        ]
+        ],
     },
     {
-        id: "islam", title: "Islam — Starter Kit", intro: "Overview of Qur'an, Prophetic tradition, Five Pillars, and diverse schools of thought.",
+        id: "islam",
+        title: "Islam — Starter Kit",
+        intro: "Overview of Qur'an, Prophetic tradition, Five Pillars, and diverse schools of thought.",
         studies: [
             { title: "Scripture & Prophethood", content: "Qur'an structure; role of hadith; prophets in Islam." },
             { title: "Five Pillars", content: "Shahada, Salat, Zakat, Sawm, Hajj; daily life rhythms." },
             { title: "Study Path", content: "Introductory surahs; biographies; comparative faith studies." },
-        ]
+        ],
     },
 ];
 let kits = storage.get("starterKits", SEED_STARTER_KITS);
@@ -217,24 +233,24 @@ $("#clearKitFormBtn")?.addEventListener("click", () => {
     $("#kitTitle").value = ""; $("#kitIntro").value = ""; $("#kitStudy").value = "";
 });
 
-/* ========= Community ========= */
+/* ========= Community (Local + Contacts + Chat) ========= */
 const cityInput = $("#localCity");
 const regionInput = $("#localRegion");
-if (cityInput && regionInput) {
-    cityInput.value = storage.get("local.city", "LaFollette");
-    regionInput.value = storage.get("local.region", "TN");
-    function updateChurchesNear() {
-        $("#churchesNear").textContent = `Churches Near ${cityInput.value || "…"}, ${regionInput.value || "…"}`;
-    }
-    updateChurchesNear();
-    ["input", "change"].forEach(ev => {
-        cityInput.addEventListener(ev, () => { storage.set("local.city", cityInput.value); updateChurchesNear(); });
-        regionInput.addEventListener(ev, () => { storage.set("local.region", regionInput.value); updateChurchesNear(); });
-    });
-    $("#localRefresh")?.addEventListener("click", () => alert("In production: pull local events, churches, and services."));
-}
+if (cityInput) cityInput.value = storage.get("local.city", "LaFollette");
+if (regionInput) regionInput.value = storage.get("local.region", "TN");
 
-/* Contacts */
+function updateChurchesNear() {
+    const el = $("#churchesNear");
+    if (!el) return;
+    el.textContent = `Churches Near ${cityInput?.value || "…"}, ${regionInput?.value || "…"}`;
+}
+updateChurchesNear();
+["input", "change"].forEach(ev => {
+    cityInput?.addEventListener(ev, () => { storage.set("local.city", cityInput.value); updateChurchesNear(); });
+    regionInput?.addEventListener(ev, () => { storage.set("local.region", regionInput.value); updateChurchesNear(); });
+});
+$("#localRefresh")?.addEventListener("click", () => alert("In production: pull local events, churches, and services."));
+
 let contacts = storage.get("contacts", []);
 function renderContacts() {
     const list = $("#contactsList"); if (!list) return;
@@ -271,7 +287,6 @@ $("#addContactBtn")?.addEventListener("click", () => {
     renderContacts(); renderChatSidebar();
 });
 
-/* Chats */
 let threads = storage.get("threads", {}); // { [contactName]: [ {id, from, text, ts} ] }
 let activeChat = null;
 
@@ -293,8 +308,7 @@ function renderChatSidebar() {
     });
 }
 function renderChatMain() {
-    const title = $("#activeChatName");
-    const msgBox = $("#chatMessages");
+    const title = $("#activeChatName"); const msgBox = $("#chatMessages");
     if (!title || !msgBox) return;
     title.textContent = activeChat || "Select a chat";
     msgBox.innerHTML = "";
@@ -342,7 +356,8 @@ const SEED_VERSES = [
 let devotionals = storage.get("devotional", SEED_VERSES);
 function renderDevotionalToday() {
     const today = devotionals[new Date().getDate() % devotionals.length];
-    const el = $("#devotionalToday"); if (!el) return;
+    const el = $("#devotionalToday");
+    if (!el) return;
     el.innerHTML = `
     <div class="muted" style="font-size:13px;">Today</div>
     <div style="font-weight:600">${today?.text || ""}</div>
@@ -500,7 +515,6 @@ $("#saveNoteBtn")?.addEventListener("click", () => {
 });
 $("#clearNoteTextBtn")?.addEventListener("click", () => $("#noteText").value = "");
 
-/* Meet & Schedule */
 $("#meetStart") && ($("#meetStart").value = nowLocalDateTimeStr());
 function calendarUrl() {
     const title = $("#meetTitle").value || "Bible Study";
@@ -531,12 +545,10 @@ function renderProgress() {
     progressLabel.textContent = `$${raised} / $${goal}`;
 }
 renderProgress();
-
 $("#inc25")?.addEventListener("click", () => { raised += 25; storage.set("raised", raised); renderProgress(); });
 $("#dec25")?.addEventListener("click", () => { raised = Math.max(0, raised - 25); storage.set("raised", raised); renderProgress(); });
 $("#resetRaised")?.addEventListener("click", () => { raised = 0; storage.set("raised", raised); renderProgress(); });
 goalInput2?.addEventListener("change", () => { goal = Math.max(100, Number(goalInput2.value) || goal); storage.set("goal", goal); renderProgress(); });
-
 $("#donDonateBtn")?.addEventListener("click", () => {
     const amount = Math.max(1, Number($("#donAmount").value) || 1);
     const purpose = $("#donPurpose").value || "General Support";
@@ -545,7 +557,7 @@ $("#donDonateBtn")?.addEventListener("click", () => {
 });
 $("#donMoreBtn")?.addEventListener("click", () => alert("In production: receipts & recurring giving"));
 
-/* ==== Recovery: remember which steps are open & print section ==== */
+/* ========= Recovery: remember open steps & print ========= */
 (function () {
     const KEY = "recovery-open-steps-v1";
     const wrap = document.getElementById("recoverySteps");
@@ -566,7 +578,6 @@ $("#donMoreBtn")?.addEventListener("click", () => alert("In production: receipts
             try { localStorage.setItem(KEY, JSON.stringify(open)); } catch { }
         });
     }
-
     const printBtn = document.getElementById("recoveryPrintBtn");
     if (printBtn) {
         printBtn.addEventListener("click", () => {
@@ -584,44 +595,47 @@ $("#donMoreBtn")?.addEventListener("click", () => alert("In production: receipts
             <title>Recovery Power in Christ</title>
             <meta name="viewport" content="width=device-width, initial-scale=1" />
             ${styles}
-            <style>body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;padding:24px;} #recovery .card{page-break-inside:avoid;}</style>
+            <style>
+              body{font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; padding:24px;}
+              #recovery .card{page-break-inside:avoid;}
+            </style>
           </head>
           <body></body>
         </html>
       `);
             w.document.body.appendChild(clone);
-            w.document.close(); w.focus(); w.print(); w.close();
+            w.document.close();
+            w.focus();
+            w.print();
+            w.close();
         });
     }
 })();
 
-/* ==========================================
-   Recovery Signups (no backend) + Admin mode
-========================================== */
+/* ========= Recovery Signups (no backend) + Admin mode ========= */
 (function () {
     const LS_KEY = "RECOVERY_SIGNUPS_V1";
     const HIDE_KEY = "RECOVERY_SIGNUPS_HIDDEN";
     const ADMIN_KEY = "RECOVERY_ADMIN_ON";   // sessionStorage key
-    const ADMIN_PIN = ""; // Optional: "7777" to require a PIN. Leave "" for no PIN.
+    const ADMIN_PIN = ""; // Optional: set a PIN string (e.g., "7777") to require it for Admin mode.
 
-    const btnOpen = document.getElementById("recoverySignUpBtn");
-    const btnCsv = document.getElementById("recoveryDownloadCsvBtn");
-    const listEl = document.getElementById("recoverySignupList");
+    const btnOpen = $("#recoverySignUpBtn");
+    const btnCsv = $("#recoveryDownloadCsvBtn");
+    const listEl = $("#recoverySignupList");
 
-    const modal = document.getElementById("recoveryModal");
-    const modalClose = document.getElementById("recoveryModalClose");
-    const modalCancel = document.getElementById("recoveryCancel");
+    const modal = $("#recoveryModal");
+    const modalClose = $("#recoveryModalClose");
+    const modalCancel = $("#recoveryCancel");
     const modalBackdrop = modal && modal.querySelector("[data-close-modal]");
-    const form = document.getElementById("recoveryForm");
+    const form = $("#recoveryForm");
 
-    // Admin UI
-    const btnAdmin = document.getElementById("recoveryAdminBtn");
-    const adminBadge = document.getElementById("recoveryAdminBadge");
-    const adminBar = document.getElementById("recoveryAdminBar");
-    const toggleHidePublic = document.getElementById("recoveryHidePublic");
-    const btnClearAll = document.getElementById("recoveryClearAllBtn");
+    const btnAdmin = $("#recoveryAdminBtn");
+    const adminBadge = $("#recoveryAdminBadge");
+    const adminBar = $("#recoveryAdminBar");
+    const toggleHidePublic = $("#recoveryHidePublic");
+    const btnClearAll = $("#recoveryClearAllBtn");
 
-    if (!listEl) return;
+    if (!listEl) return; // no recovery block
 
     // State helpers
     const isAdmin = () => sessionStorage.getItem(ADMIN_KEY) === "1";
@@ -631,21 +645,13 @@ $("#donMoreBtn")?.addEventListener("click", () => alert("In production: receipts
         updateAdminUI();
         render();
     };
+    const isHiddenPublic = () => localStorage.getItem(HIDE_KEY) === "1";
+    const setHiddenPublic = (on) => { try { on ? localStorage.setItem(HIDE_KEY, "1") : localStorage.removeItem(HIDE_KEY); } catch { } };
 
-    function isHiddenPublic() { return localStorage.getItem(HIDE_KEY) === "1"; }
-    function setHiddenPublic(on) {
-        try { on ? localStorage.setItem(HIDE_KEY, "1") : localStorage.removeItem(HIDE_KEY); } catch { }
-    }
+    function loadAll() { try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); } catch { return []; } }
+    function saveAll(rows) { try { localStorage.setItem(LS_KEY, JSON.stringify(rows)); } catch { } }
 
-    function loadAll() {
-        try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); }
-        catch { return []; }
-    }
-    function saveAll(rows) {
-        try { localStorage.setItem(LS_KEY, JSON.stringify(rows)); } catch { }
-    }
-
-    // UI updates
+    // Admin UI
     function updateAdminUI() {
         const admin = isAdmin();
         if (admin) {
@@ -660,7 +666,7 @@ $("#donMoreBtn")?.addEventListener("click", () => alert("In production: receipts
         }
     }
 
-    // Render table
+    // Render list/table
     function render() {
         const admin = isAdmin();
         const rows = loadAll();
@@ -687,7 +693,6 @@ $("#donMoreBtn")?.addEventListener("click", () => alert("In production: receipts
         </tr>
       </thead>
     `;
-
         const tbody = rows.map((r, idx) => `
       <tr>
         <td>${escapeHtml(r.fullName)}</td>
@@ -710,7 +715,7 @@ $("#donMoreBtn")?.addEventListener("click", () => alert("In production: receipts
     `;
     }
 
-    // CSV
+    // CSV download
     function toCsv(rows) {
         const headers = ["Full Name", "Email", "Phone", "Preferred", "Notes", "Created At"];
         const lines = [headers];
@@ -753,7 +758,7 @@ $("#donMoreBtn")?.addEventListener("click", () => alert("In production: receipts
     }
     function onEsc(e) { if (e.key === "Escape") { e.preventDefault(); closeModal(); } }
 
-    // Submit
+    // Form submit
     function onSubmit(e) {
         e.preventDefault();
         const data = new FormData(form);
@@ -783,7 +788,6 @@ $("#donMoreBtn")?.addEventListener("click", () => alert("In production: receipts
         }
         setAdmin(true);
     }
-
     function onRemoveRow(idx) {
         const rows = loadAll();
         if (!rows[idx]) return;
@@ -793,7 +797,6 @@ $("#donMoreBtn")?.addEventListener("click", () => alert("In production: receipts
         saveAll(rows);
         render();
     }
-
     function onClearAll() {
         const rows = loadAll();
         if (!rows.length) return alert("No signups to clear.");
@@ -803,14 +806,15 @@ $("#donMoreBtn")?.addEventListener("click", () => alert("In production: receipts
         render();
     }
 
-    // Utils (scoped)
+    // Small utils
     function csvEscape(val) {
         if (val == null) return "";
         const s = String(val);
         return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
     }
     function escapeHtml(s) {
-        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        return String(s)
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;")
             .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
     function escapeAttr(s) { return String(s).replace(/"/g, "&quot;"); }
