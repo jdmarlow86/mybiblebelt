@@ -1,506 +1,479 @@
-Absolutely! I added a static **“Recovery: 10-Step Appendix”** to the very end of your page so it’s always visible (not hidden behind tabs). It reuses your existing styles (`container`, `card`, etc.) and won’t interfere with the tab system.
-
-### What I changed
-
-* Appended a new `<section id="recovery-steps-appendix">
-    ` **just before** your `
-    <script src="./app.js"></script>` line.
-    * Kept all your existing markup untouched.
-
-    Here’s your full file with the new block added:
-
-    ```html
-    <!doctype html>
-    <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>mybiblebelt.org</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-        <!-- Set theme BEFORE CSS to prevent flash -->
-        <script>
-            (function () {
-                try {
-                    const stored = localStorage.getItem("theme"); // 'dark' | 'light' | null
-                    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-                    const useDark = stored ? stored === "dark" : prefersDark;
-                    if (useDark) document.documentElement.classList.add("dark");
-                } catch { }
-            })();
-        </script>
-
-        <link rel="stylesheet" href="./styles.css" />
-    </head>
-    <body>
-        <header class="site-header">
-            <div class="brand">
-                <div class="logo">BB</div>
-                <div class="brand-text">
-                    <div class="brand-title">mybiblebelt.org</div>
-                    <div class="brand-sub">Bible-focused study • Find community • Grow daily</div>
-                </div>
-            </div>
-
-            <nav class="nav">
-                <button data-tab="welcome" class="nav-btn active">Welcome</button>
-                <button data-tab="resources" class="nav-btn">Resources</button>
-                <button data-tab="community" class="nav-btn">Community</button>
-                <button data-tab="growth" class="nav-btn">Personal Growth</button>
-                <button data-tab="study" class="nav-btn">Bible Study</button>
-                <button data-tab="recovery" class="nav-btn">Recovery</button>
-                <button data-tab="payit" class="nav-btn">Pay it Forward</button>
-                <!-- Dark mode toggle (desktop) -->
-                <button id="themeToggle" class="nav-btn" aria-label="Toggle dark mode">🌙</button>
-            </nav>
-
-            <div class="nav-select-wrap">
-                <div class="row gap">
-                    <select id="mobileNav">
-                        <option value="welcome">Welcome</option>
-                        <option value="resources">Resources</option>
-                        <option value="community">Community</option>
-                        <option value="growth">Personal Growth</option>
-                        <option value="study">Bible Study</option>
-                        <option value="recovery">Recovery</option>
-                        <option value="payit">Pay it Forward</option>
-                    </select>
-                    <!-- Dark mode toggle (mobile) -->
-                    <button id="themeToggleMobile" class="btn" aria-label="Toggle dark mode">🌙</button>
-                </div>
-            </div>
-        </header>
-
-        <main class="container">
-            <!-- Welcome -->
-            <section id="welcome" class="tab-section">
-                <h1 class="page-title">Welcome to mybiblebelt.org</h1>
-                <p class="page-sub">Bible-focused study with a warm invitation to worship in a local church of your preference.</p>
-
-                <div class="card">
-                    <p>
-                        Our heart is to help you explore Scripture, find community, and grow daily. Whether you are just
-                        beginning or continuing a lifelong journey, you are welcome here. We encourage you to visit a local
-                        church—of your preference—to worship, learn, and serve alongside others.
-                    </p>
-                    <div class="actions">
-                        <button id="findChurchBtn" class="btn primary">Find a Local Church</button>
-                    </div>
-                </div>
-
-                <div class="grid-3">
-                    <div class="card">
-                        <h2 class="section-title">Start Studying</h2>
-                        <p>Open a study path that fits your background and goals.</p>
-                        <a data-jump="resources" href="#" class="link">Browse Starter Kits →</a>
-                    </div>
-                    <div class="card">
-                        <h2 class="section-title">Find Community</h2>
-                        <p>Discover local info and start chats with trusted contacts.</p>
-                        <a data-jump="community" href="#" class="link">Open Community →</a>
-                    </div>
-                    <div class="card">
-                        <h2 class="section-title">Grow Daily</h2>
-                        <p>Devotionals, goals, journaling, and ministry ideas.</p>
-                        <a data-jump="growth" href="#" class="link">Go to Personal Growth →</a>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Resources -->
-            <section id="resources" class="tab-section hidden">
-                <h1 class="page-title">Resources</h1>
-                <p class="page-sub">Browse a Starter Kit for many religions and denominations. Expand any study to go deeper.</p>
-
-                <div class="card">
-                    <h2 class="section-title">Add Your Own Starter Kit</h2>
-                    <div class="row gap">
-                        <input id="kitTitle" class="input" placeholder="Title (e.g., Lutheran — Starter Kit)" />
-                        <input id="kitIntro" class="input" placeholder="One-line intro" />
-                    </div>
-                    <textarea id="kitStudy" rows="3" class="input" placeholder="Optional: First study content"></textarea>
-                    <div class="actions">
-                        <button id="addKitBtn" class="btn primary">Add Kit</button>
-                        <button id="clearKitFormBtn" class="btn">Clear</button>
-                    </div>
-                </div>
-
-                <div id="kitsGrid" class="grid-2"></div>
-            </section>
-
-            <!-- Community -->
-            <section id="community" class="tab-section hidden">
-                <h1 class="page-title">Community</h1>
-                <p class="page-sub">Local information and lightweight chats with your contacts.</p>
-
-                <div class="card">
-                    <h2 class="section-title">Local Community</h2>
-                    <p>Enter your city/region to personalize local info cards.</p>
-                    <div class="row gap">
-                        <input id="localCity" class="input" placeholder="City" />
-                        <input id="localRegion" class="input" placeholder="State/Region" />
-                        <button id="localRefresh" class="btn">Refresh</button>
-                    </div>
-
-                    <div class="grid-3 mt">
-                        <div class="info-tile">
-                            <div class="info-title">Upcoming Events</div>
-                            <div class="info-body">Town Hall, Food Pantry, Youth Night…</div>
-                        </div>
-                        <div class="info-tile">
-                            <div class="info-title" id="churchesNear">Churches Near …</div>
-                            <div class="info-body">Baptist, Methodist, Catholic, SDA, Non-Denom…</div>
-                        </div>
-                        <div class="info-tile">
-                            <div class="info-title">Community Services</div>
-                            <div class="info-body">Clothing closet, counseling, shelters, tutoring.</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid-2">
-                    <div class="card">
-                        <h2 class="section-title">Contacts</h2>
-                        <div class="row gap">
-                            <input id="contactName" class="input" placeholder="Add contact name" />
-                            <button id="addContactBtn" class="btn primary">Add</button>
-                        </div>
-                        <div id="contactsList" class="list mt"></div>
-                    </div>
-
-                    <div class="card">
-                        <h2 class="section-title">Chats</h2>
-                        <div class="chat">
-                            <div class="chat-sidebar" id="chatSidebar"></div>
-                            <div class="chat-main">
-                                <div class="chat-header">
-                                    <div id="activeChatName" class="chat-title">Select a chat</div>
-                                    <button id="clearChatBtn" class="btn">Clear</button>
-                                </div>
-                                <div id="chatMessages" class="chat-messages"></div>
-                                <div class="row gap mt">
-                                    <input id="chatInput" class="input" placeholder="Type a message" />
-                                    <button id="sendChatBtn" class="btn primary">Send</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Personal Growth -->
-            <section id="growth" class="tab-section hidden">
-                <h1 class="page-title">Personal Growth</h1>
-                <p class="page-sub">Devotional, goals, journal, and practical ministry.</p>
-
-                <div class="grid-2">
-                    <div class="card">
-                        <h2 class="section-title">Daily Devotional</h2>
-                        <div id="devotionalToday" class="devotional"></div>
-                        <div class="row gap mt">
-                            <input id="devotionalCustom" class="input" placeholder="Add your own devotional text" />
-                            <button id="addDevotionalBtn" class="btn primary">Add</button>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h2 class="section-title">Goals</h2>
-                        <div class="row gap">
-                            <input id="goalInput" class="input" placeholder="e.g., Read one chapter of John" />
-                            <button id="addGoalBtn" class="btn primary">Add</button>
-                        </div>
-                        <div id="goalsList" class="list mt"></div>
-                    </div>
-
-                    <div class="card">
-                        <h2 class="section-title">Journal</h2>
-                        <textarea id="journalEntry" rows="4" class="input" placeholder="Write your thoughts, prayers, and reflections…"></textarea>
-                        <div class="actions">
-                            <button id="saveJournalBtn" class="btn primary">Save Entry</button>
-                            <button id="clearJournalBtn" class="btn">Clear</button>
-                        </div>
-                        <div id="journalList" class="list mt"></div>
-                    </div>
-
-                    <div class="card">
-                        <h2 class="section-title">Ministry (Pay It Forward in Action)</h2>
-                        <div class="row gap">
-                            <input id="ministryIdea" class="input" placeholder="e.g., Visit a neighbor, volunteer, write an encouragement note" />
-                            <button id="addMinistryBtn" class="btn primary">Add</button>
-                        </div>
-                        <div id="ministryList" class="list mt"></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Bible Study -->
-            <section id="study" class="tab-section hidden">
-                <h1 class="page-title">Bible Study</h1>
-                <p class="page-sub">Keep dated notes, create a Google Meet, and set simple schedules.</p>
-
-                <div class="grid-2">
-                    <div class="card">
-                        <h2 class="section-title">Dated Notes</h2>
-                        <div class="row gap">
-                            <input id="noteDate" type="datetime-local" class="input" />
-                            <div class="row gap">
-                                <button id="saveNoteBtn" class="btn primary">Save Note</button>
-                                <button id="clearNoteTextBtn" class="btn">Clear</button>
-                            </div>
-                        </div>
-                        <textarea id="noteText" rows="3" class="input" placeholder="Sermon notes, chapter insights, questions…"></textarea>
-                        <div id="notesList" class="list mt"></div>
-                    </div>
-
-                    <div class="card">
-                        <h2 class="section-title">Meet & Schedule</h2>
-                        <div class="row gap">
-                            <input id="meetTitle" class="input" value="Bible Study" />
-                            <input id="meetStart" type="datetime-local" class="input" />
-                            <input id="meetMins" type="number" class="input" min="15" step="15" value="60" />
-                        </div>
-                        <div class="row gap mt">
-                            <button id="createMeetBtn" class="btn primary">Create Google Meet</button>
-                            <button id="addCalendarBtn" class="btn">Add to Google Calendar</button>
-                            <button id="copyInviteBtn" class="btn">Copy Invite Link</button>
-                        </div>
-                        <p class="muted mt">Tip: Paste the Meet or Calendar link into a Community chat.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Recovery -->
-            <section id="recovery" class="tab-section hidden">
-                <h1 class="page-title">Recovery Power in Christ</h1>
-                <p class="page-sub">Theme: Freedom through faith, strength through surrender, and renewal through reform.</p>
-
-                <div class="card">
-                    <div class="row gap">
-                        <a class="btn" href="/assets/Recovery_Power_in_Christ_10_Step_Plan.pdf" download>Download PDF</a>
-                        <button id="recoveryPrintBtn" class="btn primary">Print Section</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2 class="section-title">Overview</h2>
-                    <p>
-                        A 10-Step Christian recovery path centered on Christ, practical reform, and community accountability
-                        (less emphasis on anonymity, more on transformation).
-                    </p>
-                </div>
-
-                <!-- Steps -->
-                <div id="recoverySteps" class="list mt">
-                    <!-- Steps 1–10 exactly as you had them -->
-                    <!-- (omitted here for brevity but identical to your last message) -->
-                </div>
-
-                <!-- Recovery Signups -->
-                <div class="card">
-                    <div class="row gap spread">
-                        <h2 class="section-title">Recovery Sign Ups</h2>
-                        <div class="row gap">
-                            <button id="recoveryAdminBtn" class="btn">Admin</button>
-                            <span id="recoveryAdminBadge" class="admin-badge hidden">ADMIN</span>
-                            <button id="recoverySignUpBtn" class="btn primary">Sign Up</button>
-                            <button id="recoveryDownloadCsvBtn" class="btn">Download CSV</button>
-                        </div>
-                    </div>
-
-                    <div id="recoveryAdminBar" class="row gap mt hidden">
-                        <label class="switch">
-                            <input id="recoveryHidePublic" type="checkbox">
-                            <span>Hide signups from public</span>
-                        </label>
-                        <button id="recoveryClearAllBtn" class="btn">Clear All</button>
-                    </div>
-
-                    <p class="muted">Join the “Recovery Power in Christ” journey. We’ll follow up using your preferred contact method.</p>
-                    <div id="recoverySignupList" class="list mt"></div>
-                </div>
-
-                <div class="card">
-                    <h2 class="section-title">Guiding Principles</h2>
-                    <ul class="list">
-                        <li><strong>Transparency over secrecy:</strong> Transformation thrives in truth, not anonymity.</li>
-                        <li><strong>Faith over fear:</strong> God’s grace redeems every failure.</li>
-                        <li><strong>Community over isolation:</strong> Healing multiplies through fellowship.</li>
-                        <li><strong>Reform over relapse:</strong> Every day is a step toward renewal.</li>
-                    </ul>
-                </div>
-            </section>
-
-            <!-- Pay it Forward -->
-            <section id="payit" class="tab-section hidden">
-                <h1 class="page-title">Pay It Forward</h1>
-                <p class="page-sub">Fundraising and donations to support local ministry and platform costs.</p>
-
-                <div class="card">
-                    <h2 class="section-title">Donate / Pay It Forward</h2>
-                    <div class="row gap">
-                        <input id="donAmount" type="number" class="input" min="1" value="25" />
-                        <input id="donPurpose" class="input" value="General Support" />
-                        <button id="donDonateBtn" class="btn primary">Donate</button>
-                        <button id="donMoreBtn" class="btn">More Options</button>
-                    </div>
-
-                    <div class="progress mt">
-                        <div class="row spread">
-                            <div class="label">Fundraising Progress</div>
-                            <div id="progressLabel" class="muted">$0 / $2000</div>
-                        </div>
-                        <div class="bar">
-                            <div id="progressBar" class="bar-fill" style="width: 0%;"></div>
-                        </div>
-                        <div class="grid-3 mt">
-                            <div class="row gap">
-                                <button id="dec25" class="btn">-25</button>
-                                <button id="inc25" class="btn">+25</button>
-                                <button id="resetRaised" class="btn">Reset Raised</button>
-                            </div>
-                            <div class="row gap">
-                                <span class="muted">Goal:</span>
-                                <input id="goalInput2" type="number" class="input small" value="2000" min="100" />
-                            </div>
-                            <div class="muted">Use these controls while you integrate a real payment backend.</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <footer class="site-footer">
-            <div class="container footer-inner">
-                <div>© <span id="year"></span> mybiblebelt.org</div>
-                <div class="footer-links">
-                    <a data-jump="resources" href="#">Resources</a>
-                    <a data-jump="community" href="#">Community</a>
-                    <a data-jump="growth" href="#">Personal Growth</a>
-                    <a data-jump="study" href="#">Bible Study</a>
-                    <a data-jump="payit" href="#">Donate</a>
-                </div>
-            </div>
-        </footer>
-
-        <!-- ======= Recovery 10-Step Appendix (always visible) ======= -->
-        <section id="recovery-steps-appendix" class="container" style="margin-top:24px;">
-            <div class="card">
-                <h2 class="section-title">Recovery: 10-Step Appendix</h2>
-                <p class="muted">A concise, always-visible reference to the steps.</p>
-                <ol class="list" style="padding-left:18px; margin: 12px 0 0;">
-                    <li style="margin-bottom:10px;">
-                        <strong>Step 1 — Acknowledge the Bondage</strong><br>
-                        <em>“For all have sinned and fall short of the glory of God.” – Romans 3:23</em><br>
-                        Goal: Honest self-reflection and confession without shame.
-                    </li>
-                    <li style="margin-bottom:10px;">
-                        <strong>Step 2 — Believe in Christ’s Power to Restore</strong><br>
-                        <em>“I can do all things through Christ who strengthens me.” – Philippians 4:13</em><br>
-                        Goal: Replace despair with hope grounded in divine power.
-                    </li>
-                    <li style="margin-bottom:10px;">
-                        <strong>Step 3 — Surrender to the Lord’s Guidance</strong><br>
-                        <em>“Trust in the Lord with all your heart and lean not on your own understanding.” – Proverbs 3:5–6</em><br>
-                        Goal: Transfer control from self-reliance to God-reliance.
-                    </li>
-                    <li style="margin-bottom:10px;">
-                        <strong>Step 4 — Examine and Confess Past Wrongs</strong><br>
-                        <em>“If we confess our sins, He is faithful and just to forgive us our sins.” – 1 John 1:9</em><br>
-                        Goal: Healing through humility and transparency.
-                    </li>
-                    <li style="margin-bottom:10px;">
-                        <strong>Step 5 — Reform Your Mind and Habits</strong><br>
-                        <em>“Be transformed by the renewing of your mind.” – Romans 12:2</em><br>
-                        Goal: Build new patterns that crowd out old temptations.
-                    </li>
-                    <li style="margin-bottom:10px;">
-                        <strong>Step 6 — Make Amends and Restore Relationships</strong><br>
-                        <em>“If it is possible, as far as it depends on you, live at peace with everyone.” – Romans 12:18</em><br>
-                        Goal: Reconciliation and relational healing.
-                    </li>
-                    <li style="margin-bottom:10px;">
-                        <strong>Step 7 — Build a Christ-Centered Community</strong><br>
-                        <em>“As iron sharpens iron, so one person sharpens another.” – Proverbs 27:17</em><br>
-                        Goal: Accountability through Christian brotherhood/sisterhood.
-                    </li>
-                    <li style="margin-bottom:10px;">
-                        <strong>Step 8 — Serve Others with Compassion</strong><br>
-                        <em>“Whoever refreshes others will be refreshed.” – Proverbs 11:25</em><br>
-                        Goal: Transformation through ministry and compassion.
-                    </li>
-                    <li style="margin-bottom:10px;">
-                        <strong>Step 9 — Guard Your Heart and Mind Daily</strong><br>
-                        <em>“Above all else, guard your heart, for everything you do flows from it.” – Proverbs 4:23</em><br>
-                        Goal: Spiritual maintenance through intentional living.
-                    </li>
-                    <li>
-                        <strong>Step 10 — Share Your Testimony</strong><br>
-                        <em>“They overcame him by the blood of the Lamb and by the word of their testimony.” – Revelation 12:11</em><br>
-                        Goal: Turn personal victory into a beacon for others.
-                    </li>
-                </ol>
-            </div>
-        </section>
-        <!-- ======= /Appendix ======= -->
-        <!-- Recovery: Signup Modal -->
-        <div id="recoveryModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="recoveryModalTitle">
-            <div class="modal-backdrop" data-close-modal></div>
-            <div class="modal-content" role="document">
-                <div class="modal-header">
-                    <h3 id="recoveryModalTitle" class="section-title">Recovery Sign Up</h3>
-                    <button class="icon-btn" id="recoveryModalClose" aria-label="Close">✕</button>
-                </div>
-
-                <form id="recoveryForm" class="modal-body">
-                    <div class="row gap">
-                        <label class="input-block">
-                            <span>Full Name *</span>
-                            <input name="fullName" class="input" required placeholder="e.g., Jordan Smith">
-                        </label>
-                    </div>
-
-                    <div class="grid-2">
-                        <label class="input-block">
-                            <span>Email</span>
-                            <input name="email" type="email" class="input" placeholder="jordan@example.com">
-                        </label>
-
-                        <label class="input-block">
-                            <span>Phone</span>
-                            <input name="phone" class="input" placeholder="(555) 123-4567">
-                        </label>
-                    </div>
-
-                    <fieldset class="fieldset">
-                        <legend>Preferred Contact Method *</legend>
-                        <div class="row gap wrap">
-                            <label class="chip"><input type="radio" name="preferred" value="Email" required> Email</label>
-                            <label class="chip"><input type="radio" name="preferred" value="Phone Call" required> Phone Call</label>
-                            <label class="chip"><input type="radio" name="preferred" value="Text (SMS)" required> Text (SMS)</label>
-                            <label class="chip"><input type="radio" name="preferred" value="Other" required> Other</label>
-                        </div>
-                    </fieldset>
-
-                    <label class="input-block">
-                        <span>Notes (optional)</span>
-                        <textarea name="notes" rows="3" class="input" placeholder="Anything we should know to support you better?"></textarea>
-                    </label>
-
-                    <label class="row gap">
-                        <input type="checkbox" name="consent" required>
-                        <span>I consent to be contacted about Recovery Power in Christ.</span>
-                    </label>
-
-                    <div class="modal-actions">
-                        <button type="button" class="btn" id="recoveryCancel">Cancel</button>
-                        <button type="submit" class="btn primary">Submit</button>
-                    </div>
-                </form>
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>mybiblebelt.org</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+        (function () {
+            try {
+                const stored = localStorage.getItem("theme");
+                const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                const useDark = stored ? stored === "dark" : prefersDark;
+                if (useDark) document.documentElement.classList.add("dark");
+            } catch { }
+        })();
+    </script>
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+    <header class="site-header">
+        <div class="brand">
+            <div class="logo">BB</div>
+            <div class="brand-text">
+                <div class="brand-title">mybiblebelt.org</div>
+                <div class="brand-sub">Bible-focused study • Find community • Grow daily</div>
             </div>
         </div>
 
-        <script src="./app.js"></script>
-    </body>
-</html>
-```
+        <nav class="nav">
+            <button data-tab="welcome" class="nav-btn active">Welcome</button>
+            <button data-tab="resources" class="nav-btn">Resources</button>
+            <button data-tab="community" class="nav-btn">Community</button>
+            <button data-tab="growth" class="nav-btn">Personal Growth</button>
+            <button data-tab="study" class="nav-btn">Bible Study</button>
+            <button data-tab="recovery" class="nav-btn">Recovery</button>
+            <button data-tab="payit" class="nav-btn">Pay it Forward</button>
+            <button id="themeToggle" class="nav-btn" aria-label="Toggle dark mode">🌙</button>
+        </nav>
 
-If you’d rather have the 10 steps **inside** the Recovery tab only (not as an always-visible appendix), say the word and I’ll drop them into the `#recoverySteps` block instead.
+        <div class="nav-select-wrap">
+            <div class="row gap">
+                <select id="mobileNav">
+                    <option value="welcome">Welcome</option>
+                    <option value="resources">Resources</option>
+                    <option value="community">Community</option>
+                    <option value="growth">Personal Growth</option>
+                    <option value="study">Bible Study</option>
+                    <option value="recovery">Recovery</option>
+                    <option value="payit">Pay it Forward</option>
+                </select>
+                <button id="themeToggleMobile" class="btn" aria-label="Toggle dark mode">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="welcome" class="tab-section">
+            <h1 class="page-title">Welcome to mybiblebelt.org</h1>
+            <p class="page-sub">Bible-focused study with a warm invitation to worship in a local church of your preference.</p>
+
+            <div class="card">
+                <p>
+                    Our heart is to help you explore Scripture, find community, and grow daily. Whether you are just
+                    beginning or continuing a lifelong journey, you are welcome here. We encourage you to visit a local
+                    church—of your preference—to worship, learn, and serve alongside others.
+                </p>
+                <div class="actions">
+                    <button id="findChurchBtn" class="btn primary">Find a Local Church</button>
+                </div>
+            </div>
+
+            <div class="grid-3">
+                <div class="card">
+                    <h2 class="section-title">Start Studying</h2>
+                    <p>Open a study path that fits your background and goals.</p>
+                    <a data-jump="resources" href="#" class="link">Browse Starter Kits →</a>
+                </div>
+                <div class="card">
+                    <h2 class="section-title">Find Community</h2>
+                    <p>Discover local info and start chats with trusted contacts.</p>
+                    <a data-jump="community" href="#" class="link">Open Community →</a>
+                </div>
+                <div class="card">
+                    <h2 class="section-title">Grow Daily</h2>
+                    <p>Devotionals, goals, journaling, and ministry ideas.</p>
+                    <a data-jump="growth" href="#" class="link">Go to Personal Growth →</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="resources" class="tab-section hidden">
+            <h1 class="page-title">Resources</h1>
+            <p class="page-sub">Browse a Starter Kit for many religions and denominations. Expand any study to go deeper.</p>
+
+            <div class="card">
+                <h2 class="section-title">Add Your Own Starter Kit</h2>
+                <div class="row gap">
+                    <input id="kitTitle" class="input" placeholder="Title (e.g., Lutheran — Starter Kit)" />
+                    <input id="kitIntro" class="input" placeholder="One-line intro" />
+                </div>
+                <textarea id="kitStudy" rows="3" class="input" placeholder="Optional: First study content"></textarea>
+                <div class="actions">
+                    <button id="addKitBtn" class="btn primary">Add Kit</button>
+                    <button id="clearKitFormBtn" class="btn">Clear</button>
+                </div>
+            </div>
+
+            <div id="kitsGrid" class="grid-2"></div>
+        </section>
+
+        <section id="community" class="tab-section hidden">
+            <h1 class="page-title">Community</h1>
+            <p class="page-sub">Local information and lightweight chats with your contacts.</p>
+
+            <div class="card">
+                <h2 class="section-title">Local Community</h2>
+                <p>Enter your city/region to personalize local info cards.</p>
+                <div class="row gap">
+                    <input id="localCity" class="input" placeholder="City" />
+                    <input id="localRegion" class="input" placeholder="State/Region" />
+                    <button id="localRefresh" class="btn">Refresh</button>
+                </div>
+
+                <div class="grid-3 mt">
+                    <div class="info-tile">
+                        <div class="info-title">Upcoming Events</div>
+                        <div class="info-body">Town Hall, Food Pantry, Youth Night…</div>
+                    </div>
+                    <div class="info-tile">
+                        <div class="info-title" id="churchesNear">Churches Near …</div>
+                        <div class="info-body">Baptist, Methodist, Catholic, SDA, Non-Denom…</div>
+                    </div>
+                    <div class="info-tile">
+                        <div class="info-title">Community Services</div>
+                        <div class="info-body">Clothing closet, counseling, shelters, tutoring.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h2 class="section-title">Contacts</h2>
+                    <div class="row gap">
+                        <input id="contactName" class="input" placeholder="Add contact name" />
+                        <button id="addContactBtn" class="btn primary">Add</button>
+                    </div>
+                    <div id="contactsList" class="list mt"></div>
+                </div>
+
+                <div class="card">
+                    <h2 class="section-title">Chats</h2>
+                    <div class="chat">
+                        <div class="chat-sidebar" id="chatSidebar"></div>
+                        <div class="chat-main">
+                            <div class="chat-header">
+                                <div id="activeChatName" class="chat-title">Select a chat</div>
+                                <button id="clearChatBtn" class="btn">Clear</button>
+                            </div>
+                            <div id="chatMessages" class="chat-messages"></div>
+                            <div class="row gap mt">
+                                <input id="chatInput" class="input" placeholder="Type a message" />
+                                <button id="sendChatBtn" class="btn primary">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="growth" class="tab-section hidden">
+            <h1 class="page-title">Personal Growth</h1>
+            <p class="page-sub">Devotional, goals, journal, and practical ministry.</p>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h2 class="section-title">Daily Devotional</h2>
+                    <div id="devotionalToday" class="devotional"></div>
+                    <div class="row gap mt">
+                        <input id="devotionalCustom" class="input" placeholder="Add your own devotional text" />
+                        <button id="addDevotionalBtn" class="btn primary">Add</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="section-title">Goals</h2>
+                    <div class="row gap">
+                        <input id="goalInput" class="input" placeholder="e.g., Read one chapter of John" />
+                        <button id="addGoalBtn" class="btn primary">Add</button>
+                    </div>
+                    <div id="goalsList" class="list mt"></div>
+                </div>
+
+                <div class="card">
+                    <h2 class="section-title">Journal</h2>
+                    <textarea id="journalEntry" rows="4" class="input" placeholder="Write your thoughts, prayers, and reflections…"></textarea>
+                    <div class="actions">
+                        <button id="saveJournalBtn" class="btn primary">Save Entry</button>
+                        <button id="clearJournalBtn" class="btn">Clear</button>
+                    </div>
+                    <div id="journalList" class="list mt"></div>
+                </div>
+
+                <div class="card">
+                    <h2 class="section-title">Ministry (Pay It Forward in Action)</h2>
+                    <div class="row gap">
+                        <input id="ministryIdea" class="input" placeholder="e.g., Visit a neighbor, volunteer, write an encouragement note" />
+                        <button id="addMinistryBtn" class="btn primary">Add</button>
+                    </div>
+                    <div id="ministryList" class="list mt"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="study" class="tab-section hidden">
+            <h1 class="page-title">Bible Study</h1>
+            <p class="page-sub">Keep dated notes, create a Google Meet, and set simple schedules.</p>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h2 class="section-title">Dated Notes</h2>
+                    <div class="row gap">
+                        <input id="noteDate" type="datetime-local" class="input" />
+                        <div class="row gap">
+                            <button id="saveNoteBtn" class="btn primary">Save Note</button>
+                            <button id="clearNoteTextBtn" class="btn">Clear</button>
+                        </div>
+                    </div>
+                    <textarea id="noteText" rows="3" class="input" placeholder="Sermon notes, chapter insights, questions…"></textarea>
+                    <div id="notesList" class="list mt"></div>
+                </div>
+
+                <div class="card">
+                    <h2 class="section-title">Meet & Schedule</h2>
+                    <div class="row gap">
+                        <input id="meetTitle" class="input" value="Bible Study" />
+                        <input id="meetStart" type="datetime-local" class="input" />
+                        <input id="meetMins" type="number" class="input" min="15" step="15" value="60" />
+                    </div>
+                    <div class="row gap mt">
+                        <button id="createMeetBtn" class="btn primary">Create Google Meet</button>
+                        <button id="addCalendarBtn" class="btn">Add to Google Calendar</button>
+                        <button id="copyInviteBtn" class="btn">Copy Invite Link</button>
+                    </div>
+                    <p class="muted mt">Tip: Paste the Meet or Calendar link into a Community chat.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="recovery" class="tab-section hidden">
+            <h1 class="page-title">Recovery Power in Christ</h1>
+            <p class="page-sub">Theme: Freedom through faith, strength through surrender, and renewal through reform.</p>
+
+            <div class="card">
+                <div class="row gap">
+                    <a class="btn" href="/assets/Recovery_Power_in_Christ_10_Step_Plan.pdf" download>Download PDF</a>
+                    <button id="recoveryPrintBtn" class="btn primary">Print Section</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="section-title">Overview</h2>
+                <p>
+                    A 10-Step Christian recovery path centered on Christ, practical reform, and community accountability
+                    (less emphasis on anonymity, more on transformation).
+                </p>
+            </div>
+
+            <div id="recoverySteps" class="list mt"></div>
+
+            <div class="card">
+                <h2 class="section-title">Recovery Sign Ups</h2>
+                <div class="row gap">
+                    <button id="recoveryAdminBtn" class="btn">Admin</button>
+                    <span id="recoveryAdminBadge" class="admin-badge hidden">ADMIN</span>
+                    <button id="recoverySignUpBtn" class="btn primary">Sign Up</button>
+                    <button id="recoveryDownloadCsvBtn" class="btn">Download CSV</button>
+                </div>
+
+                <div id="recoveryAdminBar" class="row gap mt hidden">
+                    <label class="switch">
+                        <input id="recoveryHidePublic" type="checkbox">
+                        <span>Hide signups from public</span>
+                    </label>
+                    <button id="recoveryClearAllBtn" class="btn">Clear All</button>
+                </div>
+
+                <p class="muted">Join the “Recovery Power in Christ” journey. We’ll follow up using your preferred contact method.</p>
+                <div id="recoverySignupList" class="list mt"></div>
+            </div>
+
+            <div class="card">
+                <h2 class="section-title">Guiding Principles</h2>
+                <ul class="list">
+                    <li><strong>Transparency over secrecy:</strong> Transformation thrives in truth, not anonymity.</li>
+                    <li><strong>Faith over fear:</strong> God’s grace redeems every failure.</li>
+                    <li><strong>Community over isolation:</strong> Healing multiplies through fellowship.</li>
+                    <li><strong>Reform over relapse:</strong> Every day is a step toward renewal.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="payit" class="tab-section hidden">
+            <h1 class="page-title">Pay It Forward</h1>
+            <p class="page-sub">Fundraising and donations to support local ministry and platform costs.</p>
+
+            <div class="card">
+                <h2 class="section-title">Donate / Pay It Forward</h2>
+                <div class="row gap">
+                    <input id="donAmount" type="number" class="input" min="1" value="25" />
+                    <input id="donPurpose" class="input" value="General Support" />
+                    <button id="donDonateBtn" class="btn primary">Donate</button>
+                    <button id="donMoreBtn" class="btn">More Options</button>
+                </div>
+
+                <div class="progress mt">
+                    <div class="row spread">
+                        <div class="label">Fundraising Progress</div>
+                        <div id="progressLabel" class="muted">$0 / $2000</div>
+                    </div>
+                    <div class="bar">
+                        <div id="progressBar" class="bar-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="grid-3 mt">
+                        <div class="row gap">
+                            <button id="dec25" class="btn">-25</button>
+                            <button id="inc25" class="btn">+25</button>
+                            <button id="resetRaised" class="btn">Reset Raised</button>
+                        </div>
+                        <div class="row gap">
+                            <span class="muted">Goal:</span>
+                            <input id="goalInput2" type="number" class="input small" value="2000" min="100" />
+                        </div>
+                        <div class="muted">Use these controls while you integrate a real payment backend.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div>© <span id="year"></span> mybiblebelt.org</div>
+            <div class="footer-links">
+                <a data-jump="resources" href="#">Resources</a>
+                <a data-jump="community" href="#">Community</a>
+                <a data-jump="growth" href="#">Personal Growth</a>
+                <a data-jump="study" href="#">Bible Study</a>
+                <a data-jump="payit" href="#">Donate</a>
+            </div>
+        </div>
+    </footer>
+
+    <section id="recovery-steps-appendix" class="container" style="margin-top:24px;">
+        <div class="card">
+            <h2 class="section-title">Recovery: Guiding Principles</h2>
+            <ul class="list" style="margin:12px 0 0;">
+                <li><strong>Transparency over secrecy:</strong> Transformation thrives in truth, not anonymity.</li>
+                <li><strong>Faith over fear:</strong> God’s grace redeems every failure.</li>
+                <li><strong>Community over isolation:</strong> Healing multiplies through fellowship.</li>
+                <li><strong>Reform over relapse:</strong> Every day is a step toward renewal.</li>
+            </ul>
+        </div>
+
+        <div class="card" style="margin-top:16px;">
+            <h2 class="section-title">Recovery: 10 Steps</h2>
+            <ol class="list" style="padding-left:18px; margin: 12px 0 0;">
+                <li style="margin-bottom:10px;">
+                    <strong>Step 1 — Acknowledge the Bondage</strong><br>
+                    <em>“For all have sinned and fall short of the glory of God.” – Romans 3:23</em><br>
+                    Goal: Honest self-reflection and confession without shame.
+                </li>
+                <li style="margin-bottom:10px;">
+                    <strong>Step 2 — Believe in Christ’s Power to Restore</strong><br>
+                    <em>“I can do all things through Christ who strengthens me.” – Philippians 4:13</em><br>
+                    Goal: Replace despair with hope grounded in divine power.
+                </li>
+                <li style="margin-bottom:10px;">
+                    <strong>Step 3 — Surrender to the Lord’s Guidance</strong><br>
+                    <em>“Trust in the Lord with all your heart and lean not on your own understanding.” – Proverbs 3:5–6</em><br>
+                    Goal: Transfer control from self-reliance to God-reliance.
+                </li>
+                <li style="margin-bottom:10px;">
+                    <strong>Step 4 — Examine and Confess Past Wrongs</strong><br>
+                    <em>“If we confess our sins, He is faithful and just to forgive us our sins.” – 1 John 1:9</em><br>
+                    Goal: Healing through humility and transparency.
+                </li>
+                <li style="margin-bottom:10px;">
+                    <strong>Step 5 — Reform Your Mind and Habits</strong><br>
+                    <em>“Be transformed by the renewing of your mind.” – Romans 12:2</em><br>
+                    Goal: Build new patterns that crowd out old temptations.
+                </li>
+                <li style="margin-bottom:10px;">
+                    <strong>Step 6 — Make Amends and Restore Relationships</strong><br>
+                    <em>“If it is possible, as far as it depends on you, live at peace with everyone.” – Romans 12:18</em><br>
+                    Goal: Reconciliation and relational healing.
+                </li>
+                <li style="margin-bottom:10px;">
+                    <strong>Step 7 — Build a Christ-Centered Community</strong><br>
+                    <em>“As iron sharpens iron, so one person sharpens another.” – Proverbs 27:17</em><br>
+                    Goal: Accountability through Christian brotherhood/sisterhood.
+                </li>
+                <li style="margin-bottom:10px;">
+                    <strong>Step 8 — Serve Others with Compassion</strong><br>
+                    <em>“Whoever refreshes others will be refreshed.” – Proverbs 11:25</em><br>
+                    Goal: Transformation through ministry and compassion.
+                </li>
+                <li style="margin-bottom:10px;">
+                    <strong>Step 9 — Guard Your Heart and Mind Daily</strong><br>
+                    <em>“Above all else, guard your heart, for everything you do flows from it.” – Proverbs 4:23</em><br>
+                    Goal: Spiritual maintenance through intentional living.
+                </li>
+                <li>
+                    <strong>Step 10 — Share Your Testimony</strong><br>
+                    <em>“They overcame him by the blood of the Lamb and by the word of their testimony.” – Revelation 12:11</em><br>
+                    Goal: Turn personal victory into a beacon for others.
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <div id="recoveryModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="recoveryModalTitle">
+        <div class="modal-backdrop" data-close-modal></div>
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <h3 id="recoveryModalTitle" class="section-title">Recovery Sign Up</h3>
+                <button class="icon-btn" id="recoveryModalClose" aria-label="Close">✕</button>
+            </div>
+
+            <form id="recoveryForm" class="modal-body">
+                <div class="row gap">
+                    <label class="input-block">
+                        <span>Full Name *</span>
+                        <input name="fullName" class="input" required placeholder="e.g., Jordan Smith">
+                    </label>
+                </div>
+
+                <div class="grid-2">
+                    <label class="input-block">
+                        <span>Email</span>
+                        <input name="email" type="email" class="input" placeholder="jordan@example.com">
+                    </label>
+
+                    <label class="input-block">
+                        <span>Phone</span>
+                        <input name="phone" class="input" placeholder="(555) 123-4567">
+                    </label>
+                </div>
+
+                <fieldset class="fieldset">
+                    <legend>Preferred Contact Method *</legend>
+                    <div class="row gap wrap">
+                        <label class="chip"><input type="radio" name="preferred" value="Email" required> Email</label>
+                        <label class="chip"><input type="radio" name="preferred" value="Phone Call" required> Phone Call</label>
+                        <label class="chip"><input type="radio" name="preferred" value="Text (SMS)" required> Text (SMS)</label>
+                        <label class="chip"><input type="radio" name="preferred" value="Other" required> Other</label>
+                    </div>
+                </fieldset>
+
+                <label class="input-block">
+                    <span>Notes (optional)</span>
+                    <textarea name="notes" rows="3" class="input" placeholder="Anything we should know to support you better?"></textarea>
+                </label>
+
+                <label class="row gap">
+                    <input type="checkbox" name="consent" required>
+                    <span>I consent to be contacted about Recovery Power in Christ.</span>
+                </label>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn" id="recoveryCancel">Cancel</button>
+                    <button type="submit" class="btn primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="./app.js"></script>
+</body>
+</html>
