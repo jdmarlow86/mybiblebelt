@@ -703,3 +703,278 @@ html.dark .signup-table th, html.dark .signup-table td {
     padding: 6px 10px;
     font-size: .85rem;
 }
+
+:root {
+    --pg-bg: #0f172a; /* dark slate */
+    --pg-card: #111827; /* card dark */
+    --pg-text: #e5e7eb; /* text light */
+    --pg-muted: #94a3b8;
+    --pg-accent: #6366f1; /* indigo */
+    --pg-accent-2: #22c55e; /* green */
+    --pg-border: #1f2937;
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --pg-bg: #f8fafc;
+        --pg-card: #ffffff;
+        --pg-text: #0f172a;
+        --pg-muted: #475569;
+        --pg-accent: #4f46e5;
+        --pg-accent-2: #16a34a;
+        --pg-border: #e5e7eb;
+    }
+}
+
+/* If your page uses a grid, these help the section span two cards */
+.pg-span-2 {
+    grid-column: span 2;
+}
+/* Optional: If your page doesn't use a grid, the section still looks nice */
+.pg-card {
+    background: var(--pg-card);
+    color: var(--pg-text);
+    border: 1px solid var(--pg-border);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 10px 18px rgba(0,0,0,0.08);
+}
+
+.pg-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.pg-title {
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+.pg-subtitle {
+    color: var(--pg-muted);
+    margin: 0;
+}
+
+.pg-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0 8px;
+}
+
+    .pg-actions.end {
+        justify-content: flex-end;
+    }
+
+.pg-btn {
+    border: 1px solid var(--pg-border);
+    background: transparent;
+    color: var(--pg-text);
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform .06s ease, background .2s ease, border-color .2s ease;
+}
+
+    .pg-btn:hover {
+        transform: translateY(-1px);
+        border-color: var(--pg-muted);
+    }
+
+    .pg-btn.primary {
+        background: var(--pg-accent);
+        border-color: var(--pg-accent);
+        color: white;
+    }
+
+    .pg-btn.subtle {
+        opacity: 0.9;
+    }
+
+    .pg-btn.tiny {
+        padding: 6px 8px;
+        font-size: .85rem;
+    }
+
+.pg-panel {
+    border: 1px dashed var(--pg-border);
+    border-radius: 14px;
+    padding: 12px;
+    margin-top: 10px;
+}
+
+.pg-panel-title {
+    margin: 0 0 8px;
+    font-size: 1.05rem;
+}
+
+.pg-row {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1fr 1fr;
+}
+
+    .pg-row.align-center {
+        align-items: center;
+        grid-template-columns: auto 100px auto auto auto;
+        gap: 8px;
+    }
+
+.pg-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pg-label {
+    font-weight: 600;
+    color: var(--pg-muted);
+}
+
+.pg-input, .pg-textarea {
+    background: transparent;
+    color: var(--pg-text);
+    border: 1px solid var(--pg-border);
+    border-radius: 10px;
+    padding: 8px 10px;
+}
+
+    .pg-input.small {
+        width: 80px;
+    }
+
+.pg-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.pg-check, .pg-radio, .pg-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pg-chip {
+    border: 1px solid var(--pg-border);
+    padding: 6px 10px;
+    border-radius: 999px;
+    width: max-content;
+}
+
+.pg-output {
+    margin-top: 12px;
+}
+
+.pg-output-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pg-pre {
+    white-space: pre-wrap;
+    border: 1px solid var(--pg-border);
+    background: rgba(255,255,255,0.03);
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 8px;
+    font-size: 0.95rem;
+}
+
+.pg-timer {
+    margin-top: 10px;
+}
+
+.pg-timer-display {
+    font-size: 2rem;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 6px;
+}
+
+.pg-timer-hints {
+    color: var(--pg-muted);
+    margin-bottom: 6px;
+}
+
+.pg-progress {
+    height: 8px;
+    background: rgba(99,102,241,0.15);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.pg-progress-bar {
+    height: 100%;
+    background: var(--pg-accent-2);
+    width: 0%;
+    transition: width .25s linear;
+}
+
+.pg-info p {
+    margin: 6px 0;
+}
+
+.pg-list, .pg-ol {
+    margin: 6px 0 0 1.25rem;
+}
+
+.pg-details summary {
+    cursor: pointer;
+    margin-top: 6px;
+}
+
+/* Dialog/Modal */
+.pg-dialog::backdrop {
+    background: rgba(0,0,0,0.5);
+}
+
+.pg-dialog-card {
+    min-width: min(720px, 96vw);
+    border-radius: 16px;
+    border: 1px solid var(--pg-border);
+    background: var(--pg-card);
+    color: var(--pg-text);
+    padding: 12px;
+}
+
+.pg-dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pg-dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.pg-icon-btn {
+    border: none;
+    background: transparent;
+    color: var(--pg-text);
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+
+@media (max-width: 800px) {
+    .pg-span-2 {
+        grid-column: 1 / -1;
+    }
+    /* span full width on small screens */
+    .pg-row {
+        grid-template-columns: 1fr;
+    }
+
+        .pg-row.align-center {
+            grid-template-columns: 1fr 100px 1fr;
+        }
+
+    .pg-grid-2 {
+        grid-template-columns: 1fr;
+    }
+}

@@ -849,3 +849,231 @@ $("#donMoreBtn")?.addEventListener("click", () => alert("In production: receipts
     modalBackdrop && modalBackdrop.addEventListener("click", closeModal);
     form && form.addEventListener("submit", onSubmit);
 })();
+
+(() => {
+    // ELEMENTS
+    const ruleBuilder = document.getElementById('ruleBuilder');
+    const prayPanel = document.getElementById('prayPanel');
+    const prayerInfo = document.getElementById('prayerInfo');
+
+    const btnCreateRule = document.getElementById('btnCreateRule');
+    const btnPrayerRequest = document.getElementById('btnPrayerRequest');
+    const btnPrayNow = document.getElementById('btnPrayNow');
+
+    const ruleForm = document.getElementById('ruleForm');
+    const btnGenerateRule = document.getElementById('btnGenerateRule');
+    const btnClearRule = document.getElementById('btnClearRule');
+    const ruleOutput = document.getElementById('ruleOutput');
+    const ruleText = document.getElementById('ruleText');
+    const btnCopyRule = document.getElementById('btnCopyRule');
+    const btnDownloadRule = document.getElementById('btnDownloadRule');
+
+    const prayMinutes = document.getElementById('prayMinutes');
+    const btnStartTimer = document.getElementById('btnStartTimer');
+    const btnPauseTimer = document.getElementById('btnPauseTimer');
+    const btnResetTimer = document.getElementById('btnResetTimer');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timerBar = document.getElementById('timerBar');
+    const timerHints = document.getElementById('timerHints');
+
+    const prayerDialog = document.getElementById('prayerDialog');
+    const prayerForm = document.getElementById('prayerForm');
+    const btnSubmitRequest = document.getElementById('btnSubmitRequest');
+
+    // SIMPLE VIEW TOGGLING
+    function showPanel(panel) {
+        // Keep info always visible; toggle the others
+        ruleBuilder.hidden = panel !== ruleBuilder;
+        prayPanel.hidden = panel !== prayPanel;
+        if (panel == null) { ruleBuilder.hidden = true; prayPanel.hidden = true; }
+    }
+
+    btnCreateRule.addEventListener('click', () => showPanel(ruleBuilder));
+    btnPrayNow.addEventListener('click', () => {
+        showPanel(prayPanel);
+        updateTimerDisplay(Number(prayMinutes.value) * 60);
+    });
+    btnPrayerRequest.addEventListener('click', () => {
+        if (typeof prayerDialog.showModal === 'function') {
+            prayerDialog.showModal();
+        } else {
+            alert('Your browser does not support modals. Please update to a modern browser.');
+        }
+    });
+
+    // ===== Create Prayer Rule =====
+    btnGenerateRule.addEventListener('click', () => {
+        const times = [...ruleForm.querySelectorAll('input[name="times"]:checked')].map(x => x.value);
+        const focus = [...ruleForm.querySelectorAll('input[name="focus"]:checked')].map(x => x.value);
+        const minutes = Math.max(1, Math.min(120, Number(document.getElementById('duration').value) || 10));
+        const scripture = (document.getElementById('scripture').value || '').trim();
+        const notes = (document.getElementById('notes').value || '').trim();
+
+        const perFocus = Math.max(1, Math.floor((minutes * 60) / Math.max(1, focus.length)));
+        const fmt = s => {
+            const m = Math.floor(s / 60), ss = String(s % 60).padStart(2, '0');
+            return `${m}:${ss}`;
+        };
+
+        let guide = `BEGINNER PRAYER RULE
+====================
+
+Times of day: ${times.length ? times.join(', ') : 'Any time'}
+Minutes per session: ${minutes}
+
+Suggested structure (${minutes} min total):
+`;
+        for (const f of focus) {
+            guide += `• ${f} — ~${fmt(perFocus)}\n`;
+        }
+        if (scripture) {
+            guide += `\nScripture reflection: ${scripture}\n`;
+        }
+        if (notes) {
+            guide += `\nPersonal notes:\n${notes}\n`;
+        }
+        guide += `
+Tips:
+- Choose a quiet place and silence notifications.
+- Start and end with gratitude; keep requests simple and honest.
+- Keep a short list of people/needs and update weekly.
+`;
+
+        ruleText.textContent = guide;
+        ruleOutput.hidden = false;
+
+        // Persist last built rule
+        try { localStorage.setItem('mbb_last_prayer_rule', guide); } catch { }
+    });
+
+    btnClearRule.addEventListener('click', () => {
+        ruleForm.reset();
+        ruleOutput.hidden = true;
+    });
+
+    btnCopyRule.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(ruleText.textContent || '');
+            btnCopyRule.textContent = 'Copied!';
+            setTimeout(() => btnCopyRule.textContent = 'Copy', 1200);
+        } catch { alert('Copy failed—select and copy manually.'); }
+    });
+
+    btnDownloadRule.addEventListener('click', () => {
+        const blob = new Blob([ruleText.textContent || ''], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'prayer-guide.txt';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 0);
+    });
+
+    // Load last rule if present
+    try {
+        const last = localStorage.getItem('mbb_last_prayer_rule');
+        if (last) {
+            ruleText.textContent = last;
+            ruleOutput.hidden = false;
+        }
+    } catch { }
+
+    // ===== Pray Now Timer =====
+    let timer = null, totalSeconds = 0, remaining = 0, paused = false;
+    function updateTimerDisplay(sec) {
+        const m = Math.floor(sec / 60), s = String(Math.floor(sec % 60)).padStart(2, '0');
+        timerDisplay.textContent = `${m}:${s}`;
+        const elapsed = Math.max(0, totalSeconds - sec);
+        const pct = totalSeconds ? (elapsed / totalSeconds) * 100 : 0;
+        timerBar.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+    }
+
+    btnStartTimer.addEventListener('click', () => {
+        totalSeconds = Math.max(60, Math.min(60 * 180, Number(prayMinutes.value) * 60 || 600));
+        remaining = totalSeconds;
+        paused = false;
+        btnPauseTimer.disabled = false;
+        btnResetTimer.disabled = false;
+
+        // Simple suggested flow message
+        const seg = Math.round(totalSeconds / 4 / 60);
+        timerHints.textContent = `Suggested flow: ${seg}m Praise • ${seg}m Confession • ${seg * 2}m Intercession • ${seg}m Listening`;
+
+        clearInterval(timer);
+        updateTimerDisplay(remaining);
+        timer = setInterval(() => {
+            if (paused) return;
+            remaining--;
+            updateTimerDisplay(remaining);
+            if (remaining <= 0) {
+                clearInterval(timer);
+                timer = null;
+                timerBar.style.width = '100%';
+                // Optional chime
+                try { new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABYAAAABAA==').play().catch(() => { }); } catch { }
+                alert('Prayer time complete. Grace and peace!');
+            }
+        }, 1000);
+    });
+
+    btnPauseTimer.addEventListener('click', () => {
+        if (!timer) return;
+        paused = !paused;
+        btnPauseTimer.textContent = paused ? 'Resume' : 'Pause';
+    });
+
+    btnResetTimer.addEventListener('click', () => {
+        clearInterval(timer); timer = null;
+        paused = false; btnPauseTimer.textContent = 'Pause';
+        totalSeconds = Math.max(60, Math.min(60 * 180, Number(prayMinutes.value) * 60 || 600));
+        remaining = totalSeconds;
+        updateTimerDisplay(remaining);
+        btnPauseTimer.disabled = true;
+        btnResetTimer.disabled = true;
+    });
+
+    // ===== Prayer Request Modal =====
+    // Persist locally; you can wire to your backend later if desired.
+    function getRequests() {
+        try { return JSON.parse(localStorage.getItem('mbb_prayer_requests') || '[]'); } catch { return []; }
+    }
+    function setRequests(list) {
+        try { localStorage.setItem('mbb_prayer_requests', JSON.stringify(list)); } catch { }
+    }
+
+    btnSubmitRequest.addEventListener('click', (e) => {
+        e.preventDefault();
+        const type = (prayerForm.querySelector('input[name="reqType"]:checked') || {}).value || 'For myself';
+        const name = document.getElementById('reqName').value.trim();
+        const email = document.getElementById('reqEmail').value.trim();
+        const msg = document.getElementById('reqMessage').value.trim();
+        const privacy = (prayerForm.querySelector('input[name="privacy"]:checked') || {}).value || 'Private';
+
+        if (!msg) { alert('Please enter a prayer request.'); return; }
+
+        const entry = {
+            id: 'req_' + Date.now(),
+            type, name, email, privacy,
+            message: msg,
+            createdAt: new Date().toISOString()
+        };
+
+        const list = getRequests();
+        list.unshift(entry);
+        setRequests(list);
+
+        // Clear form and close
+        prayerForm.reset();
+        prayerDialog.close();
+
+        // Light confirmation
+        alert('Prayer request saved locally. You can add sharing later on your backend.');
+    });
+
+    // Close on backdrop click (optional nicety)
+    prayerDialog.addEventListener('click', (e) => {
+        const rect = prayerDialog.querySelector('.pg-dialog-card').getBoundingClientRect();
+        const inDialog = e.clientX >= rect.left && e.clientX <= rect.right &&
+            e.clientY >= rect.top && e.clientY <= rect.bottom;
+        if (!inDialog) prayerDialog.close();
+    });
+})();

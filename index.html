@@ -180,6 +180,176 @@
             <h1 class="page-title">Personal Growth</h1>
             <p class="page-sub">Devotional, goals, journal, and practical ministry.</p>
 
+            <!-- ===== Prayer Section (Drop-in) ===== -->
+            <section id="prayer-section" class="pg-card pg-span-2">
+                <header class="pg-header">
+                    <h2 class="pg-title">Prayer</h2>
+                    <p class="pg-subtitle">Pray • Learn • Share</p>
+                </header>
+
+                <!-- Action Bar -->
+                <div class="pg-actions">
+                    <button class="pg-btn" id="btnCreateRule">Create Prayer Rule</button>
+                    <button class="pg-btn" id="btnPrayerRequest">Prayer Request</button>
+                    <button class="pg-btn primary" id="btnPrayNow">Pray Now</button>
+                </div>
+
+                <!-- Create Prayer Rule (Builder) -->
+                <div class="pg-panel" id="ruleBuilder" hidden>
+                    <h3 class="pg-panel-title">Create a Simple Prayer Rule</h3>
+                    <form id="ruleForm" class="pg-form">
+                        <div class="pg-row">
+                            <div class="pg-field">
+                                <label class="pg-label">Times of Day</label>
+                                <label class="pg-chip"><input type="checkbox" name="times" value="Morning" checked> Morning</label>
+                                <label class="pg-chip"><input type="checkbox" name="times" value="Midday"> Midday</label>
+                                <label class="pg-chip"><input type="checkbox" name="times" value="Evening" checked> Evening</label>
+                            </div>
+                            <div class="pg-field">
+                                <label class="pg-label" for="duration">Minutes per session</label>
+                                <input id="duration" type="number" min="1" max="120" value="10" class="pg-input" required>
+                            </div>
+                        </div>
+
+                        <div class="pg-row">
+                            <div class="pg-field">
+                                <label class="pg-label">Focus Areas</label>
+                                <div class="pg-grid-2">
+                                    <label class="pg-check"><input type="checkbox" name="focus" value="Praise/Thanksgiving" checked> Praise/Thanksgiving</label>
+                                    <label class="pg-check"><input type="checkbox" name="focus" value="Confession"> Confession</label>
+                                    <label class="pg-check"><input type="checkbox" name="focus" value="Intercession for others" checked> Intercession for others</label>
+                                    <label class="pg-check"><input type="checkbox" name="focus" value="Petition/Needs"> Petition/Needs</label>
+                                    <label class="pg-check"><input type="checkbox" name="focus" value="Listening/Silence" checked> Listening/Silence</label>
+                                    <label class="pg-check"><input type="checkbox" name="focus" value="Scripture reflection"> Scripture reflection</label>
+                                </div>
+                            </div>
+                            <div class="pg-field">
+                                <label class="pg-label" for="scripture">Optional Scripture verse</label>
+                                <input id="scripture" type="text" placeholder="e.g., Psalm 23:1–3" class="pg-input">
+                            </div>
+                        </div>
+
+                        <div class="pg-row">
+                            <div class="pg-field">
+                                <label class="pg-label" for="notes">Personal notes (optional)</label>
+                                <textarea id="notes" class="pg-textarea" rows="3" placeholder="Intentions, people to pray for, reminders..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="pg-actions end">
+                            <button type="button" class="pg-btn" id="btnGenerateRule">Generate Guide</button>
+                            <button type="button" class="pg-btn subtle" id="btnClearRule">Clear</button>
+                        </div>
+                    </form>
+
+                    <div id="ruleOutput" class="pg-output" hidden>
+                        <div class="pg-output-header">
+                            <h4>Your Beginner Prayer Guide</h4>
+                            <div class="pg-output-actions">
+                                <button class="pg-btn tiny" id="btnCopyRule" title="Copy to clipboard">Copy</button>
+                                <button class="pg-btn tiny" id="btnDownloadRule" title="Download as .txt">Download</button>
+                            </div>
+                        </div>
+                        <pre class="pg-pre" id="ruleText"></pre>
+                    </div>
+                </div>
+
+                <!-- Pray Now (Timer) -->
+                <div class="pg-panel" id="prayPanel" hidden>
+                    <h3 class="pg-panel-title">Pray Now</h3>
+                    <div class="pg-row align-center">
+                        <label class="pg-label" for="prayMinutes">Minutes:</label>
+                        <input id="prayMinutes" type="number" min="1" max="180" value="10" class="pg-input small" />
+                        <button class="pg-btn" id="btnStartTimer">Start</button>
+                        <button class="pg-btn subtle" id="btnPauseTimer" disabled>Pause</button>
+                        <button class="pg-btn subtle" id="btnResetTimer" disabled>Reset</button>
+                    </div>
+
+                    <div class="pg-timer">
+                        <div class="pg-timer-display" aria-live="polite" id="timerDisplay">10:00</div>
+                        <div class="pg-timer-hints" id="timerHints">
+                            Suggested flow: 2m Praise • 2m Confession • 4m Intercession • 2m Listening
+                        </div>
+                        <div class="pg-progress" aria-hidden="true">
+                            <div class="pg-progress-bar" id="timerBar" style="width:0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- General Info -->
+                <div class="pg-panel" id="prayerInfo">
+                    <h3 class="pg-panel-title">What is Prayer? Why pray?</h3>
+                    <div class="pg-info">
+                        <p><strong>Prayer</strong> is a conversation with God—speaking, listening, and aligning your heart with His will.</p>
+                        <ul class="pg-list">
+                            <li><strong>Relationship:</strong> Deepens trust and intimacy with God.</li>
+                            <li><strong>Clarity:</strong> Calms the mind and helps discern next steps.</li>
+                            <li><strong>Resilience:</strong> Reduces anxiety and builds hope during trials.</li>
+                            <li><strong>Community:</strong> Interceding for others strengthens unity and compassion.</li>
+                            <li><strong>Formation:</strong> Regular rhythms shape character and gratitude.</li>
+                        </ul>
+                        <details class="pg-details">
+                            <summary>Tips for beginners</summary>
+                            <ol class="pg-ol">
+                                <li>Start small: 5–10 minutes at consistent times.</li>
+                                <li>Pick a quiet place; put your device on Do Not Disturb.</li>
+                                <li>Use a simple structure (Praise → Confession → Intercession → Petition → Listening).</li>
+                                <li>Keep a short list of people/needs and update weekly.</li>
+                                <li>End with gratitude and one practical step for today.</li>
+                            </ol>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Prayer Request Modal -->
+                <dialog id="prayerDialog" class="pg-dialog">
+                    <form method="dialog" class="pg-dialog-card" id="prayerForm">
+                        <header class="pg-dialog-header">
+                            <h3>Prayer Request</h3>
+                            <button class="pg-icon-btn" value="cancel" aria-label="Close">&times;</button>
+                        </header>
+
+                        <div class="pg-field">
+                            <label class="pg-label">Type</label>
+                            <div class="pg-grid-2">
+                                <label class="pg-radio"><input type="radio" name="reqType" value="For myself" checked> For myself</label>
+                                <label class="pg-radio"><input type="radio" name="reqType" value="Request prayer"> Request prayer</label>
+                            </div>
+                        </div>
+
+                        <div class="pg-row">
+                            <div class="pg-field">
+                                <label class="pg-label" for="reqName">Name (optional)</label>
+                                <input id="reqName" type="text" class="pg-input" placeholder="Your name">
+                            </div>
+                            <div class="pg-field">
+                                <label class="pg-label" for="reqEmail">Email (optional)</label>
+                                <input id="reqEmail" type="email" class="pg-input" placeholder="name@example.com">
+                            </div>
+                        </div>
+
+                        <div class="pg-field">
+                            <label class="pg-label" for="reqMessage">Prayer request</label>
+                            <textarea id="reqMessage" class="pg-textarea" rows="4" required placeholder="Share your need or the person to pray for..."></textarea>
+                        </div>
+
+                        <div class="pg-row">
+                            <div class="pg-field">
+                                <label class="pg-label">Privacy</label>
+                                <label class="pg-radio"><input type="radio" name="privacy" value="Private" checked> Private (only you)</label>
+                                <label class="pg-radio"><input type="radio" name="privacy" value="Anonymous"> Anonymous (ok to share without name)</label>
+                                <label class="pg-radio"><input type="radio" name="privacy" value="Share with first name"> Share with first name</label>
+                            </div>
+                        </div>
+
+                        <footer class="pg-dialog-footer">
+                            <button class="pg-btn" value="submit" id="btnSubmitRequest">Submit</button>
+                            <button class="pg-btn subtle" value="cancel">Cancel</button>
+                        </footer>
+                    </form>
+                </dialog>
+            </section>
+
             <div class="grid-2">
                 <div class="card">
                     <h2 class="section-title">Daily Devotional</h2>
