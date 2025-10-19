@@ -60,49 +60,45 @@ const toggleTheme = () => {
 /* ========= Tabs ========= */
 const sections = $$(".tab-section");
 const nav = $(".nav");
-const navBtns = $$(".nav-btn[data-tab]");
 const mobileNav = $("#mobileNav");
-const appendix = $("#recovery-steps-appendix"); // Show only on the Recovery tab
+const appendix = $("#recovery-steps-appendix"); // optional
 
-// Build a quick set of valid tab ids from the DOM
-const TAB_IDS = new Set(sections.map ? sections.map(s => s.id) : Array.from(sections).map(s => s.id));
+// Build a canonical set of valid tab ids from the DOM
+const TAB_IDS = new Set(sections.map(s => s.id));
 const DEFAULT_TAB = "welcome";
 
-function showTab(id) {
-    // Guard against invalid ids
-    const tabId = TAB_IDS.has(id) ? id : DEFAULT_TAB;
+function showTab(rawId) {
+    const id = TAB_IDS.has(rawId) ? rawId : DEFAULT_TAB;
 
-    sections.forEach(s => s.classList.toggle("hidden", s.id !== tabId));
-    navBtns.forEach(b => b.classList.toggle("active", b.dataset.tab === tabId));
-    if (mobileNav) mobileNav.value = tabId;
+    // Toggle sections
+    sections.forEach(s => s.classList.toggle("hidden", s.id !== id));
 
-    // update URL hash without scrolling
-    if (location.hash !== `#${tabId}`) {
-        history.replaceState(null, "", `#${tabId}`);
+    // Toggle active state on nav buttons
+    $$(".nav-btn[data-tab]").forEach(b => b.classList.toggle("active", b.dataset.tab === id));
+
+    // Sync mobile selector
+    if (mobileNav && mobileNav.value !== id) mobileNav.value = id;
+
+    // Update hash without scrolling
+    if (location.hash !== `#${id}`) {
+        history.replaceState(null, "", `#${id}`);
     }
 
-    // Only show the appendix (printable guidance + steps) on Recovery tab
-    if (appendix) {
-        appendix.classList.toggle("hidden", tabId !== "recovery");
-    }
+    // Optional appendix visibility
+    if (appendix) appendix.classList.toggle("hidden", id !== "recovery");
 }
 
-// Wire only real tab buttons
-navBtns.forEach(btn => {
-    btn.addEventListener("click", () => showTab(btn.dataset.tab));
-});
-
-// Defensive: if someone clicks a nav button without data-tab (Support/Theme), ignore
+// 1) Single delegated handler on the nav (ignores Support/Theme)
 nav?.addEventListener("click", (e) => {
-    const btn = e.target.closest(".nav-btn");
-    if (!btn || !btn.dataset.tab) return; // ignore non-tab buttons
+    const btn = e.target.closest(".nav-btn[data-tab]");
+    if (!btn) return;                 // not a tab button
     showTab(btn.dataset.tab);
 });
 
-// Mobile selector
+// 2) Mobile selector
 mobileNav?.addEventListener("change", () => showTab(mobileNav.value));
 
-// Support [data-jump] links
+// 3) [data-jump] links anywhere in the document
 document.addEventListener("click", (e) => {
     const t = e.target.closest("[data-jump]");
     if (!t) return;
@@ -110,9 +106,12 @@ document.addEventListener("click", (e) => {
     showTab(t.getAttribute("data-jump"));
 });
 
+// 4) Respond to back/forward hash changes too
+window.addEventListener("hashchange", () => showTab(location.hash.slice(1)));
+
 // Initial tab (hash or default)
-const initial = TAB_IDS.has(location.hash?.slice(1)) ? location.hash.slice(1) : DEFAULT_TAB;
-showTab(initial);
+showTab(location.hash.slice(1));
+
 
 
 /* ========= Footer Year ========= */
