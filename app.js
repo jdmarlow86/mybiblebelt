@@ -115,7 +115,9 @@ showTab(location.hash.slice(1));
 
 
 /* ========= Footer Year ========= */
-$("#year").textContent = new Date().getFullYear();
+const yearEl = $("#year");
+if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
 
 /* ========= Theme toggle bindings ========= */
 $("#themeToggle")?.addEventListener("click", toggleTheme);
