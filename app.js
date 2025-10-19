@@ -59,32 +59,61 @@ const toggleTheme = () => {
 
 /* ========= Tabs ========= */
 const sections = $$(".tab-section");
+const nav = $(".nav");
 const navBtns = $$(".nav-btn[data-tab]");
 const mobileNav = $("#mobileNav");
 const appendix = $("#recovery-steps-appendix"); // Show only on the Recovery tab
 
+// Build a quick set of valid tab ids from the DOM
+const TAB_IDS = new Set(sections.map ? sections.map(s => s.id) : Array.from(sections).map(s => s.id));
+const DEFAULT_TAB = "welcome";
+
 function showTab(id) {
-    sections.forEach(s => s.classList.toggle("hidden", s.id !== id));
-    navBtns.forEach(b => b.classList.toggle("active", b.dataset.tab === id));
-    if (mobileNav) mobileNav.value = id;
-    history.replaceState(null, "", `#${id}`);
+    // Guard against invalid ids
+    const tabId = TAB_IDS.has(id) ? id : DEFAULT_TAB;
+
+    sections.forEach(s => s.classList.toggle("hidden", s.id !== tabId));
+    navBtns.forEach(b => b.classList.toggle("active", b.dataset.tab === tabId));
+    if (mobileNav) mobileNav.value = tabId;
+
+    // update URL hash without scrolling
+    if (location.hash !== `#${tabId}`) {
+        history.replaceState(null, "", `#${tabId}`);
+    }
 
     // Only show the appendix (printable guidance + steps) on Recovery tab
     if (appendix) {
-        if (id === "recovery") appendix.classList.remove("hidden");
-        else appendix.classList.add("hidden");
+        appendix.classList.toggle("hidden", tabId !== "recovery");
     }
 }
-navBtns.forEach(btn => btn.addEventListener("click", () => showTab(btn.dataset.tab)));
+
+// Wire only real tab buttons
+navBtns.forEach(btn => {
+    btn.addEventListener("click", () => showTab(btn.dataset.tab));
+});
+
+// Defensive: if someone clicks a nav button without data-tab (Support/Theme), ignore
+nav?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".nav-btn");
+    if (!btn || !btn.dataset.tab) return; // ignore non-tab buttons
+    showTab(btn.dataset.tab);
+});
+
+// Mobile selector
 mobileNav?.addEventListener("change", () => showTab(mobileNav.value));
+
+// Support [data-jump] links
 document.addEventListener("click", (e) => {
     const t = e.target.closest("[data-jump]");
     if (!t) return;
     e.preventDefault();
     showTab(t.getAttribute("data-jump"));
 });
-const initial = location.hash?.slice(1) || "welcome";
+
+// Initial tab (hash or default)
+const initial = TAB_IDS.has(location.hash?.slice(1)) ? location.hash.slice(1) : DEFAULT_TAB;
 showTab(initial);
+
 
 /* ========= Footer Year ========= */
 $("#year").textContent = new Date().getFullYear();
