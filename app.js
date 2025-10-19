@@ -881,6 +881,9 @@ $("#donMoreBtn")?.addEventListener("click", () => alert("In production: receipts
 })();
 
 (() => {
+    // Bail out if the Prayer section isn't on the page yet
+    if (!document.getElementById('prayer-section')) return;
+
     // ELEMENTS
     const ruleBuilder = document.getElementById('ruleBuilder');
     const prayPanel = document.getElementById('prayPanel');
@@ -912,38 +915,32 @@ $("#donMoreBtn")?.addEventListener("click", () => alert("In production: receipts
 
     // SIMPLE VIEW TOGGLING
     function showPanel(panel) {
-        // Keep info always visible; toggle the others
-        ruleBuilder.hidden = panel !== ruleBuilder;
-        prayPanel.hidden = panel !== prayPanel;
-        if (panel == null) { ruleBuilder.hidden = true; prayPanel.hidden = true; }
+        if (ruleBuilder) ruleBuilder.hidden = panel !== ruleBuilder;
+        if (prayPanel) prayPanel.hidden = panel !== prayPanel;
+        if (panel == null) { if (ruleBuilder) ruleBuilder.hidden = true; if (prayPanel) prayPanel.hidden = true; }
     }
 
-    btnCreateRule.addEventListener('click', () => showPanel(ruleBuilder));
-    btnPrayNow.addEventListener('click', () => {
+    btnCreateRule?.addEventListener('click', () => showPanel(ruleBuilder));
+    btnPrayNow?.addEventListener('click', () => {
         showPanel(prayPanel);
-        updateTimerDisplay(Number(prayMinutes.value) * 60);
+        if (prayMinutes) updateTimerDisplay(Number(prayMinutes.value) * 60);
     });
-    btnPrayerRequest.addEventListener('click', () => {
-        if (typeof prayerDialog.showModal === 'function') {
-            prayerDialog.showModal();
-        } else {
-            alert('Your browser does not support modals. Please update to a modern browser.');
-        }
+    btnPrayerRequest?.addEventListener('click', () => {
+        if (prayerDialog && typeof prayerDialog.showModal === 'function') prayerDialog.showModal();
+        else alert('Your browser does not support modals. Please update to a modern browser.');
     });
 
     // ===== Create Prayer Rule =====
-    btnGenerateRule.addEventListener('click', () => {
+    btnGenerateRule?.addEventListener('click', () => {
+        if (!ruleForm || !ruleText || !ruleOutput) return;
         const times = [...ruleForm.querySelectorAll('input[name="times"]:checked')].map(x => x.value);
         const focus = [...ruleForm.querySelectorAll('input[name="focus"]:checked')].map(x => x.value);
-        const minutes = Math.max(1, Math.min(120, Number(document.getElementById('duration').value) || 10));
-        const scripture = (document.getElementById('scripture').value || '').trim();
-        const notes = (document.getElementById('notes').value || '').trim();
+        const minutes = Math.max(1, Math.min(120, Number(document.getElementById('duration')?.value) || 10));
+        const scripture = (document.getElementById('scripture')?.value || '').trim();
+        const notes = (document.getElementById('notes')?.value || '').trim();
 
         const perFocus = Math.max(1, Math.floor((minutes * 60) / Math.max(1, focus.length)));
-        const fmt = s => {
-            const m = Math.floor(s / 60), ss = String(s % 60).padStart(2, '0');
-            return `${m}:${ss}`;
-        };
+        const fmt = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
         let guide = `BEGINNER PRAYER RULE
 ====================
@@ -953,15 +950,9 @@ Minutes per session: ${minutes}
 
 Suggested structure (${minutes} min total):
 `;
-        for (const f of focus) {
-            guide += `• ${f} — ~${fmt(perFocus)}\n`;
-        }
-        if (scripture) {
-            guide += `\nScripture reflection: ${scripture}\n`;
-        }
-        if (notes) {
-            guide += `\nPersonal notes:\n${notes}\n`;
-        }
+        for (const f of focus) guide += `• ${f} — ~${fmt(perFocus)}\n`;
+        if (scripture) guide += `\nScripture reflection: ${scripture}\n`;
+        if (notes) guide += `\nPersonal notes:\n${notes}\n`;
         guide += `
 Tips:
 - Choose a quiet place and silence notifications.
@@ -971,17 +962,16 @@ Tips:
 
         ruleText.textContent = guide;
         ruleOutput.hidden = false;
-
-        // Persist last built rule
         try { localStorage.setItem('mbb_last_prayer_rule', guide); } catch { }
     });
 
-    btnClearRule.addEventListener('click', () => {
-        ruleForm.reset();
-        ruleOutput.hidden = true;
+    btnClearRule?.addEventListener('click', () => {
+        ruleForm?.reset();
+        if (ruleOutput) ruleOutput.hidden = true;
     });
 
-    btnCopyRule.addEventListener('click', async () => {
+    btnCopyRule?.addEventListener('click', async () => {
+        if (!ruleText) return;
         try {
             await navigator.clipboard.writeText(ruleText.textContent || '');
             btnCopyRule.textContent = 'Copied!';
@@ -989,7 +979,8 @@ Tips:
         } catch { alert('Copy failed—select and copy manually.'); }
     });
 
-    btnDownloadRule.addEventListener('click', () => {
+    btnDownloadRule?.addEventListener('click', () => {
+        if (!ruleText) return;
         const blob = new Blob([ruleText.textContent || ''], { type: 'text/plain' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
@@ -998,18 +989,15 @@ Tips:
         setTimeout(() => URL.revokeObjectURL(a.href), 0);
     });
 
-    // Load last rule if present
     try {
         const last = localStorage.getItem('mbb_last_prayer_rule');
-        if (last) {
-            ruleText.textContent = last;
-            ruleOutput.hidden = false;
-        }
+        if (last && ruleText && ruleOutput) { ruleText.textContent = last; ruleOutput.hidden = false; }
     } catch { }
 
     // ===== Pray Now Timer =====
     let timer = null, totalSeconds = 0, remaining = 0, paused = false;
     function updateTimerDisplay(sec) {
+        if (!timerDisplay || !timerBar) return;
         const m = Math.floor(sec / 60), s = String(Math.floor(sec % 60)).padStart(2, '0');
         timerDisplay.textContent = `${m}:${s}`;
         const elapsed = Math.max(0, totalSeconds - sec);
@@ -1017,16 +1005,14 @@ Tips:
         timerBar.style.width = `${Math.min(100, Math.max(0, pct))}%`;
     }
 
-    btnStartTimer.addEventListener('click', () => {
-        totalSeconds = Math.max(60, Math.min(60 * 180, Number(prayMinutes.value) * 60 || 600));
-        remaining = totalSeconds;
-        paused = false;
-        btnPauseTimer.disabled = false;
-        btnResetTimer.disabled = false;
+    btnStartTimer?.addEventListener('click', () => {
+        totalSeconds = Math.max(60, Math.min(60 * 180, Number(prayMinutes?.value) * 60 || 600));
+        remaining = totalSeconds; paused = false;
+        if (btnPauseTimer) btnPauseTimer.disabled = false;
+        if (btnResetTimer) btnResetTimer.disabled = false;
 
-        // Simple suggested flow message
         const seg = Math.round(totalSeconds / 4 / 60);
-        timerHints.textContent = `Suggested flow: ${seg}m Praise • ${seg}m Confession • ${seg * 2}m Intercession • ${seg}m Listening`;
+        if (timerHints) timerHints.textContent = `Suggested flow: ${seg}m Praise • ${seg}m Confession • ${seg * 2}m Intercession • ${seg}m Listening`;
 
         clearInterval(timer);
         updateTimerDisplay(remaining);
@@ -1035,34 +1021,30 @@ Tips:
             remaining--;
             updateTimerDisplay(remaining);
             if (remaining <= 0) {
-                clearInterval(timer);
-                timer = null;
-                timerBar.style.width = '100%';
-                // Optional chime
+                clearInterval(timer); timer = null;
+                if (timerBar) timerBar.style.width = '100%';
                 try { new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABYAAAABAA==').play().catch(() => { }); } catch { }
                 alert('Prayer time complete. Grace and peace!');
             }
         }, 1000);
     });
 
-    btnPauseTimer.addEventListener('click', () => {
+    btnPauseTimer?.addEventListener('click', () => {
         if (!timer) return;
         paused = !paused;
-        btnPauseTimer.textContent = paused ? 'Resume' : 'Pause';
+        if (btnPauseTimer) btnPauseTimer.textContent = paused ? 'Resume' : 'Pause';
     });
 
-    btnResetTimer.addEventListener('click', () => {
-        clearInterval(timer); timer = null;
-        paused = false; btnPauseTimer.textContent = 'Pause';
-        totalSeconds = Math.max(60, Math.min(60 * 180, Number(prayMinutes.value) * 60 || 600));
-        remaining = totalSeconds;
-        updateTimerDisplay(remaining);
-        btnPauseTimer.disabled = true;
-        btnResetTimer.disabled = true;
+    btnResetTimer?.addEventListener('click', () => {
+        clearInterval(timer); timer = null; paused = false;
+        if (btnPauseTimer) btnPauseTimer.textContent = 'Pause';
+        totalSeconds = Math.max(60, Math.min(60 * 180, Number(prayMinutes?.value) * 60 || 600));
+        remaining = totalSeconds; updateTimerDisplay(remaining);
+        if (btnPauseTimer) btnPauseTimer.disabled = true;
+        if (btnResetTimer) btnResetTimer.disabled = true;
     });
 
     // ===== Prayer Request Modal =====
-    // Persist locally; you can wire to your backend later if desired.
     function getRequests() {
         try { return JSON.parse(localStorage.getItem('mbb_prayer_requests') || '[]'); } catch { return []; }
     }
@@ -1070,43 +1052,35 @@ Tips:
         try { localStorage.setItem('mbb_prayer_requests', JSON.stringify(list)); } catch { }
     }
 
-    btnSubmitRequest.addEventListener('click', (e) => {
+    btnSubmitRequest?.addEventListener('click', (e) => {
         e.preventDefault();
+        if (!prayerForm || !prayerDialog) return;
         const type = (prayerForm.querySelector('input[name="reqType"]:checked') || {}).value || 'For myself';
-        const name = document.getElementById('reqName').value.trim();
-        const email = document.getElementById('reqEmail').value.trim();
-        const msg = document.getElementById('reqMessage').value.trim();
+        const name = document.getElementById('reqName')?.value.trim() || '';
+        const email = document.getElementById('reqEmail')?.value.trim() || '';
+        const msg = document.getElementById('reqMessage')?.value.trim() || '';
         const privacy = (prayerForm.querySelector('input[name="privacy"]:checked') || {}).value || 'Private';
 
         if (!msg) { alert('Please enter a prayer request.'); return; }
 
-        const entry = {
-            id: 'req_' + Date.now(),
-            type, name, email, privacy,
-            message: msg,
-            createdAt: new Date().toISOString()
-        };
+        const entry = { id: 'req_' + Date.now(), type, name, email, privacy, message: msg, createdAt: new Date().toISOString() };
+        const list = getRequests(); list.unshift(entry); setRequests(list);
 
-        const list = getRequests();
-        list.unshift(entry);
-        setRequests(list);
-
-        // Clear form and close
         prayerForm.reset();
-        prayerDialog.close();
-
-        // Light confirmation
+        if (typeof prayerDialog.close === 'function') prayerDialog.close();
         alert('Prayer request saved locally. You can add sharing later on your backend.');
     });
 
     // Close on backdrop click (optional nicety)
-    prayerDialog.addEventListener('click', (e) => {
-        const rect = prayerDialog.querySelector('.pg-dialog-card').getBoundingClientRect();
-        const inDialog = e.clientX >= rect.left && e.clientX <= rect.right &&
-            e.clientY >= rect.top && e.clientY <= rect.bottom;
-        if (!inDialog) prayerDialog.close();
+    prayerDialog?.addEventListener('click', (e) => {
+        const card = prayerDialog.querySelector('.pg-dialog-card');
+        if (!card) return;
+        const r = card.getBoundingClientRect();
+        const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+        if (!inside && typeof prayerDialog.close === 'function') prayerDialog.close();
     });
 })();
+
 
 (() => {
     // Your tags
