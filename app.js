@@ -112,12 +112,9 @@ window.addEventListener("hashchange", () => showTab(location.hash.slice(1)));
 // Initial tab (hash or default)
 showTab(location.hash.slice(1));
 
-
-
 /* ========= Footer Year ========= */
 const yearEl = $("#year");
 if (yearEl) yearEl.textContent = String(new Date().getFullYear());
-
 
 /* ========= Theme toggle bindings ========= */
 $("#themeToggle")?.addEventListener("click", toggleTheme);
@@ -880,6 +877,7 @@ $("#donMoreBtn")?.addEventListener("click", () => alert("In production: receipts
     form && form.addEventListener("submit", onSubmit);
 })();
 
+/* ========= Prayer (defensive bindings) ========= */
 (() => {
     // Bail out if the Prayer section isn't on the page yet
     if (!document.getElementById('prayer-section')) return;
@@ -1081,7 +1079,7 @@ Tips:
     });
 })();
 
-
+/* ========= Support modal ========= */
 (() => {
     // Your tags
     const TAGS = {
@@ -1106,7 +1104,7 @@ Tips:
     const vmWeb = document.getElementById('vmWeb');
     const vmCopy = document.getElementById('vmCopy');
 
-    // Open modal
+    // Open modal (these ids exist in your HTML; if they didn't, we would guard)
     btnSupport.addEventListener('click', () => {
         if (typeof dialog.showModal === 'function') dialog.showModal();
         else alert('Your browser does not support modals.');
@@ -1134,7 +1132,6 @@ Tips:
     }
 
     // PayPal (web)
-    // Format: https://www.paypal.com/paypalme/<handle>/<amount>
     ppWeb.addEventListener('click', () => {
         const amt = getAmount();
         const base = `https://www.paypal.com/paypalme/${encodeURIComponent(TAGS.paypal)}`;
@@ -1144,7 +1141,6 @@ Tips:
     ppCopy.addEventListener('click', (e) => copy(TAGS.paypal, e.currentTarget));
 
     // Cash App (web)
-    // Common format supports trailing /<amount> for convenience.
     caWeb.addEventListener('click', () => {
         const amt = getAmount();
         const clean = TAGS.cashapp.startsWith('$') ? TAGS.cashapp.slice(1) : TAGS.cashapp;
@@ -1155,7 +1151,6 @@ Tips:
     caCopy.addEventListener('click', (e) => copy(TAGS.cashapp, e.currentTarget));
 
     // Venmo
-    // App deep link (best effort on mobile): venmo://paycharge?recipients=<user>&amount=<amt>&note=<note>
     vmApp.addEventListener('click', () => {
         const amt = getAmount();
         const note = getNote();
@@ -1164,9 +1159,7 @@ Tips:
         if (amt) qp.set('amount', amt);
         if (note) qp.set('note', note);
         const deeplink = `venmo://paycharge?${qp.toString()}`;
-        // Attempt deep link
         window.location.href = deeplink;
-        // Tip: user agents without Venmo will ignore; web fallback is provided below
     });
 
     // Web profile fallback
