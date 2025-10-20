@@ -1,242 +1,227 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" class="light">
 <head>
     <meta charset="utf-8" />
-    <title>mybiblebelt.org</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <!-- Set theme BEFORE CSS to prevent flash -->
-    <script>
-        (function () {
-            try {
-                const stored = localStorage.getItem("theme");
-                const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-                const useDark = stored ? stored === "dark" : prefersDark;
-                if (useDark) document.documentElement.classList.add("dark");
-            } catch { }
-        })();
-    </script>
-
-    <link rel="stylesheet" href="./styles.css" />
-    <style>
-        /* === Support button styling === */
-        .nav-btn.support-btn {
-            background-color: #16a34a; /* Tailwind green-600 */
-            color: #fff;
-            font-weight: 600;
-            border-radius: 6px;
-            padding: 6px 14px;
-            transition: background 0.2s ease, transform 0.1s ease;
-        }
-
-            .nav-btn.support-btn:hover {
-                background-color: #22c55e; /* Tailwind green-500 */
-                transform: translateY(-1px);
-            }
-
-            .nav-btn.support-btn:active {
-                background-color: #15803d; /* Tailwind green-700 */
-                transform: translateY(0);
-            }
-    </style>
+    <title>My Bible Belt — Clean Starter</title>
+    <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
     <header class="site-header">
-        <div class="brand">
-            <div class="logo">
-                <img src="assets/mybiblebelt-icon.png" alt="mybiblebelt.org Logo" style="width:36px; height:36px; border-radius:10px;">
-            </div>
-            <div class="brand-text">
-                <div class="brand-title">mybiblebelt.org</div>
-                <div class="brand-sub">Bible-focused study • Find community • Grow daily</div>
-            </div>
-        </div>
+        <div class="brand">My Bible Belt</div>
 
         <nav class="nav">
-            <button data-tab="welcome" class="nav-btn active">Welcome</button>
-            <button data-tab="resources" class="nav-btn">Resources</button>
-            <button data-tab="community" class="nav-btn">Community</button>
-            <button data-tab="growth" class="nav-btn">Personal Growth</button>
-            <button data-tab="study" class="nav-btn">Bible Study</button>
-            <button data-tab="recovery" class="nav-btn">Recovery</button>
-            <button data-tab="payit" class="nav-btn">Pay it Forward</button>
-            <!-- 🟢 Green Support button (no data-tab) -->
-            <button id="btnSupport" class="nav-btn support-btn" data-role="support" aria-haspopup="dialog">💚 Support</button>
-            <button id="themeToggle" class="nav-btn" aria-label="Toggle dark mode">🌙</button>
+            <button class="nav-btn" data-tab="welcome">Welcome</button>
+            <button class="nav-btn" data-tab="resources">Resources</button>
+            <button class="nav-btn" data-tab="prayer">Prayer</button>
+            <button class="nav-btn" data-tab="support">Support</button>
+
+            <div class="grow"></div>
+
+            <button id="themeToggle" class="icon-btn" title="Toggle theme"></button>
         </nav>
 
-        <div class="nav-select-wrap">
-            <div class="row gap">
-                <select id="mobileNav">
-                    <option value="welcome">Welcome</option>
-                    <option value="resources">Resources</option>
-                    <option value="community">Community</option>
-                    <option value="growth">Personal Growth</option>
-                    <option value="study">Bible Study</option>
-                    <option value="recovery">Recovery</option>
-                    <option value="payit">Pay it Forward</option>
-                </select>
-                <button id="themeToggleMobile" class="btn" aria-label="Toggle dark mode">🌙</button>
-            </div>
+        <div class="mobile-nav">
+            <label for="mobileNav" class="sr-only">Navigate</label>
+            <select id="mobileNav">
+                <option value="welcome">Welcome</option>
+                <option value="resources">Resources</option>
+                <option value="prayer">Prayer</option>
+                <option value="support">Support</option>
+            </select>
+            <button id="themeToggleMobile" class="icon-btn" title="Toggle theme (mobile)"></button>
         </div>
     </header>
 
-    <main class="container">
-        <!-- Everything else remains unchanged -->
+    <main>
+        <!-- Welcome -->
         <section id="welcome" class="tab-section">
-            <h1 class="page-title">Welcome to mybiblebelt.org</h1>
-            <p class="page-sub">Bible-focused study with a warm invitation to worship in a local church of your preference.</p>
             <div class="card">
-                <p>
-                    Our heart is to help you explore Scripture, find community, and grow daily. Whether you are just
-                    beginning or continuing a lifelong journey, you are welcome here. We encourage you to visit a local
-                    church—of your preference—to worship, learn, and serve alongside others.
-                </p>
-                <div class="actions">
-                    <button id="findChurchBtn" class="btn primary">Find a Local Church</button>
-                </div>
+                <h2>Welcome</h2>
+                <p>Clean starter with working tabs, theme toggle, resources, prayer tools, and a support modal.</p>
+                <button id="findChurchBtn" class="btn">Find a Church (demo)</button>
             </div>
         </section>
 
-        <!-- (all your other sections like Resources, Community, Growth, Study, Recovery, Payit remain intact) -->
+        <!-- Resources -->
+        <section id="resources" class="tab-section hidden">
+            <div class="card">
+                <h2>Starter Kits</h2>
+
+                <div class="row gap mt">
+                    <input id="kitTitle" class="input" placeholder="Kit title e.g. Baptist — Starter Kit" />
+                    <input id="kitIntro" class="input" placeholder="Short intro" />
+                </div>
+                <div class="row gap mt">
+                    <input id="kitStudy" class="input" placeholder="One study item (optional)" />
+                    <button id="addKitBtn" class="btn">Add Kit</button>
+                    <button id="clearKitFormBtn" class="btn ghost">Clear</button>
+                </div>
+
+                <div id="kitsGrid" class="grid mt"></div>
+            </div>
+        </section>
+
+        <!-- Prayer -->
+        <section id="prayer" class="tab-section hidden">
+            <div id="prayer-section" class="card">
+                <h2>Prayer Tools</h2>
+                <p class="muted" id="prayerInfo">Build a simple prayer rule or use a timed prayer session.</p>
+
+                <div class="row gap mt">
+                    <button id="btnCreateRule" class="btn">Create a Prayer Rule</button>
+                    <button id="btnPrayNow" class="btn">Pray Now (Timer)</button>
+                    <button id="btnPrayerRequest" class="btn ghost">Add Prayer Request</button>
+                </div>
+
+                <!-- Rule Builder -->
+                <div id="ruleBuilder" class="mt hidden">
+                    <h3>Create Rule</h3>
+                    <form id="ruleForm" class="stack">
+                        <fieldset>
+                            <legend>Times of day</legend>
+                            <label><input type="checkbox" name="times" value="Morning" /> Morning</label>
+                            <label><input type="checkbox" name="times" value="Midday" /> Midday</label>
+                            <label><input type="checkbox" name="times" value="Evening" /> Evening</label>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>Focus areas</legend>
+                            <label><input type="checkbox" name="focus" value="Praise" checked /> Praise</label>
+                            <label><input type="checkbox" name="focus" value="Confession" checked /> Confession</label>
+                            <label><input type="checkbox" name="focus" value="Intercession" checked /> Intercession</label>
+                            <label><input type="checkbox" name="focus" value="Listening" checked /> Listening</label>
+                        </fieldset>
+
+                        <div class="row gap">
+                            <label>Minutes: <input id="duration" type="number" min="1" max="120" value="10" class="input w-xs" /></label>
+                            <input id="scripture" class="input grow" placeholder="Scripture (optional)" />
+                            <input id="notes" class="input grow" placeholder="Notes (optional)" />
+                        </div>
+
+                        <div class="row gap">
+                            <button type="button" id="btnGenerateRule" class="btn">Generate</button>
+                            <button type="button" id="btnClearRule" class="btn ghost">Clear</button>
+                            <button type="button" id="btnCopyRule" class="btn ghost">Copy</button>
+                            <button type="button" id="btnDownloadRule" class="btn ghost">Download</button>
+                        </div>
+                    </form>
+
+                    <pre id="ruleOutput" class="pre hidden"><code id="ruleText"></code></pre>
+                </div>
+
+                <!-- Pray Now Timer -->
+                <div id="prayPanel" class="mt hidden">
+                    <h3>Timed Prayer</h3>
+                    <div class="row gap">
+                        <label>
+                            Minutes:
+                            <input id="prayMinutes" type="number" class="input w-xs" min="1" max="180" value="10" />
+                        </label>
+                        <button id="btnStartTimer" class="btn">Start</button>
+                        <button id="btnPauseTimer" class="btn ghost" disabled>Pause</button>
+                        <button id="btnResetTimer" class="btn ghost" disabled>Reset</button>
+                    </div>
+
+                    <div class="timer mt">
+                        <div class="timer-bar" id="timerBar"></div>
+                    </div>
+                    <div class="row spread">
+                        <div id="timerDisplay" class="timer-display">0:00</div>
+                        <div id="timerHints" class="muted"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prayer Request Modal -->
+            <dialog id="prayerDialog" class="pg-dialog">
+                <div class="pg-dialog-card">
+                    <h3>Prayer Request</h3>
+                    <form id="prayerForm" method="dialog" class="stack">
+                        <div class="row gap">
+                            <label><input type="radio" name="reqType" value="For myself" checked /> For myself</label>
+                            <label><input type="radio" name="reqType" value="For someone else" /> For someone else</label>
+                        </div>
+                        <input id="reqName" class="input" placeholder="Your name (optional)" />
+                        <input id="reqEmail" class="input" placeholder="Your email (optional)" />
+                        <textarea id="reqMessage" class="input" placeholder="What can we pray for?" rows="4"></textarea>
+                        <div class="row gap">
+                            <label><input type="radio" name="privacy" value="Private" checked /> Private</label>
+                            <label><input type="radio" name="privacy" value="Share with group" /> Share with group</label>
+                        </div>
+                        <div class="row gap mt">
+                            <button id="btnSubmitRequest" class="btn">Save</button>
+                            <button value="cancel" class="btn ghost">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </dialog>
+        </section>
+
+        <!-- Support -->
+        <section id="support" class="tab-section hidden">
+            <div class="card">
+                <h2>Support</h2>
+                <p>If this project helps you, you can support it below.</p>
+                <div class="row gap">
+                    <button id="btnSupport" class="btn">Open Support Modal</button>
+                </div>
+            </div>
+
+            <dialog id="supportDialog" class="pg-dialog">
+                <div class="pg-dialog-card">
+                    <h3>Support the Project</h3>
+
+                    <div class="stack">
+                        <label>
+                            Amount (optional)
+                            <input id="supAmount" class="input" type="number" min="1" placeholder="e.g. 25" />
+                        </label>
+                        <label>
+                            Note (optional)
+                            <input id="supNote" class="input" type="text" placeholder="e.g. Keep it up!" />
+                        </label>
+                    </div>
+
+                    <div class="mt">
+                        <h4>PayPal</h4>
+                        <div class="row gap">
+                            <button id="ppWeb" class="btn">Open</button>
+                            <button id="ppCopy" class="btn ghost">Copy handle</button>
+                        </div>
+                    </div>
+
+                    <div class="mt">
+                        <h4>Cash App</h4>
+                        <div class="row gap">
+                            <button id="caWeb" class="btn">Open</button>
+                            <button id="caCopy" class="btn ghost">Copy $tag</button>
+                        </div>
+                    </div>
+
+                    <div class="mt">
+                        <h4>Venmo</h4>
+                        <div class="row gap">
+                            <button id="vmApp" class="btn">Open app</button>
+                            <button id="vmWeb" class="btn ghost">Open web</button>
+                            <button id="vmCopy" class="btn ghost">Copy @user</button>
+                        </div>
+                    </div>
+
+                    <div class="row right mt">
+                        <form method="dialog">
+                            <button class="btn ghost">Close</button>
+                        </form>
+                    </div>
+                </div>
+            </dialog>
+        </section>
     </main>
 
-    <!-- ===== Support Modal (Drop-in, unchanged) ===== -->
-    <dialog id="supportDialog" class="pg-dialog">
-        <form method="dialog" class="pg-dialog-card" id="supportForm">
-            <header class="pg-dialog-header">
-                <h3>Support Jonathan</h3>
-                <button class="pg-icon-btn" value="cancel" aria-label="Close">×</button>
-            </header>
+    <footer class="site-footer">
+        <div>© <span id="year"></span> My Bible Belt</div>
+    </footer>
 
-            <div class="pg-row">
-                <div class="pg-field">
-                    <label class="pg-label" for="supAmount">Amount (USD, optional)</label>
-                    <input id="supAmount" type="number" min="1" step="1" class="pg-input" placeholder="e.g., 25" />
-                </div>
-                <div class="pg-field">
-                    <label class="pg-label" for="supNote">Note (optional)</label>
-                    <input id="supNote" type="text" class="pg-input" placeholder="Thanks for your work!" />
-                </div>
-            </div>
-
-            <div class="pg-panel" style="margin-top:10px">
-                <h4 class="pg-panel-title">Choose a method</h4>
-
-                <div class="pg-panel" style="margin-top:8px">
-                    <div class="pg-row" style="grid-template-columns: 1fr auto auto;">
-                        <div>
-                            <strong>PayPal</strong><br>
-                            <small>paypal.com/paypalme/<code>jdmarlow86</code></small>
-                        </div>
-                        <button class="pg-btn" type="button" id="ppWeb">Open on web</button>
-                        <button class="pg-btn subtle" type="button" id="ppCopy">Copy handle</button>
-                    </div>
-                </div>
-
-                <div class="pg-panel" style="margin-top:8px">
-                    <div class="pg-row" style="grid-template-columns: 1fr auto auto;">
-                        <div>
-                            <strong>Cash App</strong><br>
-                            <small>cash.app/<code>$jdmarlow</code></small>
-                        </div>
-                        <button class="pg-btn" type="button" id="caWeb">Open on web</button>
-                        <button class="pg-btn subtle" type="button" id="caCopy">Copy $tag</button>
-                    </div>
-                </div>
-
-                <div class="pg-panel" style="margin-top:8px">
-                    <div class="pg-row" style="grid-template-columns: 1fr auto auto auto;">
-                        <div>
-                            <strong>Venmo</strong><br>
-                            <small>venmo.com/u/<code>Jonathan-Marlow-19</code></small>
-                        </div>
-                        <button class="pg-btn" type="button" id="vmApp">Open in app</button>
-                        <button class="pg-btn" type="button" id="vmWeb">Open on web</button>
-                        <button class="pg-btn subtle" type="button" id="vmCopy">Copy @user</button>
-                    </div>
-                </div>
-            </div>
-
-            <footer class="pg-dialog-footer">
-                <button class="pg-btn subtle" value="cancel">Close</button>
-            </footer>
-        </form>
-    </dialog>
-
-    <!-- Support logic -->
-    <script>
-        (function () {
-            const TAGS = {
-                paypal: 'jdmarlow86',
-                cashapp: '$jdmarlow',
-                venmo: 'Jonathan-Marlow-19'
-            };
-            const btnSupport = document.getElementById('btnSupport');
-            const dialog = document.getElementById('supportDialog');
-            const supAmount = document.getElementById('supAmount');
-            const supNote = document.getElementById('supNote');
-            const ppWeb = document.getElementById('ppWeb');
-            const ppCopy = document.getElementById('ppCopy');
-            const caWeb = document.getElementById('caWeb');
-            const caCopy = document.getElementById('caCopy');
-            const vmApp = document.getElementById('vmApp');
-            const vmWeb = document.getElementById('vmWeb');
-            const vmCopy = document.getElementById('vmCopy');
-
-            btnSupport.addEventListener('click', () => {
-                if (typeof dialog.showModal === 'function') dialog.showModal();
-                else alert('Your browser does not support modals.');
-            });
-
-            const getAmount = () => {
-                const v = parseInt(supAmount.value, 10);
-                return Number.isFinite(v) && v > 0 ? v : null;
-            };
-            const getNote = () => (supNote.value || '').trim();
-            function openNew(url) { window.open(url, '_blank', 'noopener,noreferrer'); }
-            async function copy(text, el) {
-                try {
-                    await navigator.clipboard.writeText(text);
-                    const old = el.textContent;
-                    el.textContent = 'Copied!';
-                    setTimeout(() => el.textContent = old, 1200);
-                } catch {
-                    alert('Copy failed—please copy manually: ' + text);
-                }
-            }
-
-            ppWeb.addEventListener('click', () => {
-                const amt = getAmount();
-                const base = `https://www.paypal.com/paypalme/${encodeURIComponent(TAGS.paypal)}`;
-                openNew(amt ? `${base}/${amt}` : base);
-            });
-            ppCopy.addEventListener('click', e => copy(TAGS.paypal, e.currentTarget));
-
-            caWeb.addEventListener('click', () => {
-                const amt = getAmount();
-                const clean = TAGS.cashapp.startsWith('$') ? TAGS.cashapp.slice(1) : TAGS.cashapp;
-                const base = `https://cash.app/$${encodeURIComponent(clean)}`;
-                openNew(amt ? `${base}/${amt}` : base);
-            });
-            caCopy.addEventListener('click', e => copy(TAGS.cashapp, e.currentTarget));
-
-            vmApp.addEventListener('click', () => {
-                const amt = getAmount();
-                const note = getNote();
-                const qp = new URLSearchParams();
-                qp.set('recipients', TAGS.venmo);
-                if (amt) qp.set('amount', amt);
-                if (note) qp.set('note', note);
-                window.location.href = `venmo://paycharge?${qp.toString()}`;
-            });
-            vmWeb.addEventListener('click', () => {
-                openNew(`https://venmo.com/u/${encodeURIComponent(TAGS.venmo)}`);
-            });
-            vmCopy.addEventListener('click', e => copy(TAGS.venmo, e.currentTarget));
-        })();
-    </script>
-
-    <script src="./app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
