@@ -14,6 +14,7 @@
             <button class="nav-btn" data-tab="welcome">Welcome</button>
             <button class="nav-btn" data-tab="resources">Resources</button>
             <button class="nav-btn" data-tab="prayer">Prayer</button>
+            <button class="nav-btn" data-tab="recovery">Recovery</button>
             <button class="nav-btn" data-tab="support">Support</button>
 
             <div class="grow"></div>
@@ -27,6 +28,7 @@
                 <option value="welcome">Welcome</option>
                 <option value="resources">Resources</option>
                 <option value="prayer">Prayer</option>
+                <option value="recovery">Recovery</option>
                 <option value="support">Support</option>
             </select>
             <button id="themeToggleMobile" class="icon-btn" title="Toggle theme (mobile)"></button>
@@ -157,6 +159,126 @@
                 </div>
             </dialog>
         </section>
+
+        <section id="recovery" class="tab-section hidden">
+            <div class="card">
+                <h2>Recovery Power in Christ</h2>
+                <p class="muted">A gentle, practical plan with steps, scriptures, and local follow-up. All data stays in your browser unless you export it.</p>
+
+                <div class="row gap mt">
+                    <button id="recoveryPrintBtn" class="btn">Print this Plan</button>
+                    <button id="recoverySignUpBtn" class="btn">Sign Up for Follow-Up</button>
+
+                    <span id="recoveryAdminBadge" class="badge hidden">Admin</span>
+                    <div class="grow"></div>
+                    <button id="recoveryAdminBtn" class="btn ghost">Admin</button>
+                </div>
+
+                <!-- Admin toolbar -->
+                <div id="recoveryAdminBar" class="admin-bar hidden">
+                    <label class="row gap">
+                        <input id="recoveryHidePublic" type="checkbox" />
+                        <span>Hide signups publicly on this device</span>
+                    </label>
+                    <div class="grow"></div>
+                    <button id="recoveryDownloadCsvBtn" class="btn ghost">Download CSV</button>
+                    <button id="recoveryClearAllBtn" class="btn ghost">Clear All</button>
+                </div>
+
+                <!-- Steps + Appendix -->
+                <div id="recovery-steps-appendix" class="mt">
+                    <h3>Your Recovery Steps</h3>
+                    <div id="recoverySteps" class="re-steps">
+                        <details class="re-step" data-step="1" open>
+                            <summary><span class="step-num">1</span> Surrender & Honesty</summary>
+                            <div class="re-body">
+                                <p>Admit powerlessness over addiction and invite Christ into the mess with total honesty.</p>
+                                <ul>
+                                    <li>Pray Psalm 51 (short & honest).</li>
+                                    <li>Tell one trusted person “I need help.”</li>
+                                    <li>Remove obvious access/temptations today.</li>
+                                </ul>
+                            </div>
+                        </details>
+
+                        <details class="re-step" data-step="2">
+                            <summary><span class="step-num">2</span> Safety & Daily Rhythm</summary>
+                            <div class="re-body">
+                                <p>Stabilize your day. Sleep, food, movement, and a short devotional block.</p>
+                                <ul>
+                                    <li>Morning: 10 minutes (scripture + prayer).</li>
+                                    <li>Text a check-in buddy by noon.</li>
+                                    <li>Evening: brief review; gratitude for 3 things.</li>
+                                </ul>
+                            </div>
+                        </details>
+
+                        <details class="re-step" data-step="3">
+                            <summary><span class="step-num">3</span> Confession & Clean-up</summary>
+                            <div class="re-body">
+                                <p>Bring secrets into the light in safe community; start repairing fallout in small pieces.</p>
+                            </div>
+                        </details>
+
+                        <details class="re-step" data-step="4">
+                            <summary><span class="step-num">4</span> Tools & Triggers</summary>
+                            <div class="re-body">
+                                <p>Identify triggers, add speed bumps, and practice replacement habits.</p>
+                            </div>
+                        </details>
+
+                        <details class="re-step" data-step="5">
+                            <summary><span class="step-num">5</span> Serve & Grow</summary>
+                            <div class="re-body">
+                                <p>Begin serving in small ways; help others find hope you’re discovering.</p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Signups List -->
+                <div class="mt">
+                    <h3>Follow-Up Signups</h3>
+                    <div id="recoverySignupList" class="signup-wrap">
+                        <div class="muted">No sign ups yet.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signup Modal -->
+            <dialog id="recoveryModal" class="pg-dialog">
+                <div class="pg-dialog-card">
+                    <h3>Sign Up for Follow-Up</h3>
+                    <form id="recoveryForm" class="stack">
+                        <input name="fullName" class="input" placeholder="Full name" />
+                        <input name="email" type="email" class="input" placeholder="Email (optional)" />
+                        <input name="phone" class="input" placeholder="Phone (optional)" />
+                        <label>
+                            Preferred contact
+                            <select name="preferred" class="input">
+                                <option value="">Choose…</option>
+                                <option>Email</option>
+                                <option>Phone</option>
+                                <option>Text</option>
+                            </select>
+                        </label>
+                        <textarea name="notes" class="input" rows="3" placeholder="Notes (optional)"></textarea>
+                        <label class="row gap">
+                            <input name="consent" type="checkbox" />
+                            <span>I consent to be contacted for follow-up.</span>
+                        </label>
+
+                        <div class="row gap mt">
+                            <button class="btn">Submit</button>
+                            <button id="recoveryCancel" type="button" class="btn ghost">Cancel</button>
+                        </div>
+                    </form>
+                    <button id="recoveryModalClose" class="icon-close" title="Close" aria-label="Close">×</button>
+                    <div data-close-modal class="pg-backdrop-close" aria-hidden="true"></div>
+                </div>
+            </dialog>
+        </section>
+
 
         <!-- Support -->
         <section id="support" class="tab-section hidden">

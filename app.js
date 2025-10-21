@@ -316,3 +316,252 @@ Tips:
 
 /* ========= Misc demo ========= */
 $("#findChurchBtn")?.addEventListener("click", () => alert("Coming soon: church finder!"));
+
+/* ========= Recovery (steps memory, print, signups, admin) ========= */
+(() => {
+    const section = $("#recovery");
+    if (!section) return; // not on this page build
+
+    // ----- Remember which <details> are open -----
+    const OPEN_KEY = "recovery-open-steps-v1";
+    const stepsWrap = $("#recoverySteps");
+    if (stepsWrap) {
+        try {
+            const openSet = new Set(JSON.parse(localStorage.getItem(OPEN_KEY) || "[]"));
+            stepsWrap.querySelectorAll("details.re-step[data-step]").forEach(d => {
+                const no = d.getAttribute("data-step");
+                if (openSet.has(no)) d.setAttribute("open", "");
+                else d.removeAttribute("open");
+            });
+        } catch { }
+        stepsWrap.addEventListener("toggle", () => {
+            const open = [];
+            stepsWrap.querySelectorAll("details.re-step[data-step]").forEach(d => {
+                if (d.open) open.push(d.getAttribute("data-step"));
+            });
+            try { localStorage.setItem(OPEN_KEY, JSON.stringify(open)); } catch { }
+        });
+    }
+
+    // ----- Print current plan -----
+    $("#recoveryPrintBtn")?.addEventListener("click", () => {
+        const node = section; // print the whole tab
+        const w = window.open("", "_blank", "noopener,noreferrer,width=900,height=1200");
+        if (!w) return;
+        const styles = Array.from(document.styleSheets)
+            .map(s => { try { return s.href ? `<link rel="stylesheet" href="${s.href}">` : ""; } catch { return ""; } })
+            .join("");
+        w.document.write(`
+      <html>
+        <head>
+          <title>Recovery Power in Christ</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          ${styles}
+          <style>
+            body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; padding:24px; background:#fff; color:#111;}
+            .card{border:0}
+            details.re-step{page-break-inside:avoid;}
+          </style>
+        </head>
+        <body></body>
+      </html>
+    `);
+        w.document.body.appendChild(node.cloneNode(true));
+        w.document.close(); w.focus(); w.print(); w.close();
+    });
+
+    // ----- Signups + Admin -----
+    const LS_KEY = "RECOVERY_SIGNUPS_V1";
+    const HIDE_KEY = "RECOVERY_SIGNUPS_HIDDEN";
+    const ADMIN_KEY = "RECOVERY_ADMIN_ON"; // sessionStorage
+    const ADMIN_PIN = ""; // optional PIN, e.g., "7777"
+
+    const listEl = $("#recoverySignupList");
+    const modal = $("#recoveryModal");
+    const form = $("#recoveryForm");
+
+    const btnOpen = $("#recoverySignUpBtn");
+    const btnCsv = $("#recoveryDownloadCsvBtn");
+    const btnAdmin = $("#recoveryAdminBtn");
+    const adminBadge = $("#recoveryAdminBadge");
+    const adminBar = $("#recoveryAdminBar");
+    const toggleHidePublic = $("#recoveryHidePublic");
+    const btnClearAll = $("#recoveryClearAllBtn");
+    const modalClose = $("#recoveryModalClose");
+    const modalCancel = $("#recoveryCancel");
+    const modalBackdrop = modal?.querySelector?.("[data-close-modal]");
+
+    if (!listEl) return;
+
+    const isAdmin = () => sessionStorage.getItem(ADMIN_KEY) === "1";
+    const setAdmin = (on) => {
+        if (on) sessionStorage.setItem(ADMIN_KEY, "1");
+        else sessionStorage.removeItem(ADMIN_KEY);
+        updateAdminUI(); render();
+    };
+    const isHiddenPublic = () => localStorage.getItem(HIDE_KEY) === "1";
+    const setHiddenPublic = (on) => { try { on ? localStorage.setItem(HIDE_KEY, "1") : localStorage.removeItem(HIDE_KEY); } catch { } };
+
+    const loadAll = () => { try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); } catch { return []; } };
+    const saveAll = (rows) => { try { localStorage.setItem(LS_KEY, JSON.stringify(rows)); } catch { } };
+
+    function updateAdminUI() {
+        const admin = isAdmin();
+        adminBadge?.classList.toggle("hidden", !admin);
+        adminBar?.classList.toggle("hidden", !admin);
+        if (toggleHidePublic) toggleHidePublic.checked = isHiddenPublic();
+        if (btnAdmin) btnAdmin.textContent = admin ? "Admin (on)" : "Admin";
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function escapeAttr(s) { return String(s).replace(/"/g, "&quot;"); }
+    function csvEscape(val) { if (val == null) return ""; const s = String(val); return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; }
+
+    function render() {
+        const admin = isAdmin();
+        const rows = loadAll();
+
+        if (!admin && isHiddenPublic()) {
+            listEl.innerHTML = `<div class="muted">Signups are currently hidden.</div>`;
+            return;
+        }
+        if (!rows.length) {
+            listEl.innerHTML = `<div class="muted">No sign ups yet. Be the first—click “Sign Up”.</div>`;
+            return;
+        }
+
+        const thead = `
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Preferred</th>
+          <th>Notes</th>
+          <th>Date</th>
+          ${admin ? `<th>Actions</th>` : ``}
+        </tr>
+      </thead>`;
+        const tbody = rows.map((r, i) => `
+      <tr>
+        <td>${escapeHtml(r.fullName || "")}</td>
+        <td>${r.email ? `<a href="mailto:${escapeAttr(r.email)}">${escapeHtml(r.email)}</a>` : "—"}</td>
+        <td>${r.phone ? `<a href="tel:${escapeAttr(r.phone)}">${escapeHtml(r.phone)}</a>` : "—"}</td>
+        <td><span class="signup-badge">${escapeHtml(r.preferred || "")}</span></td>
+        <td>${escapeHtml((r.notes || ""))}</td>
+        <td>${new Date(r.createdAt).toLocaleString()}</td>
+        ${admin ? `<td><button class="btn ghost sm" data-remove-index="${i}">Remove</button></td>` : ``}
+      </tr>`).join("");
+
+        listEl.innerHTML = `
+      <div class="mt">
+        <table class="signup-table">
+          ${thead}
+          <tbody>${tbody}</tbody>
+        </table>
+      </div>`;
+    }
+
+    function toCsv(rows) {
+        const headers = ["Full Name", "Email", "Phone", "Preferred", "Notes", "Created At"];
+        const lines = [headers];
+        rows.forEach(r => {
+            lines.push([
+                r.fullName || "", r.email || "", r.phone || "",
+                r.preferred || "", String(r.notes || "").replace(/\r?\n/g, " "),
+                new Date(r.createdAt).toISOString()
+            ]);
+        });
+        return lines.map(cols => cols.map(csvEscape).join(",")).join("\r\n");
+    }
+
+    function downloadCsv() {
+        const rows = loadAll();
+        const csv = toCsv(rows);
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url; a.download = "recovery_signups.csv";
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
+    }
+
+    function openModal() {
+        modal?.classList?.remove("hidden");
+        modal?.showModal?.();
+    }
+    function closeModal() {
+        modal?.classList?.add("hidden");
+        modal?.close?.();
+        form?.reset?.();
+    }
+
+    function onSubmit(e) {
+        e.preventDefault();
+        if (!form) return;
+
+        const data = new FormData(form);
+        const fullName = (data.get("fullName") || "").toString().trim();
+        const email = (data.get("email") || "").toString().trim();
+        const phone = (data.get("phone") || "").toString().trim();
+        const preferred = (data.get("preferred") || "").toString();
+        const notes = (data.get("notes") || "").toString();
+        const consent = !!data.get("consent");
+
+        if (!fullName) return alert("Please enter your full name.");
+        if (!preferred) return alert("Please choose a preferred contact method.");
+        if (!consent) return alert("Please consent to be contacted.");
+        if (!email && !phone) return alert("Provide at least one contact detail (email or phone).");
+
+        const row = { fullName, email, phone, preferred, notes, createdAt: Date.now() };
+        const rows = loadAll(); rows.push(row); saveAll(rows);
+        render(); closeModal();
+    }
+
+    function toggleAdmin() {
+        if (isAdmin()) { setAdmin(false); return; }
+        if (typeof ADMIN_PIN === "string" && ADMIN_PIN.length) {
+            const entered = prompt("Enter admin PIN:");
+            if (entered !== ADMIN_PIN) return alert("Incorrect PIN.");
+        }
+        setAdmin(true);
+    }
+
+    function onRemoveRow(idx) {
+        const rows = loadAll();
+        if (!rows[idx]) return;
+        const ok = confirm(`Remove signup for "${rows[idx].fullName || "this person"}"?`);
+        if (!ok) return;
+        rows.splice(idx, 1); saveAll(rows); render();
+    }
+
+    function onClearAll() {
+        const rows = loadAll();
+        if (!rows.length) return alert("No signups to clear.");
+        if (!confirm("This will permanently remove ALL signups on this device. Continue?")) return;
+        saveAll([]); render();
+    }
+
+    // Wire-up
+    updateAdminUI(); render();
+    btnOpen?.addEventListener("click", openModal);
+    btnCsv?.addEventListener("click", downloadCsv);
+    btnAdmin?.addEventListener("click", toggleAdmin);
+    btnClearAll?.addEventListener("click", onClearAll);
+    toggleHidePublic?.addEventListener("change", () => { setHiddenPublic(!!toggleHidePublic.checked); render(); });
+
+    listEl.addEventListener("click", (e) => {
+        const btn = e.target.closest?.("[data-remove-index]");
+        if (!btn) return;
+        if (!isAdmin()) return alert("Admin mode is off.");
+        const idx = parseInt(btn.getAttribute("data-remove-index"), 10);
+        if (Number.isFinite(idx)) onRemoveRow(idx);
+    });
+
+    form?.addEventListener("submit", onSubmit);
+    modalClose?.addEventListener("click", closeModal);
+    modalCancel?.addEventListener("click", closeModal);
+    modalBackdrop?.addEventListener("click", closeModal);
+})();

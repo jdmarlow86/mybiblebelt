@@ -259,3 +259,114 @@ main {
         display: flex;
     }
 }
+
+/* Recovery */
+.re-steps {
+    display: grid;
+    gap: .5rem;
+}
+
+.re-step {
+    border: 1px solid var(--border);
+    border-radius: .5rem;
+    background: var(--bg);
+}
+
+    .re-step > summary {
+        list-style: none;
+        cursor: pointer;
+        padding: .6rem .75rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+        .re-step > summary::-webkit-details-marker {
+            display: none;
+        }
+
+    .re-step[open] > summary {
+        border-bottom: 1px solid var(--border);
+    }
+
+.re-body {
+    padding: .75rem;
+}
+
+.step-num {
+    display: inline-grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-size: .85rem;
+}
+
+.badge {
+    background: var(--accent);
+    color: #fff;
+    border-radius: 999px;
+    padding: .2rem .6rem;
+    font-size: .75rem;
+}
+
+.admin-bar {
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+    border: 1px dashed var(--border);
+    padding: .5rem;
+    border-radius: .5rem;
+    margin-top: .5rem;
+}
+
+.signup-wrap {
+    overflow-x: auto;
+}
+
+.signup-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .signup-table th, .signup-table td {
+        border: 1px solid var(--border);
+        padding: .5rem;
+        text-align: left;
+    }
+
+    .signup-table th {
+        background: var(--card);
+    }
+
+.signup-badge {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: .4rem;
+    padding: .1rem .4rem;
+    font-size: .75rem;
+}
+
+/* Modal helpers */
+.pg-dialog-card {
+    position: relative;
+}
+
+.icon-close {
+    position: absolute;
+    right: .5rem;
+    top: .5rem;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    font-size: 1.25rem;
+    cursor: pointer;
+}
+
+.pg-backdrop-close {
+    position: fixed;
+    inset: 0;
+}
