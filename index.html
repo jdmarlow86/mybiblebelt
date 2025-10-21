@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>My Bible Belt — Clean Starter</title>
     <link rel="stylesheet" href="styles.css" />
+
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+
 </head>
 <body>
     <header class="site-header">
@@ -12,6 +21,8 @@
 
         <nav class="nav">
             <button class="nav-btn" data-tab="welcome">Welcome</button>
+            <!-- in your .nav button group -->
+            <button class="nav-btn" data-tab="church">Church</button>
             <button class="nav-btn" data-tab="resources">Resources</button>
             <button class="nav-btn" data-tab="prayer">Prayer</button>
             <button class="nav-btn" data-tab="recovery">Recovery</button>
@@ -46,6 +57,50 @@
                 <button id="findChurchBtn" class="btn">Find a Church (demo)</button>
             </div>
         </section>
+
+        <section id="church" class="tab-section hidden">
+            <h1 class="page-title">Church Finder</h1>
+            <p class="page-sub">Find nearby churches by location or city.</p>
+
+            <div class="card">
+                <div class="pg-row">
+                    <div class="pg-field">
+                        <label class="pg-label" for="churchSearch">Search by city/town</label>
+                        <input id="churchSearch" class="pg-input" placeholder="e.g., Knoxville, TN" />
+                    </div>
+                    <div class="pg-field">
+                        <label class="pg-label" for="churchRadius">Radius (miles)</label>
+                        <select id="churchRadius" class="pg-input small">
+                            <option>3</option>
+                            <option selected>5</option>
+                            <option>10</option>
+                            <option>15</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row gap mt">
+                    <button id="churchUseMyLocation" class="btn primary">Use My Location</button>
+                    <button id="churchSearchBtn" class="btn">Search City</button>
+                    <button id="churchClearBtn" class="btn">Clear</button>
+                </div>
+
+                <div id="churchStatus" class="muted" style="margin-top:8px;"></div>
+            </div>
+
+            <div class="grid-2" style="margin-top:16px;">
+                <div class="card">
+                    <div class="section-title">Map</div>
+                    <div id="churchMap" style="height: 420px; border:1px solid var(--border); border-radius: 12px; overflow:hidden;"></div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title">Nearby Churches</div>
+                    <div id="churchResults" class="list mt"></div>
+                </div>
+            </div>
+        </section>
+
 
         <!-- Resources -->
         <section id="resources" class="tab-section hidden">

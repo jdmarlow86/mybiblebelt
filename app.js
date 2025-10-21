@@ -862,3 +862,215 @@ $("#findChurchBtn")?.addEventListener("click", () => alert("Coming soon: church 
             .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 })();
+
+/* ========= Church Finder (Leaflet + OSM) ========= */
+(() => {
+    // Abort if the Church tab isn't on this page
+    const section = document.getElementById("church");
+    if (!section) return;
+
+    // Elements
+    const inputCity = document.getElementById("churchSearch");
+    const radiusSel = document.getElementById("churchRadius");
+    const useMyLocBtn = document.getElementById("churchUseMyLocation");
+    const searchBtn = document.getElementById("churchSearchBtn");
+    const clearBtn = document.getElementById("churchClearBtn");
+    const statusEl = document.getElementById("churchStatus");
+    const resultsEl = document.getElementById("churchResults");
+    const mapEl = document.getElementById("churchMap");
+
+    // State
+    let map, markersLayer;
+
+    // Helpers
+    function miToMeters(mi) { return Math.max(1, Number(mi) || 5) * 1609.34; }
+    function setStatus(msg, isError = false) {
+        if (!statusEl) return;
+        statusEl.textContent = msg || "";
+        statusEl.style.color = isError ? "#b91c1c" : "var(--muted)";
+    }
+    function clearResults() {
+        if (resultsEl) resultsEl.innerHTML = "";
+        if (markersLayer) markersLayer.clearLayers();
+    }
+    function ensureMap(lat = 35.9606, lon = -83.9207, zoom = 12) {
+        if (!mapEl || typeof L === "undefined") return;
+        if (!map) {
+            map = L.map(mapEl).setView([lat, lon], zoom);
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                maxZoom: 19,
+                attribution: "&copy; OpenStreetMap contributors"
+            }).addTo(map);
+            markersLayer = L.layerGroup().addTo(map);
+        } else {
+            map.setView([lat, lon], zoom);
+        }
+    }
+    function addMarker(lat, lon, name, denom, addr) {
+        if (!markersLayer || typeof L === "undefined") return;
+        const title = name || "Church";
+        const lines = [
+            `<strong>${escapeHtml(title)}</strong>`,
+            denom ? `<div>${escapeHtml(denom)}</div>` : "",
+            addr ? `<div class="meta">${escapeHtml(addr)}</div>` : ""
+        ].join("");
+        L.marker([lat, lon]).addTo(markersLayer).bindPopup(lines);
+    }
+    function renderItem(place) {
+        const div = document.createElement("div");
+        div.className = "church-item";
+        const name = place.tags.name || "Unnamed Church";
+        const denom = place.tags.denomination || place.tags.religion || "";
+        const addr = [
+            place.tags["addr:housenumber"] || "",
+            place.tags["addr:street"] || "",
+            place.tags["addr:city"] || "",
+            place.tags["addr:state"] || "",
+            place.tags["addr:postcode"] || ""
+        ].filter(Boolean).join(" ");
+
+        const lat = place.lat || place.center?.lat;
+        const lon = place.lon || place.center?.lon;
+
+        const gmaps = (lat && lon)
+            ? `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`
+            : null;
+
+        div.innerHTML = `
+      <div style="font-weight:600;">${escapeHtml(name)}</div>
+      <div class="meta">${escapeHtml(denom || "—")}</div>
+      ${addr ? `<div class="meta">${escapeHtml(addr)}</div>` : ""}
+      <div class="row gap mt">
+        ${gmaps ? `<a class="btn" href="${gmaps}" target="_blank" rel="noopener">Open in Google Maps</a>` : ""}
+      </div>
+    `;
+        resultsEl.appendChild(div);
+    }
+    function escapeHtml(s) {
+        return String(s)
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    // Fetch nearby churches (radius meters)
+    async function fetchChurches(lat, lon, radiusMeters) {
+        setStatus("Searching nearby churches…");
+        clearResults();
+
+        // Overpass query: Christian churches around point
+        const query = `
+      [out:json][timeout:25];
+      (
+        node["amenity"="place_of_worship"]["religion"="christian"](around:${Math.floor(radiusMeters)},${lat},${lon});
+        way["amenity"="place_of_worship"]["religion"="christian"](around:${Math.floor(radiusMeters)},${lat},${lon});
+        relation["amenity"="place_of_worship"]["religion"="christian"](around:${Math.floor(radiusMeters)},${lat},${lon});
+      );
+      out center tags;
+    `;
+        try {
+            const resp = await fetch("https://overpass-api.de/api/interpreter", {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=UTF-8" },
+                body: query
+            });
+            if (!resp.ok) throw new Error("Overpass request failed");
+            const data = await resp.json();
+            const elements = (data && data.elements) ? data.elements : [];
+            if (!elements.length) {
+                setStatus("No churches found in range. Try a larger radius.");
+                return;
+            }
+
+            // Fit map and render
+            ensureMap(lat, lon);
+            const bounds = [];
+            elements.forEach(el => {
+                const eLat = el.lat || el.center?.lat;
+                const eLon = el.lon || el.center?.lon;
+                if (typeof eLat === "number" && typeof eLon === "number") {
+                    addMarker(eLat, eLon, el.tags?.name, el.tags?.denomination || el.tags?.religion, [
+                        el.tags?.["addr:housenumber"] || "",
+                        el.tags?.["addr:street"] || "",
+                        el.tags?.["addr:city"] || "",
+                        el.tags?.["addr:state"] || "",
+                        el.tags?.["addr:postcode"] || ""
+                    ].filter(Boolean).join(" "));
+                    bounds.push([eLat, eLon]);
+                    renderItem(el);
+                }
+            });
+            if (bounds.length && map && typeof L !== "undefined") {
+                map.fitBounds(bounds, { padding: [20, 20] });
+            } else {
+                ensureMap(lat, lon, 12);
+            }
+            setStatus(`Found ${elements.length} place(s).`);
+        } catch (err) {
+            console.error(err);
+            setStatus("Error fetching churches. Please try again.", true);
+        }
+    }
+
+    // Geocode city to coords (Nominatim)
+    async function geocodeCity(q) {
+        // Keep queries polite; Nominatim prefers sensible referer and modest frequency
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`;
+        const resp = await fetch(url, { headers: { "Accept": "application/json" } });
+        if (!resp.ok) throw new Error("Geocoding failed");
+        const arr = await resp.json();
+        return (arr && arr[0]) ? { lat: Number(arr[0].lat), lon: Number(arr[0].lon), display: arr[0].display_name } : null;
+    }
+
+    // Actions
+    useMyLocBtn?.addEventListener("click", () => {
+        if (!navigator.geolocation) return setStatus("Geolocation is not supported in this browser.", true);
+        setStatus("Getting your location…");
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                const radiusMeters = miToMeters(radiusSel?.value);
+                ensureMap(lat, lon, 13);
+                fetchChurches(lat, lon, radiusMeters);
+            },
+            (err) => {
+                console.error(err);
+                setStatus("Location denied or unavailable.", true);
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+        );
+    });
+
+    searchBtn?.addEventListener("click", async () => {
+        const q = (inputCity?.value || "").trim();
+        if (!q) return setStatus("Enter a city/town to search.");
+        setStatus("Looking up that place…");
+        try {
+            const hit = await geocodeCity(q);
+            if (!hit) return setStatus("Place not found. Try another search.", true);
+            const radiusMeters = miToMeters(radiusSel?.value);
+            ensureMap(hit.lat, hit.lon, 12);
+            fetchChurches(hit.lat, hit.lon, radiusMeters);
+        } catch (e) {
+            console.error(e);
+            setStatus("Search failed. Please try again.", true);
+        }
+    });
+
+    clearBtn?.addEventListener("click", () => {
+        if (inputCity) inputCity.value = "";
+        setStatus("");
+        clearResults();
+        ensureMap(); // default view
+    });
+
+    // Lazy-init map on first tab show or immediately if already visible
+    const initIfVisible = () => {
+        const hidden = section.classList.contains("hidden");
+        if (!hidden && !map) ensureMap(); // default center (Knoxville area fallback)
+    };
+    // If your app uses hash-based tabs, this covers both initial + changes:
+    window.addEventListener("hashchange", initIfVisible);
+    // Try once on load in case the tab is already active:
+    initIfVisible();
+})();

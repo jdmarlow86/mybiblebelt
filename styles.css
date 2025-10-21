@@ -416,3 +416,21 @@ main {
     color: var(--muted);
     font-size: 12px;
 }
+
+/* church results look like your other list items */
+.church-item {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 8px;
+}
+
+    .church-item .meta {
+        color: var(--muted);
+        font-size: 12px;
+    }
+
+#churchMap .leaflet-control-attribution {
+    font-size: 11px;
+}
