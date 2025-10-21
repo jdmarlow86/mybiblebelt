@@ -58,14 +58,87 @@ function toggleTheme() { setTheme(document.documentElement.classList.contains("d
 (() => {
     const SEED = [
         {
-            id: "baptist", title: "Baptist — Starter Kit", intro: "Believer's baptism, congregational governance, Scripture-centric.",
-            studies: [{ title: "History & Distinctives", content: "17th c. English Separatism; local autonomy." }]
+            id: "baptist",
+            title: "Baptist — Starter Kit",
+            intro: "Emphasizes believer’s baptism, local church autonomy, and the authority of Scripture.",
+            badgeColor: "#2563eb",    // blue
+            badgeEmoji: "??",
+            studies: [{ title: "Distinctives", content: "Born from 17th-century English Separatism; focus on personal conversion and congregational rule." }]
         },
         {
-            id: "methodist", title: "Methodist — Starter Kit", intro: "Grace (prevenient/justifying/sanctifying), connectionalism, holiness.",
-            studies: [{ title: "Wesleyan Heritage", content: "John & Charles Wesley; band meetings." }]
+            id: "methodist",
+            title: "Methodist — Starter Kit",
+            intro: "Centers on grace, holiness, and accountable discipleship inspired by John Wesley.",
+            badgeColor: "#dc2626",    // red
+            badgeEmoji: "??",
+            studies: [{ title: "Grace & Growth", content: "Prevenient, justifying, and sanctifying grace; small group ‘bands’ for mutual support." }]
         },
+        {
+            id: "catholic",
+            title: "Catholic — Starter Kit",
+            intro: "Historic Christian church tracing back to the apostles, emphasizing sacrament and tradition.",
+            badgeColor: "#d97706",    // gold/amber
+            badgeEmoji: "?",
+            studies: [{ title: "Faith & Sacraments", content: "Seven sacraments; unity through the Eucharist; Catechism as guide to faith and morals." }]
+        },
+        {
+            id: "orthodox",
+            title: "Eastern Orthodox — Starter Kit",
+            intro: "Ancient communion emphasizing liturgy, icons, and the mystery of divine transformation.",
+            badgeColor: "#7c2d12",    // deep maroon
+            badgeEmoji: "???",
+            studies: [{ title: "Theosis", content: "Salvation as participation in God’s life; icons as windows to heaven." }]
+        },
+        {
+            id: "lutheran",
+            title: "Lutheran — Starter Kit",
+            intro: "Rooted in the Reformation, highlighting salvation by grace through faith alone.",
+            badgeColor: "#7c3aed",    // purple
+            badgeEmoji: "??",
+            studies: [{ title: "Justification", content: "Luther’s ‘sola fide’; Word and Sacrament central to worship." }]
+        },
+        {
+            id: "presbyterian",
+            title: "Presbyterian — Starter Kit",
+            intro: "Governed by elders and shaped by Reformed theology’s focus on God’s sovereignty.",
+            badgeColor: "#0d9488",    // teal
+            badgeEmoji: "???",
+            studies: [{ title: "Covenant Faith", content: "Calvin’s influence; confessions like the Westminster Standards." }]
+        },
+        {
+            id: "seventhday",
+            title: "Seventh-day Adventist — Starter Kit",
+            intro: "Advent hope, holistic health, and Sabbath rest rooted in Scripture and the soon return of Christ.",
+            badgeColor: "#16a34a",    // green
+            badgeEmoji: "??",
+            studies: [{ title: "Advent Hope", content: "19th-century origins; Saturday Sabbath, healthful living, Christ’s ministry in heaven." }]
+        },
+        {
+            id: "pentecostal",
+            title: "Pentecostal — Starter Kit",
+            intro: "Emphasizes the Holy Spirit’s gifts, expressive worship, and active evangelism.",
+            badgeColor: "#f97316",    // orange
+            badgeEmoji: "?",
+            studies: [{ title: "Spirit & Power", content: "Azusa Street Revival; tongues and healing as Spirit’s work." }]
+        },
+        {
+            id: "non-denom",
+            title: "Non-Denominational — Starter Kit",
+            intro: "Independent congregations focused on simple gospel preaching and contemporary worship.",
+            badgeColor: "#6b7280",    // gray
+            badgeEmoji: "??",
+            studies: [{ title: "Unity in Simplicity", content: "Emphasis on a personal relationship with Jesus, Bible teaching, and local mission." }]
+        },
+        {
+            id: "jewish",
+            title: "Messianic / Jewish Roots — Starter Kit",
+            intro: "Explores Hebraic roots and the Torah’s moral heart viewed through faith in the Messiah.",
+            badgeColor: "#0ea5e9",    // sky blue
+            badgeEmoji: "??",
+            studies: [{ title: "Roots of Faith", content: "Sabbaths, feasts, and covenants understood through fulfillment in the Messiah." }]
+        }
     ];
+
     let kits = (() => { try { return JSON.parse(localStorage.getItem("starterKits") || "null") || SEED; } catch { return SEED; } })();
 
     function render() {
