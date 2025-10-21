@@ -638,3 +638,227 @@ $("#findChurchBtn")?.addEventListener("click", () => alert("Coming soon: church 
     modalCancel?.addEventListener("click", closeModal);
     modalBackdrop?.addEventListener("click", closeModal);
 })();
+
+/* ========= Community (Video + Chat + Join + Notes + Projects) ========= */
+(() => {
+    // Elements
+    const video = document.getElementById("communityVideo");
+    const startCamBtn = document.getElementById("startCamBtn");
+    const stopCamBtn = document.getElementById("stopCamBtn");
+
+    const chatBox = document.getElementById("communityChatMessages");
+    const chatInput = document.getElementById("communityChatInput");
+    const sendChatBtn = document.getElementById("sendCommunityMsgBtn");
+    const clearChatBtn = document.getElementById("clearCommunityChatBtn");
+
+    const nameEl = document.getElementById("communityName");
+    const emailEl = document.getElementById("communityEmail");
+    const joinBtn = document.getElementById("joinCommunityBtn");
+    const dlCsvBtn = document.getElementById("downloadCommunityCsvBtn");
+    const membersCount = document.getElementById("communityMembersCount");
+
+    const notesText = document.getElementById("communityNotesText");
+    const saveNotesBtn = document.getElementById("saveCommunityNotesBtn");
+    const clearNotesBtn = document.getElementById("clearCommunityNotesBtn");
+    const notesSavedEl = document.getElementById("communityNotesSaved");
+
+    const helpBtn = document.getElementById("helpBtn");
+
+    const projectTitle = document.getElementById("projectTitle");
+    const projectOwner = document.getElementById("projectOwner");
+    const projectDesc = document.getElementById("projectDesc");
+    const newProjectBtn = document.getElementById("newProjectBtn");
+    const clearProjectsBtn = document.getElementById("clearProjectsBtn");
+    const projectsList = document.getElementById("communityProjectsList");
+
+    // Bail if the Community section isn't on this page
+    if (!document.getElementById("community")) return;
+
+    /* ---- Camera Preview ---- */
+    let localStream = null;
+    startCamBtn?.addEventListener("click", async () => {
+        if (!video) return;
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            video.srcObject = localStream;
+        } catch (err) {
+            alert("Camera access was blocked or unavailable.");
+            console.error(err);
+        }
+    });
+    stopCamBtn?.addEventListener("click", () => {
+        if (localStream) {
+            localStream.getTracks().forEach(t => t.stop());
+            localStream = null;
+        }
+        if (video) video.srcObject = null;
+    });
+
+    /* ---- Chat (local only) ---- */
+    const CHAT_KEY = "community_chat_v1";
+    let chat = storage.get(CHAT_KEY, []); // [{id, text, ts}]
+
+    function renderChat() {
+        if (!chatBox) return;
+        chatBox.innerHTML = "";
+        chat.forEach(m => {
+            const d = document.createElement("div");
+            d.className = "msg";
+            d.innerHTML = `<div>${m.text}</div><div class="msg-meta">${new Date(m.ts).toLocaleString()}</div>`;
+            chatBox.appendChild(d);
+        });
+    }
+    renderChat();
+
+    sendChatBtn?.addEventListener("click", () => {
+        const text = (chatInput?.value || "").trim();
+        if (!text) return;
+        chat = [{ id: Date.now(), text, ts: Date.now() }, ...chat];
+        storage.set(CHAT_KEY, chat);
+        if (chatInput) chatInput.value = "";
+        renderChat();
+    });
+    clearChatBtn?.addEventListener("click", () => {
+        if (!confirm("Clear chat?")) return;
+        chat = [];
+        storage.set(CHAT_KEY, chat);
+        renderChat();
+    });
+
+    /* ---- Join Community + CSV ---- */
+    const MEMBERS_KEY = "community_members_v1";
+    let members = storage.get(MEMBERS_KEY, []); // [{name, email, ts}]
+    function updateMembersUI() {
+        if (membersCount) {
+            membersCount.textContent = members.length
+                ? `Members on this device: ${members.length}`
+                : `No members yet.`;
+        }
+    }
+    updateMembersUI();
+
+    joinBtn?.addEventListener("click", () => {
+        const name = (nameEl?.value || "").trim();
+        const email = (emailEl?.value || "").trim();
+        if (!name) return alert("Please enter your name.");
+        if (!email) return alert("Please enter your email.");
+        members.push({ name, email, ts: Date.now() });
+        storage.set(MEMBERS_KEY, members);
+        nameEl && (nameEl.value = "");
+        emailEl && (emailEl.value = "");
+        updateMembersUI();
+        alert("Welcome! You’ve been added locally.");
+    });
+
+    dlCsvBtn?.addEventListener("click", () => {
+        const lines = [["Name", "Email", "Joined (ISO)"]];
+        members.forEach(m => lines.push([m.name, m.email, new Date(m.ts).toISOString()]));
+        const csv = lines.map(r => r.map(csvEscape).join(",")).join("\r\n");
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url; a.download = "community_members.csv";
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
+    });
+
+    function csvEscape(val) {
+        if (val == null) return "";
+        const s = String(val);
+        return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    }
+
+    /* ---- Notes ---- */
+    const NOTES_KEY = "community_notes_v1";
+    const initialNotes = storage.get(NOTES_KEY, "");
+    if (notesText) notesText.value = initialNotes;
+
+    function markSaved() {
+        if (!notesSavedEl) return;
+        notesSavedEl.textContent = "Saved " + new Date().toLocaleTimeString();
+        setTimeout(() => { if (notesSavedEl) notesSavedEl.textContent = ""; }, 1500);
+    }
+
+    // Manual save
+    saveNotesBtn?.addEventListener("click", () => {
+        storage.set(NOTES_KEY, notesText?.value || "");
+        markSaved();
+    });
+    // Auto-save on input (throttled lightweight)
+    notesText?.addEventListener("input", () => {
+        storage.set(NOTES_KEY, notesText.value);
+    });
+    clearNotesBtn?.addEventListener("click", () => {
+        if (!notesText) return;
+        notesText.value = "";
+        storage.set(NOTES_KEY, "");
+        markSaved();
+    });
+
+    /* ---- Help button ---- */
+    helpBtn?.addEventListener("click", () => {
+        window.location.href = "mailto:jonmarlow@gmail.com?subject=Community%20Help&body=Hi%20Jonathan,%0D%0A%0D%0A";
+    });
+
+    /* ---- Projects ---- */
+    const PROJECTS_KEY = "community_projects_v1";
+    let projects = storage.get(PROJECTS_KEY, []); // [{id,title,owner,desc,ts}]
+    function renderProjects() {
+        if (!projectsList) return;
+        if (!projects.length) {
+            projectsList.innerHTML = `<div class="muted">No projects yet—create one!</div>`;
+            return;
+        }
+        projectsList.innerHTML = projects.map(p => `
+      <div class="project-pill">
+        <h4>${escapeHtml(p.title)}</h4>
+        <div class="project-meta">Owner: ${escapeHtml(p.owner || "—")} • Created: ${new Date(p.ts).toLocaleString()}</div>
+        <div style="margin-top:6px; white-space:pre-wrap;">${escapeHtml(p.desc || "")}</div>
+        <div class="row gap mt">
+          <button class="btn sm" data-del="${p.id}">Remove</button>
+        </div>
+      </div>
+    `).join("");
+    }
+    renderProjects();
+
+    newProjectBtn?.addEventListener("click", () => {
+        const title = (projectTitle?.value || "").trim();
+        const owner = (projectOwner?.value || "").trim();
+        const desc = (projectDesc?.value || "").trim();
+        if (!title) return alert("Please enter a project title.");
+        const item = { id: "prj_" + Date.now(), title, owner, desc, ts: Date.now() };
+        projects = [item, ...projects];
+        storage.set(PROJECTS_KEY, projects);
+        if (projectTitle) projectTitle.value = "";
+        if (projectOwner) projectOwner.value = "";
+        if (projectDesc) projectDesc.value = "";
+        renderProjects();
+    });
+
+    clearProjectsBtn?.addEventListener("click", () => {
+        if (!projects.length) return alert("No projects to clear.");
+        const ok = confirm("Clear all projects on this device?");
+        if (!ok) return;
+        projects = [];
+        storage.set(PROJECTS_KEY, projects);
+        renderProjects();
+    });
+
+    // Delete single project (event delegation)
+    projectsList?.addEventListener("click", (e) => {
+        const btn = e.target.closest?.("[data-del]");
+        if (!btn) return;
+        const id = btn.getAttribute("data-del");
+        projects = projects.filter(p => p.id !== id);
+        storage.set(PROJECTS_KEY, projects);
+        renderProjects();
+    });
+
+    // Small helpers
+    function escapeHtml(s) {
+        return String(s)
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+})();

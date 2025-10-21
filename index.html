@@ -160,6 +160,113 @@
             </dialog>
         </section>
 
+        <!-- COMMUNITY -->
+        <section id="community" class="tab-section hidden">
+            <h1 class="page-title">Community</h1>
+            <p class="page-sub">Connect, collaborate, and care for one another.</p>
+
+            <!-- Row: Video + Chat -->
+            <div class="grid-2">
+                <!-- Video -->
+                <div class="card">
+                    <div class="section-title">Video (Local Preview)</div>
+                    <p class="muted" style="margin-top:6px">
+                        This is a private, on-device camera preview (no upload). You can later swap to a room link or WebRTC server.
+                    </p>
+                    <div class="mt">
+                        <video id="communityVideo" playsinline autoplay muted style="width:100%; border-radius:12px; border:1px solid var(--border); background: #000; min-height: 220px;"></video>
+                    </div>
+                    <div class="row gap mt">
+                        <button id="startCamBtn" class="btn">Start Camera</button>
+                        <button id="stopCamBtn" class="btn">Stop</button>
+                    </div>
+                </div>
+
+                <!-- Chat -->
+                <div class="card">
+                    <div class="section-title">Chat</div>
+                    <div id="communityChatMessages" class="chat-messages" style="height:280px"></div>
+                    <div class="row gap mt">
+                        <input id="communityChatInput" class="input" placeholder="Type a message…" />
+                        <button id="sendCommunityMsgBtn" class="btn">Send</button>
+                        <button id="clearCommunityChatBtn" class="btn">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row: Join + Notes -->
+            <div class="grid-2" style="margin-top:16px;">
+                <!-- Join community -->
+                <div class="card">
+                    <div class="section-title">Join the Community</div>
+                    <div class="pg-row" style="margin-top:10px;">
+                        <div class="pg-field">
+                            <label class="pg-label" for="communityName">Full Name</label>
+                            <input id="communityName" class="pg-input" placeholder="Jane Doe" />
+                        </div>
+                        <div class="pg-field">
+                            <label class="pg-label" for="communityEmail">Email</label>
+                            <input id="communityEmail" type="email" class="pg-input" placeholder="you@example.com" />
+                        </div>
+                    </div>
+                    <div class="row gap mt">
+                        <button id="joinCommunityBtn" class="btn primary">Join Community</button>
+                        <button id="downloadCommunityCsvBtn" class="btn">Download Members CSV</button>
+                    </div>
+                    <p class="muted" style="margin-top:8px">Saved locally; you can later wire this to your backend or a Google Sheet.</p>
+
+                    <div id="communityMembersCount" class="muted" style="margin-top:8px"></div>
+                </div>
+
+                <!-- Notes -->
+                <div class="card">
+                    <div class="section-title">Community Notes</div>
+                    <textarea id="communityNotesText" class="pg-textarea" rows="7" placeholder="Shared agenda, ideas, or reminders…"></textarea>
+                    <div class="row gap mt">
+                        <button id="saveCommunityNotesBtn" class="btn">Save</button>
+                        <button id="clearCommunityNotesBtn" class="btn">Clear</button>
+                    </div>
+                    <div id="communityNotesSaved" class="muted" style="margin-top:6px;"></div>
+                </div>
+            </div>
+
+            <!-- Row: Help + Projects -->
+            <div class="grid-2" style="margin-top:16px;">
+                <!-- Help -->
+                <div class="card">
+                    <div class="section-title">Need Help?</div>
+                    <p class="muted">Click the button to email the coordinator.</p>
+                    <button id="helpBtn" class="btn">Email jonmarlow@gmail.com</button>
+                </div>
+
+                <!-- Projects -->
+                <div class="card">
+                    <div class="section-title">Local Projects</div>
+                    <p class="muted">Start something practical for your area.</p>
+                    <div class="pg-row" style="margin-top:8px;">
+                        <div class="pg-field">
+                            <label class="pg-label" for="projectTitle">Project Title</label>
+                            <input id="projectTitle" class="pg-input" placeholder="Food Pantry Drive" />
+                        </div>
+                        <div class="pg-field">
+                            <label class="pg-label" for="projectOwner">Owner</label>
+                            <input id="projectOwner" class="pg-input" placeholder="Your name" />
+                        </div>
+                    </div>
+                    <div class="pg-field" style="margin-top:8px;">
+                        <label class="pg-label" for="projectDesc">Short Description</label>
+                        <textarea id="projectDesc" class="pg-textarea" rows="3" placeholder="What is it, when, where…"></textarea>
+                    </div>
+                    <div class="row gap mt">
+                        <button id="newProjectBtn" class="btn primary">Create Project</button>
+                        <button id="clearProjectsBtn" class="btn">Clear All</button>
+                    </div>
+                    <div id="communityProjectsList" class="mt"></div>
+                </div>
+            </div>
+        </section>
+
+
         <section id="recovery" class="tab-section hidden">
             <div class="card">
                 <h2>Recovery Power in Christ</h2>

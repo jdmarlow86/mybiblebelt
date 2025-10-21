@@ -398,3 +398,21 @@ main {
 .muted {
     color: var(--muted);
 }
+
+/* slim project pills */
+.project-pill {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 8px;
+}
+
+    .project-pill h4 {
+        margin: 0 0 4px;
+    }
+
+.project-meta {
+    color: var(--muted);
+    font-size: 12px;
+}
