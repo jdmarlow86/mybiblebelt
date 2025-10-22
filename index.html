@@ -579,59 +579,49 @@
             <div class="card">
                 <h2>Support</h2>
                 <p>If this project helps you, you can support it below.</p>
-                <div class="row gap">
-                    <button id="btnSupport" class="btn">Open Support Modal</button>
+
+                <!-- shared inputs -->
+                <div class="grid-2" style="margin-top:12px;">
+                    <label>
+                        Amount (optional)
+                        <input id="supAmount" class="input" type="number" min="1" placeholder="e.g. 25" />
+                    </label>
+                    <label>
+                        Note (optional)
+                        <input id="supNote" class="input" type="text" placeholder="e.g. Keep it up!" />
+                    </label>
                 </div>
-            </div>
 
-            <dialog id="supportDialog" class="pg-dialog">
-                <div class="pg-dialog-card">
-                    <h3>Support the Project</h3>
-
-                    <div class="stack">
-                        <label>
-                            Amount (optional)
-                            <input id="supAmount" class="input" type="number" min="1" placeholder="e.g. 25" />
-                        </label>
-                        <label>
-                            Note (optional)
-                            <input id="supNote" class="input" type="text" placeholder="e.g. Keep it up!" />
-                        </label>
-                    </div>
-
-                    <div class="mt">
-                        <h4>PayPal</h4>
+                <!-- methods -->
+                <div class="grid-2" style="margin-top:16px;">
+                    <div class="info-tile">
+                        <h4 style="margin:0 0 6px;">PayPal</h4>
                         <div class="row gap">
-                            <button id="ppWeb" class="btn">Open</button>
+                            <button id="ppOpen" class="btn">Open</button>
                             <button id="ppCopy" class="btn ghost">Copy handle</button>
                         </div>
                     </div>
 
-                    <div class="mt">
-                        <h4>Cash App</h4>
+                    <div class="info-tile">
+                        <h4 style="margin:0 0 6px;">Cash App</h4>
                         <div class="row gap">
-                            <button id="caWeb" class="btn">Open</button>
+                            <button id="caOpen" class="btn">Open</button>
                             <button id="caCopy" class="btn ghost">Copy $tag</button>
                         </div>
                     </div>
 
-                    <div class="mt">
-                        <h4>Venmo</h4>
+                    <div class="info-tile">
+                        <h4 style="margin:0 0 6px;">Venmo</h4>
                         <div class="row gap">
                             <button id="vmApp" class="btn">Open app</button>
-                            <button id="vmWeb" class="btn ghost">Open web</button>
+                            <button id="vmWeb" class="btn">Open web</button>
                             <button id="vmCopy" class="btn ghost">Copy @user</button>
                         </div>
                     </div>
-
-                    <div class="row right mt">
-                        <form method="dialog">
-                            <button class="btn ghost">Close</button>
-                        </form>
-                    </div>
                 </div>
-            </dialog>
+            </div>
         </section>
+
     </main>
 
     <footer class="site-footer">

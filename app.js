@@ -369,11 +369,9 @@ Tips:
     });
 })();
 
-/* ========= Support Modal ========= */
+/* ========= Support (Inline) ========= */
 (() => {
     const TAGS = { paypal: 'jdmarlow86', cashapp: '$jdmarlow', venmo: 'Jonathan-Marlow-19' };
-    const dialog = $("#supportDialog");
-    $("#btnSupport")?.addEventListener("click", () => dialog?.showModal?.());
 
     const getAmount = () => {
         const v = parseInt($("#supAmount")?.value || "", 10);
@@ -383,25 +381,35 @@ Tips:
 
     function openNew(url) { window.open(url, "_blank", "noopener,noreferrer"); }
     async function copy(text, el) {
-        try { await navigator.clipboard.writeText(text); el.textContent = "Copied!"; setTimeout(() => el.textContent = "Copy", 1200); }
-        catch { alert("Copy failed—please copy manually: " + text); }
+        try {
+            await navigator.clipboard.writeText(text);
+            el.textContent = "Copied!";
+            setTimeout(() => (el.textContent = el.dataset.label || "Copy"), 1200);
+        } catch {
+            alert("Copy failed—please copy manually: " + text);
+        }
     }
 
-    $("#ppWeb")?.addEventListener("click", () => {
+    // PayPal
+    $("#ppOpen")?.addEventListener("click", () => {
         const amt = getAmount();
         const base = `https://www.paypal.com/paypalme/${encodeURIComponent(TAGS.paypal)}`;
         openNew(amt ? `${base}/${amt}` : base);
     });
-    $("#ppCopy")?.addEventListener("click", (e) => copy(TAGS.paypal, e.currentTarget));
+    const ppCopyBtn = $("#ppCopy");
+    if (ppCopyBtn) { ppCopyBtn.dataset.label = "Copy handle"; ppCopyBtn.addEventListener("click", (e) => copy(TAGS.paypal, e.currentTarget)); }
 
-    $("#caWeb")?.addEventListener("click", () => {
+    // Cash App
+    $("#caOpen")?.addEventListener("click", () => {
         const amt = getAmount();
         const clean = TAGS.cashapp.startsWith('$') ? TAGS.cashapp.slice(1) : TAGS.cashapp;
         const base = `https://cash.app/$${encodeURIComponent(clean)}`;
         openNew(amt ? `${base}/${amt}` : base);
     });
-    $("#caCopy")?.addEventListener("click", (e) => copy(TAGS.cashapp, e.currentTarget));
+    const caCopyBtn = $("#caCopy");
+    if (caCopyBtn) { caCopyBtn.dataset.label = "Copy $tag"; caCopyBtn.addEventListener("click", (e) => copy(TAGS.cashapp, e.currentTarget)); }
 
+    // Venmo
     $("#vmApp")?.addEventListener("click", () => {
         const amt = getAmount(); const note = getNote();
         const qp = new URLSearchParams();
@@ -411,8 +419,10 @@ Tips:
         location.href = `venmo://paycharge?${qp.toString()}`;
     });
     $("#vmWeb")?.addEventListener("click", () => openNew(`https://venmo.com/u/${encodeURIComponent(TAGS.venmo)}`));
-    $("#vmCopy")?.addEventListener("click", (e) => copy(TAGS.venmo, e.currentTarget));
+    const vmCopyBtn = $("#vmCopy");
+    if (vmCopyBtn) { vmCopyBtn.dataset.label = "Copy @user"; vmCopyBtn.addEventListener("click", (e) => copy(TAGS.venmo, e.currentTarget)); }
 })();
+
 
 /* ========= Misc demo ========= */
 $("#findChurchBtn")?.addEventListener("click", () => alert("Coming soon: church finder!"));
