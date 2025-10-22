@@ -26,30 +26,57 @@ function toggleTheme() { setTheme(document.documentElement.classList.contains("d
 /* ========= Tabs ========= */
 (() => {
     const sections = $$(".tab-section");
-    const TAB_IDS = new Set(sections.map(s => s.id));
+    const TAB_IDS = new Set(sections.map(s => s.id).concat(["welcome"])); // include welcome
     const DEFAULT = "welcome";
+    const welcomeSection = $("#welcome");
 
     function showTab(raw) {
         const id = TAB_IDS.has(raw) ? raw : DEFAULT;
+
+        // Show/hide tab sections
         sections.forEach(s => s.classList.toggle("hidden", s.id !== id));
+
+        // Show Welcome ONLY on the Welcome tab
+        if (welcomeSection) {
+            welcomeSection.classList.toggle("hidden", id !== "welcome");
+        }
+
+        // Active state on buttons
         $$(".nav-btn[data-tab]").forEach(b => b.classList.toggle("active", b.dataset.tab === id));
-        if ($("#mobileNav") && $("#mobileNav").value !== id) $("#mobileNav").value = id;
+
+        // Sync mobile select
+        const mob = $("#mobileNav");
+        if (mob && mob.value !== id) mob.value = id;
+
+        // Keep hash in sync without scroll jump
         if (location.hash !== `#${id}`) history.replaceState(null, "", `#${id}`);
     }
 
+    // Nav button clicks
     $(".nav")?.addEventListener("click", (e) => {
         const btn = e.target.closest(".nav-btn[data-tab]");
-        if (!btn) return; showTab(btn.dataset.tab);
+        if (!btn) return;
+        showTab(btn.dataset.tab);
     });
+
+    // Mobile select
     $("#mobileNav")?.addEventListener("change", (e) => showTab(e.target.value));
+
+    // Any element with data-jump
     document.addEventListener("click", (e) => {
         const j = e.target.closest?.("[data-jump]");
-        if (!j) return; e.preventDefault(); showTab(j.getAttribute("data-jump"));
+        if (!j) return;
+        e.preventDefault();
+        showTab(j.getAttribute("data-jump"));
     });
+
+    // Hash changes
     window.addEventListener("hashchange", () => showTab(location.hash.slice(1)));
 
+    // Initial render
     showTab(location.hash.slice(1));
 })();
+
 
 /* ========= Footer Year ========= */
 (() => { const y = $("#year"); if (y) y.textContent = String(new Date().getFullYear()); })();
