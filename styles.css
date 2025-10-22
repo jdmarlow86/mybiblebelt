@@ -77,17 +77,28 @@ a {
     white-space: nowrap;
 }
 
+/* ---------- Header & Nav (centered) ---------- */
 .site-header {
     position: sticky;
     top: 0;
     background: var(--bg);
     border-bottom: 1px solid var(--border);
     z-index: 10;
+    /* Center the header content */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
     .site-header .brand {
         padding: .75rem 1rem;
         font-weight: 700;
+        /* Center brand row */
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        justify-content: center;
+        text-align: center;
     }
 
 .nav {
@@ -96,6 +107,9 @@ a {
     gap: .5rem;
     padding: .5rem 1rem;
     border-top: 1px solid var(--border);
+    /* Center nav links & allow wrapping */
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .nav-btn {
@@ -260,7 +274,7 @@ main {
     }
 }
 
-/* Recovery */
+/* ---------- Recovery ---------- */
 .re-steps {
     display: grid;
     gap: .5rem;
@@ -350,7 +364,7 @@ main {
     font-size: .75rem;
 }
 
-/* Modal helpers */
+/* ---------- Modal helpers ---------- */
 .pg-dialog-card {
     position: relative;
 }
@@ -435,34 +449,33 @@ main {
     font-size: 11px;
 }
 
-/* ---------- Welcome Section ---------- */
-:root {
-    --welcome-bg: #0b1020; /* deep indigo */
-    --welcome-fg: #eef2ff; /* soft off-white */
-    --card-bg: #11162b;
-    --card-bg-hover: #0e1428;
-    --muted: #c7cffb;
-    --accent: #8ea2ff;
-    --ring: #c7d2fe;
-    --shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-}
+/* ---------- Welcome Section (scoped, theme-aware) ---------- */
 
-@media (prefers-color-scheme: light) {
-    :root {
-        --welcome-bg: #f6f7fb;
-        --welcome-fg: #0f172a;
-        --card-bg: #ffffff;
-        --card-bg-hover: #f8fafc;
-        --muted: #42567a;
-        --accent: #4355ff;
-        --ring: #a5b4fc;
-    }
-}
-
+/* Light defaults */
 .welcome {
+    --welcome-bg: #f6f7fb;
+    --welcome-fg: #0f172a;
+    --welcome-card-bg: #ffffff;
+    --welcome-card-bg-hover: #f8fafc;
+    --welcome-muted: #42567a;
+    --welcome-accent: #4355ff;
+    --welcome-ring: #a5b4fc;
+    --welcome-shadow: 0 10px 25px rgba(0, 0, 0, 0.10);
     background: radial-gradient(1200px 600px at 10% -10%, rgba(67,85,255,0.15), transparent), radial-gradient(900px 500px at 100% -20%, rgba(142,162,255,0.15), transparent), var(--welcome-bg);
     color: var(--welcome-fg);
     padding: clamp(2rem, 3vw + 1rem, 4rem) 1rem;
+}
+
+/* Dark overrides driven by your `.dark` class */
+.dark .welcome {
+    --welcome-bg: #0b1020; /* deep indigo */
+    --welcome-fg: #eef2ff; /* soft off-white */
+    --welcome-card-bg: #11162b;
+    --welcome-card-bg-hover: #0e1428;
+    --welcome-muted: #c7cffb;
+    --welcome-accent: #8ea2ff;
+    --welcome-ring: #c7d2fe;
+    --welcome-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
 }
 
 .welcome__inner {
@@ -484,7 +497,7 @@ main {
 .welcome__lead {
     max-width: 60ch;
     margin: 0 auto;
-    color: var(--muted);
+    color: var(--welcome-muted);
     font-size: clamp(1rem, .2vw + 1rem, 1.125rem);
 }
 
@@ -495,13 +508,13 @@ main {
     margin-top: 1.5rem;
 }
 
-@media (min-width: 640px) { /* sm */
+@media (min-width: 640px) {
     .welcome__grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-@media (min-width: 1024px) { /* lg */
+@media (min-width: 1024px) {
     .welcome__grid {
         grid-template-columns: repeat(3, 1fr);
     }
@@ -511,12 +524,12 @@ main {
     display: grid;
     grid-template-rows: auto auto 1fr auto;
     gap: .25rem;
-    background: var(--card-bg);
+    background: var(--welcome-card-bg);
     color: inherit;
     text-decoration: none;
     border-radius: 16px;
     padding: 1rem 1.125rem;
-    box-shadow: var(--shadow);
+    box-shadow: var(--welcome-shadow);
     outline: 1px solid rgba(255,255,255,0.06);
     transition: transform 200ms ease, outline-color 200ms ease, background-color 200ms ease;
 }
@@ -524,8 +537,8 @@ main {
     .welcome__card:hover,
     .welcome__card:focus-visible {
         transform: translateY(-2px);
-        background: var(--card-bg-hover);
-        outline-color: var(--ring);
+        background: var(--welcome-card-bg-hover);
+        outline-color: var(--welcome-ring);
     }
 
 .welcome__icon {
@@ -548,7 +561,7 @@ main {
 
 .welcome__cardText {
     margin: 0;
-    color: var(--muted);
+    color: var(--welcome-muted);
     font-size: .975rem;
 }
 
@@ -556,7 +569,7 @@ main {
     margin-top: .5rem;
     font-weight: 600;
     font-size: .9rem;
-    color: var(--accent);
+    color: var(--welcome-accent);
 }
 
 @media (prefers-reduced-motion: reduce) {
