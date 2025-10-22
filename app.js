@@ -1074,3 +1074,41 @@ $("#findChurchBtn")?.addEventListener("click", () => alert("Coming soon: church 
     // Try once on load in case the tab is already active:
     initIfVisible();
 })();
+
+document.addEventListener('DOMContentLoaded', () => {
+    const sections = [...document.querySelectorAll('.tab-section')];
+    const navBtns = [...document.querySelectorAll('.nav .nav-btn')];
+    const mobileNav = document.getElementById('mobileNav');
+
+    function showTab(key) {
+        // Show/hide sections
+        sections.forEach(s => {
+            s.classList.toggle('hidden', s.id !== key);
+        });
+
+        // Special case: "welcome" is not a .tab-section (keep it visible only for welcome)
+        const welcome = document.getElementById('welcome');
+        if (welcome) welcome.classList.toggle('hidden', key !== 'welcome');
+
+        // Active state on buttons
+        navBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === key));
+
+        // Sync mobile select
+        if (mobileNav && mobileNav.value !== key) mobileNav.value = key;
+    }
+
+    // Delegate clicks
+    document.querySelector('.nav')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.nav-btn');
+        if (!btn) return;
+        const key = btn.dataset.tab;
+        if (!key) return;
+        showTab(key);
+    });
+
+    // Mobile select
+    mobileNav?.addEventListener('change', (e) => showTab(e.target.value));
+
+    // Initial tab: show welcome by default
+    showTab('welcome');
+});
