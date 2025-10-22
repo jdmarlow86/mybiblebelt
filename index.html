@@ -17,11 +17,13 @@
 </head>
 <body>
     <header class="site-header">
-        <div class="brand">My Bible Belt</div>
+        <div class="brand">
+            <img src="assets/mybiblebelt-icon.png" alt="MyBibleBelt Logo" style="width:36px; height:36px; border-radius:10px;">
+            <span>My Bible Belt</span>
+        </div>
 
         <nav class="nav">
             <button class="nav-btn" data-tab="welcome">Welcome</button>
-            <!-- in your .nav button group -->
             <button class="nav-btn" data-tab="church">Church</button>
             <button class="nav-btn" data-tab="resources">Resources</button>
             <button class="nav-btn" data-tab="prayer">Prayer</button>
@@ -29,24 +31,25 @@
             <button class="nav-btn" data-tab="community">Community</button>
             <button class="nav-btn" data-tab="support">Support</button>
 
-            <div class="grow"></div>
-
-            <button id="themeToggle" class="icon-btn" title="Toggle theme"></button>
+            <!-- Optional theme toggle aligned at center-bottom -->
+            <button id="themeToggle" class="icon-btn" title="Toggle theme">🌓</button>
         </nav>
 
         <div class="mobile-nav">
             <label for="mobileNav" class="sr-only">Navigate</label>
             <select id="mobileNav">
                 <option value="welcome">Welcome</option>
+                <option value="church">Church</option>
                 <option value="resources">Resources</option>
                 <option value="prayer">Prayer</option>
                 <option value="recovery">Recovery</option>
                 <option value="community">Community</option>
                 <option value="support">Support</option>
             </select>
-            <button id="themeToggleMobile" class="icon-btn" title="Toggle theme (mobile)"></button>
+            <button id="themeToggleMobile" class="icon-btn" title="Toggle theme (mobile)">🌓</button>
         </div>
     </header>
+
 
     <main>
         <!-- Welcome -->
