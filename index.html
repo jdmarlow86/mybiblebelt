@@ -50,13 +50,62 @@
 
     <main>
         <!-- Welcome -->
-        <section id="welcome" class="tab-section">
-            <div class="card">
-                <h2>Welcome</h2>
-                <p>Clean starter with working tabs, theme toggle, resources, prayer tools, and a support modal.</p>
-                <button id="findChurchBtn" class="btn">Find a Church (demo)</button>
+        <section id="welcome" class="welcome">
+            <div class="welcome__inner">
+                <header class="welcome__header">
+                    <h1 class="welcome__title">Welcome to MyBibleBelt.org</h1>
+                    <p class="welcome__lead">
+                        A place to grow in faith, find support, and connect with a caring community.
+                        Explore the sections below to get started.
+                    </p>
+                </header>
+
+                <div class="welcome__grid">
+                    <a class="welcome__card" href="#recovery">
+                        <div class="welcome__icon" aria-hidden="true">📖</div>
+                        <h3 class="welcome__cardTitle">Recovery</h3>
+                        <p class="welcome__cardText">A guided 10-step plan for spiritual and personal restoration with space for reflection.</p>
+                        <span class="welcome__cta">Open Recovery</span>
+                    </a>
+
+                    <a class="welcome__card" href="#prayer">
+                        <div class="welcome__icon" aria-hidden="true">🙏</div>
+                        <h3 class="welcome__cardTitle">Prayer</h3>
+                        <p class="welcome__cardText">Share requests, join others in prayer, and receive strength through daily devotionals.</p>
+                        <span class="welcome__cta">Go to Prayer</span>
+                    </a>
+
+                    <a class="welcome__card" href="#resources">
+                        <div class="welcome__icon" aria-hidden="true">🌍</div>
+                        <h3 class="welcome__cardTitle">Resources</h3>
+                        <p class="welcome__cardText">Study tools and teachings from across Christian traditions, including Seventh-day Adventist materials.</p>
+                        <span class="welcome__cta">Browse Resources</span>
+                    </a>
+
+                    <a class="welcome__card" href="#community">
+                        <div class="welcome__icon" aria-hidden="true">💬</div>
+                        <h3 class="welcome__cardTitle">Community</h3>
+                        <p class="welcome__cardText">Watch, chat, take notes, and collaborate on local projects with others.</p>
+                        <span class="welcome__cta">Enter Community</span>
+                    </a>
+
+                    <a class="welcome__card" href="#church-finder">
+                        <div class="welcome__icon" aria-hidden="true">🕊️</div>
+                        <h3 class="welcome__cardTitle">Church Finder</h3>
+                        <p class="welcome__cardText">Locate nearby churches and ministries using your current location and an interactive map.</p>
+                        <span class="welcome__cta">Find a Church</span>
+                    </a>
+
+                    <a class="welcome__card" href="#affiliates">
+                        <div class="welcome__icon" aria-hidden="true">🤝</div>
+                        <h3 class="welcome__cardTitle">Affiliates</h3>
+                        <p class="welcome__cardText">Meet local faith-friendly partners and businesses supporting the mission.</p>
+                        <span class="welcome__cta">View Affiliates</span>
+                    </a>
+                </div>
             </div>
         </section>
+
 
         <section id="church" class="tab-section hidden">
             <h1 class="page-title">Church Finder</h1>
