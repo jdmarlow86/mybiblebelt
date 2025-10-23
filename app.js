@@ -1150,7 +1150,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showTab('welcome');
 });
 
-/* ========= Study (Library + Study Cards) ========= */
+/* ========= Study (Library + Study Cards) — with Starter Links ========= */
 (() => {
     // Only run if the Study tab exists
     const studySection = $("#study");
@@ -1158,7 +1158,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ----- Study Links Library ----- */
     const LINKS_KEY = "study_links_v1";
-    // Starter traditions (broad + Christian families you already use)
+
+    // Traditions shown as cards
     const TRADITIONS = [
         { id: "christian", name: "Christian (General)" },
         { id: "catholic", name: "Catholic" },
@@ -1181,12 +1182,92 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: "other", name: "Other / Local" }
     ];
 
+    // ? Starter links (authoritative / widely used)
+    const SEED_LINKS = {
+        christian: [
+            { label: "BibleProject – Explore", url: "https://bibleproject.com/explore/" },
+            { label: "Blue Letter Bible (Study Tools)", url: "https://www.blueletterbible.org" },
+            { label: "Bible Gateway – Study Resources", url: "https://www.biblegateway.com/resources/" }
+        ],
+        catholic: [
+            { label: "Vatican – Catechism", url: "https://www.vatican.va/archive/ENG0015/_INDEX.HTM" },
+            { label: "USCCB – Bible & Readings", url: "https://bible.usccb.org" }
+        ],
+        orthodox: [
+            { label: "GOARCH – Articles & Topics", url: "https://www.goarch.org/departments/faith" },
+            { label: "OCA – Study & Resources", url: "https://www.oca.org/orthodoxy" }
+        ],
+        protestant: [
+            { label: "BibleProject – How to Read the Bible", url: "https://bibleproject.com/how-to-read-the-bible/" }
+        ],
+        anglican: [
+            { label: "Anglican Communion – Resources", url: "https://www.anglicancommunion.org/resources.aspx" }
+        ],
+        lutheran: [
+            { label: "Book of Concord (Confessions)", url: "https://bookofconcord.org" },
+            { label: "LCMS – Bible Study Resources", url: "https://www.lcms.org/resources" }
+        ],
+        reformed: [
+            { label: "Westminster Confession & Catechisms", url: "https://www.pcaac.org/resources/wcf/" }
+        ],
+        baptist: [
+            { label: "Baptist Faith & Message (2000)", url: "https://bfm.sbc.net" }
+        ],
+        methodist: [
+            { label: "UMC – Discipleship & Study", url: "https://www.umc.org/en/content/ask-the-umc-what-is-discipleship" }
+        ],
+        pentecostal: [
+            { label: "AG – Statement & Resources", url: "https://ag.org/Beliefs/Statement-of-Fundamental-Truths" }
+        ],
+        seventhday: [
+            { label: "Adventist – Beliefs & Bible Study", url: "https://www.adventist.org/beliefs/" },
+            { label: "Sabbath School & PM", url: "https://www.sabbathschoolpersonalministries.org" },
+            { label: "EGW Writings", url: "https://egwwritings.org" }
+        ],
+        nondenom: [
+            { label: "BibleProject – Study Notes & Themes", url: "https://bibleproject.com/explore/" }
+        ],
+        // ?? You asked for these explicitly:
+        jewish: [
+            { label: "Sefaria – Torah & Commentary", url: "https://www.sefaria.org" },
+            { label: "Chabad – Weekly Parsha", url: "https://www.chabad.org/parshah/default_cdo/jewish/Torah-Portion.htm" },
+            { label: "My Jewish Learning – Torah Study", url: "https://www.myjewishlearning.com/category/study/the-torah/" }
+        ],
+        islam: [
+            { label: "Quran.com (Arabic & Translations)", url: "https://quran.com" },
+            { label: "Quranic Arabic Corpus", url: "https://corpus.quran.com" },
+            { label: "Sunnah.com (Hadith Collections)", url: "https://sunnah.com" },
+            { label: "AlTafsir (Tafsir Database)", url: "https://www.altafsir.com" }
+        ],
+        hinduism: [
+            { label: "Sacred Texts – Hinduism", url: "https://www.sacred-texts.com/hin/" },
+            { label: "Vedanta Society – Talks & Texts", url: "https://vedanta.org" }
+        ],
+        buddhism: [
+            { label: "SuttaCentral (Pali Canon & Translations)", url: "https://suttacentral.net" },
+            { label: "Access to Insight", url: "https://www.accesstoinsight.org" }
+        ],
+        sikhism: [
+            { label: "Srigranth – Sri Guru Granth Sahib", url: "https://www.srigranth.org" },
+            { label: "SikhNet – Learn & Resources", url: "https://www.sikhnet.com/learn" }
+        ],
+        bahai: [
+            { label: "Bahai.org – Library", url: "https://www.bahai.org/library/" }
+        ],
+        other: []
+    };
+
     const grid = $("#studyLinksGrid");
 
     const storageLinks = {
         get() {
-            try { return JSON.parse(localStorage.getItem(LINKS_KEY) || "null") || {}; }
-            catch { return {}; }
+            try {
+                const saved = JSON.parse(localStorage.getItem(LINKS_KEY) || "null");
+                // If nothing saved, use seeds
+                return saved && typeof saved === "object" ? saved : { ...SEED_LINKS };
+            } catch {
+                return { ...SEED_LINKS };
+            }
         },
         set(val) { try { localStorage.setItem(LINKS_KEY, JSON.stringify(val)); } catch { } }
     };
@@ -1212,7 +1293,7 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
             const linksWrap = $("[data-links]", card);
 
-            // Render chips
+            // Render link chips
             links.forEach((lnk, idx) => {
                 const chip = document.createElement("div");
                 chip.className = "study-link";
@@ -1223,7 +1304,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 linksWrap.appendChild(chip);
             });
 
-            // Add handler
+            // Add link
             $("[data-add]", card)?.addEventListener("click", () => {
                 const url = $("[data-url]", card)?.value.trim();
                 const label = $("[data-label]", card)?.value.trim();
@@ -1235,7 +1316,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderLinks();
             });
 
-            // Delete handler (event delegation)
+            // Delete link (delegated)
             linksWrap.addEventListener("click", (e) => {
                 const btn = e.target.closest?.("[data-del]");
                 if (!btn) return;
@@ -1252,7 +1333,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     $("#studyClearLinksBtn")?.addEventListener("click", () => {
         if (!confirm("Clear all saved study links on this device?")) return;
-        storageLinks.set({});
+        storageLinks.set({}); // next render will repopulate as empty (no seeds) unless you prefer restoring seeds:
+        // storageLinks.set({ ...SEED_LINKS }); // ? use this line instead to restore seeds after clearing
         renderLinks();
     });
 
@@ -1273,7 +1355,7 @@ document.addEventListener('DOMContentLoaded', () => {
         URL.revokeObjectURL(url);
     });
 
-    /* ----- Study Cards ----- */
+    /* ----- Study Cards (unchanged from your previous version) ----- */
     const CARDS_KEY = "study_cards_v1";
     const cardsGrid = $("#studyCardsGrid");
 
@@ -1337,7 +1419,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Build text representation
     function formatCard(c) {
         return `STUDY CARD
 ============
@@ -1379,7 +1460,6 @@ ${(c.refs || []).join("\n")}
         const list = [card, ...storageCards.get()];
         storageCards.set(list);
         renderCards();
-        // clear
         ["scTitle", "scPassage", "scAim", "scTags", "scNotes", "scRefs"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
     });
 
