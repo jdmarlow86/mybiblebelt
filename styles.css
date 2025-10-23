@@ -636,3 +636,22 @@ main {
         padding: 0;
         font-size: 14px;
     }
+.study-link {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: .35rem .5rem;
+    border-radius: .5rem;
+}
+
+    .study-link .rm {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        font-size: 1rem;
+        line-height: 1;
+        color: var(--muted);
+    }
