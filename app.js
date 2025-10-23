@@ -1149,3 +1149,313 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial tab: show welcome by default
     showTab('welcome');
 });
+
+/* ========= Study (Library + Study Cards) ========= */
+(() => {
+    // Only run if the Study tab exists
+    const studySection = $("#study");
+    if (!studySection) return;
+
+    /* ----- Study Links Library ----- */
+    const LINKS_KEY = "study_links_v1";
+    // Starter traditions (broad + Christian families you already use)
+    const TRADITIONS = [
+        { id: "christian", name: "Christian (General)" },
+        { id: "catholic", name: "Catholic" },
+        { id: "orthodox", name: "Eastern Orthodox" },
+        { id: "protestant", name: "Protestant (General)" },
+        { id: "anglican", name: "Anglican" },
+        { id: "lutheran", name: "Lutheran" },
+        { id: "reformed", name: "Reformed / Presbyterian" },
+        { id: "baptist", name: "Baptist" },
+        { id: "methodist", name: "Methodist / Wesleyan" },
+        { id: "pentecostal", name: "Pentecostal / Charismatic" },
+        { id: "seventhday", name: "Seventh-day Adventist" },
+        { id: "nondenom", name: "Non-Denominational" },
+        { id: "jewish", name: "Judaism" },
+        { id: "islam", name: "Islam" },
+        { id: "hinduism", name: "Hinduism" },
+        { id: "buddhism", name: "Buddhism" },
+        { id: "sikhism", name: "Sikhism" },
+        { id: "bahai", name: "Bahá’í" },
+        { id: "other", name: "Other / Local" }
+    ];
+
+    const grid = $("#studyLinksGrid");
+
+    const storageLinks = {
+        get() {
+            try { return JSON.parse(localStorage.getItem(LINKS_KEY) || "null") || {}; }
+            catch { return {}; }
+        },
+        set(val) { try { localStorage.setItem(LINKS_KEY, JSON.stringify(val)); } catch { } }
+    };
+
+    function renderLinks() {
+        if (!grid) return;
+        const data = storageLinks.get();
+        grid.innerHTML = "";
+        TRADITIONS.forEach(tr => {
+            const links = Array.isArray(data[tr.id]) ? data[tr.id] : [];
+            const card = document.createElement("div");
+            card.className = "info-tile";
+            card.innerHTML = `
+        <div class="row spread">
+          <div class="section-title">${tr.name}</div>
+        </div>
+        <div class="stack mt" data-links></div>
+        <div class="row gap mt">
+          <input class="input grow" placeholder="Add link (URL)" data-url>
+          <input class="input grow" placeholder="Label (optional)" data-label>
+          <button class="btn" data-add>Add</button>
+        </div>
+      `;
+            const linksWrap = $("[data-links]", card);
+
+            // Render chips
+            links.forEach((lnk, idx) => {
+                const chip = document.createElement("div");
+                chip.className = "study-link";
+                chip.innerHTML = `
+          <a href="${escapeAttr(lnk.url)}" target="_blank" rel="noopener">${escapeHtml(lnk.label || lnk.url)}</a>
+          <button class="rm" title="Remove" data-del="${idx}">×</button>
+        `;
+                linksWrap.appendChild(chip);
+            });
+
+            // Add handler
+            $("[data-add]", card)?.addEventListener("click", () => {
+                const url = $("[data-url]", card)?.value.trim();
+                const label = $("[data-label]", card)?.value.trim();
+                if (!url) return alert("Please enter a URL.");
+                const next = storageLinks.get();
+                next[tr.id] = Array.isArray(next[tr.id]) ? next[tr.id] : [];
+                next[tr.id].push({ url, label });
+                storageLinks.set(next);
+                renderLinks();
+            });
+
+            // Delete handler (event delegation)
+            linksWrap.addEventListener("click", (e) => {
+                const btn = e.target.closest?.("[data-del]");
+                if (!btn) return;
+                const idx = parseInt(btn.getAttribute("data-del"), 10);
+                const next = storageLinks.get();
+                next[tr.id].splice(idx, 1);
+                storageLinks.set(next);
+                renderLinks();
+            });
+
+            grid.appendChild(card);
+        });
+    }
+
+    $("#studyClearLinksBtn")?.addEventListener("click", () => {
+        if (!confirm("Clear all saved study links on this device?")) return;
+        storageLinks.set({});
+        renderLinks();
+    });
+
+    $("#studyExportLinksBtn")?.addEventListener("click", () => {
+        const data = storageLinks.get();
+        const rows = [["Tradition ID", "Tradition Name", "Label", "URL"]];
+        TRADITIONS.forEach(tr => {
+            (data[tr.id] || []).forEach(lnk => {
+                rows.push([tr.id, tr.name, lnk.label || "", lnk.url || ""]);
+            });
+        });
+        const csv = rows.map(r => r.map(csvEscape).join(",")).join("\r\n");
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url; a.download = "study_links.csv";
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
+    });
+
+    /* ----- Study Cards ----- */
+    const CARDS_KEY = "study_cards_v1";
+    const cardsGrid = $("#studyCardsGrid");
+
+    const storageCards = {
+        get() { try { return JSON.parse(localStorage.getItem(CARDS_KEY) || "[]"); } catch { return []; } },
+        set(v) { try { localStorage.setItem(CARDS_KEY, JSON.stringify(v)); } catch { } }
+    };
+
+    function renderCards() {
+        if (!cardsGrid) return;
+        const cards = storageCards.get();
+        if (!cards.length) {
+            cardsGrid.innerHTML = `<div class="muted">No study cards yet—create one above.</div>`;
+            return;
+        }
+        cardsGrid.innerHTML = cards.map(c => `
+      <div class="info-tile">
+        <div class="row spread">
+          <div>
+            <div class="section-title">${escapeHtml(c.title || "Untitled")}</div>
+            <div class="muted">${escapeHtml(c.passage || "")}${c.tags?.length ? " • " + c.tags.map(escapeHtml).join(", ") : ""}</div>
+          </div>
+          <div class="row gap">
+            <button class="btn ghost" data-copy="${c.id}">Copy</button>
+            <button class="btn ghost" data-dl="${c.id}">Download</button>
+            <button class="btn" data-del="${c.id}">Delete</button>
+          </div>
+        </div>
+        <div class="mt" style="white-space:pre-wrap;">${escapeHtml(c.notes || "")}</div>
+        ${c.refs?.length ? `<div class="mt stack">${c.refs.map(u => `<a href="${escapeAttr(u)}" target="_blank" rel="noopener">${escapeHtml(u)}</a>`).join("")}</div>` : ""}
+      </div>
+    `).join("");
+
+        // Wire actions
+        cardsGrid.querySelectorAll("[data-copy]").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const id = btn.getAttribute("data-copy"); const card = storageCards.get().find(x => x.id === id);
+                if (!card) return;
+                try { await navigator.clipboard.writeText(formatCard(card)); alert("Card copied."); } catch { alert("Copy failed."); }
+            });
+        });
+        cardsGrid.querySelectorAll("[data-dl]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = btn.getAttribute("data-dl"); const card = storageCards.get().find(x => x.id === id);
+                if (!card) return;
+                const blob = new Blob([formatCard(card)], { type: "text/plain" });
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = (card.title || "study-card") + ".txt";
+                document.body.appendChild(a); a.click(); a.remove();
+                setTimeout(() => URL.revokeObjectURL(a.href), 0);
+            });
+        });
+        cardsGrid.querySelectorAll("[data-del]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = btn.getAttribute("data-del");
+                const list = storageCards.get().filter(x => x.id !== id);
+                storageCards.set(list);
+                renderCards();
+            });
+        });
+    }
+
+    // Build text representation
+    function formatCard(c) {
+        return `STUDY CARD
+============
+Title: ${c.title || ""}
+Passage/Source: ${c.passage || ""}
+Tags: ${Array.isArray(c.tags) ? c.tags.join(", ") : ""}
+
+Aim:
+${c.aim || ""}
+
+Notes:
+${c.notes || ""}
+
+References:
+${(c.refs || []).join("\n")}
+`;
+    }
+
+    // Inputs
+    const scTitle = $("#scTitle");
+    const scPassage = $("#scPassage");
+    const scAim = $("#scAim");
+    const scTags = $("#scTags");
+    const scNotes = $("#scNotes");
+    const scRefs = $("#scRefs");
+
+    $("#scSaveBtn")?.addEventListener("click", () => {
+        const title = scTitle?.value.trim();
+        if (!title) return alert("Please enter a title.");
+        const card = {
+            id: "sc_" + Date.now(),
+            title,
+            passage: scPassage?.value.trim() || "",
+            aim: scAim?.value.trim() || "",
+            tags: (scTags?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+            notes: scNotes?.value || "",
+            refs: (scRefs?.value || "").split(",").map(s => s.trim()).filter(Boolean)
+        };
+        const list = [card, ...storageCards.get()];
+        storageCards.set(list);
+        renderCards();
+        // clear
+        ["scTitle", "scPassage", "scAim", "scTags", "scNotes", "scRefs"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+    });
+
+    $("#scCopyBtn")?.addEventListener("click", async () => {
+        const temp = {
+            title: scTitle?.value || "",
+            passage: scPassage?.value || "",
+            aim: scAim?.value || "",
+            tags: (scTags?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+            notes: scNotes?.value || "",
+            refs: (scRefs?.value || "").split(",").map(s => s.trim()).filter(Boolean)
+        };
+        try { await navigator.clipboard.writeText(formatCard(temp)); alert("Draft copied."); } catch { alert("Copy failed."); }
+    });
+
+    $("#scDownloadBtn")?.addEventListener("click", () => {
+        const temp = {
+            title: scTitle?.value || "study-card",
+            passage: scPassage?.value || "",
+            aim: scAim?.value || "",
+            tags: (scTags?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+            notes: scNotes?.value || "",
+            refs: (scRefs?.value || "").split(",").map(s => s.trim()).filter(Boolean)
+        };
+        const blob = new Blob([formatCard(temp)], { type: "text/plain" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = (temp.title || "study-card") + ".txt";
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 0);
+    });
+
+    $("#scClearBtn")?.addEventListener("click", () => {
+        ["scTitle", "scPassage", "scAim", "scTags", "scNotes", "scRefs"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+    });
+
+    $("#scExportCsvBtn")?.addEventListener("click", () => {
+        const rows = [["Title", "Passage", "Aim", "Tags", "Notes", "Refs"]];
+        storageCards.get().forEach(c => {
+            rows.push([
+                c.title || "",
+                c.passage || "",
+                c.aim || "",
+                (c.tags || []).join("|"),
+                (c.notes || "").replace(/\r?\n/g, " "),
+                (c.refs || []).join("|")
+            ]);
+        });
+        const csv = rows.map(r => r.map(csvEscape).join(",")).join("\r\n");
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url; a.download = "study_cards.csv";
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
+    });
+
+    $("#scClearAllBtn")?.addEventListener("click", () => {
+        if (!confirm("Delete all saved study cards on this device?")) return;
+        storageCards.set([]);
+        renderCards();
+    });
+
+    // Helpers
+    function escapeHtml(s) {
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function escapeAttr(s) { return String(s).replace(/"/g, "&quot;"); }
+    function csvEscape(val) {
+        if (val == null) return "";
+        const s = String(val);
+        return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    }
+
+    // Initial renders
+    renderLinks();
+    renderCards();
+})();

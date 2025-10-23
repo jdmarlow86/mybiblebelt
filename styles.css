@@ -609,3 +609,30 @@ main {
             transform: none;
         }
 }
+
+/* Study: link item chips inside info-tiles */
+.study-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 13px;
+}
+
+    .study-link a {
+        color: var(--text);
+        text-decoration: none;
+    }
+
+    .study-link .rm {
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        line-height: 1;
+        padding: 0;
+        font-size: 14px;
+    }

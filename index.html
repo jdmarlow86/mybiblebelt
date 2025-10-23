@@ -27,6 +27,7 @@
             <button class="nav-btn" data-tab="church">Church</button>
             <button class="nav-btn" data-tab="resources">Resources</button>
             <button class="nav-btn" data-tab="prayer">Prayer</button>
+            <button class="nav-btn" data-tab="study">Study</button>
             <button class="nav-btn" data-tab="recovery">Recovery</button>
             <button class="nav-btn" data-tab="community">Community</button>
             <button class="nav-btn" data-tab="support">Support</button>
@@ -42,6 +43,7 @@
                 <option value="church">Church</option>
                 <option value="resources">Resources</option>
                 <option value="prayer">Prayer</option>
+                <option value="study">Study</option>
                 <option value="recovery">Recovery</option>
                 <option value="community">Community</option>
                 <option value="support">Support</option>
@@ -268,6 +270,75 @@
                 </div>
             </dialog>
         </section>
+
+        <!-- Study -->
+        <section id="study" class="tab-section hidden">
+            <div class="card">
+                <h2>Study Library</h2>
+                <p class="muted">Links to materials by tradition. Add your own favorites; everything is saved on this device.</p>
+
+                <div id="studyLinksGrid" class="grid mt"></div>
+
+                <div class="row gap mt">
+                    <button id="studyExportLinksBtn" class="btn">Export Links CSV</button>
+                    <button id="studyClearLinksBtn" class="btn ghost">Clear All Links</button>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:16px;">
+                <h2>My Study Card</h2>
+                <p class="muted">Create a quick study plan or note you can save, copy, or download.</p>
+
+                <div class="grid-2 mt">
+                    <label>
+                        Title
+                        <input id="scTitle" class="input" placeholder="e.g., Beatitudes Study">
+                    </label>
+                    <label>
+                        Passage / Source
+                        <input id="scPassage" class="input" placeholder="e.g., Matthew 5:1–12 or “Intro to Dharma”">
+                    </label>
+                </div>
+
+                <div class="grid-2 mt">
+                    <label>
+                        Summary / Aim
+                        <input id="scAim" class="input" placeholder="What you want to learn or focus on">
+                    </label>
+                    <label>
+                        Tags (comma-separated)
+                        <input id="scTags" class="input" placeholder="e.g., Sermon, Compassion, Ethics">
+                    </label>
+                </div>
+
+                <label class="mt">
+                    Key Notes (Markdown ok)
+                    <textarea id="scNotes" class="pg-textarea" rows="6" placeholder="- Main points
+- Questions
+- Cross references"></textarea>
+                </label>
+
+                <label class="mt">
+                    References (comma-separated URLs)
+                    <input id="scRefs" class="input" placeholder="https://example.org, https://another.example">
+                </label>
+
+                <div class="row gap mt">
+                    <button id="scSaveBtn" class="btn">Save Card</button>
+                    <button id="scCopyBtn" class="btn ghost">Copy</button>
+                    <button id="scDownloadBtn" class="btn">Download .txt</button>
+                    <button id="scClearBtn" class="btn ghost">Clear</button>
+                </div>
+
+                <div class="row gap mt">
+                    <button id="scExportCsvBtn" class="btn">Export Cards CSV</button>
+                    <button id="scClearAllBtn" class="btn ghost">Delete All Cards</button>
+                </div>
+
+                <div id="studyCardsGrid" class="grid mt"></div>
+            </div>
+        </section>
+
 
         <!-- COMMUNITY -->
         <section id="community" class="tab-section hidden">
