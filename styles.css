@@ -52,13 +52,18 @@ body {
     font: 16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 }
 
-/* HEADER + NAV (centered rows) */
-.site-header {
-    display: grid;
-    row-gap: 4px;
-    justify-items: center;
+/* HEADER + NAV (original, non-centered) */
+.site-header,
+.site-footer {
     border-bottom: 1px solid var(--border);
     background: var(--bg);
+}
+
+.site-footer {
+    border-top: 1px solid var(--border);
+    border-bottom: 0;
+    padding: 16px;
+    text-align: center;
 }
 
 .brand {
@@ -66,7 +71,6 @@ body {
     align-items: center;
     gap: 8px;
     padding: 12px 16px 0 16px;
-    justify-content: center;
 }
 
 .brand__img {
@@ -79,30 +83,18 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    justify-content: center;
-    align-items: center;
     padding: 12px 16px;
-    width: 100%;
 }
 
 .mobile-nav {
     display: flex;
     gap: 8px;
     align-items: center;
-    justify-content: center;
     padding: 0 16px 12px 16px;
 }
 
-/* FOOTER */
-.site-footer {
-    border-top: 1px solid var(--border);
-    padding: 16px;
-    text-align: center;
-    background: var(--bg);
-}
-
 /* PAGE LAYOUT */
-.tab {
+.tab-section, .welcome {
     padding: 16px;
     max-width: 1100px;
     margin: 0 auto;
@@ -206,7 +198,7 @@ body {
     gap: 16px;
 }
 
-@media (min-width:900px) {
+@media (min-width: 900px) {
     .grid-2 {
         grid-template-columns: 1fr 1fr;
     }
@@ -214,9 +206,30 @@ body {
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(240px,1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 12px;
 }
+
+/* Welcome cards */
+.welcome__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.welcome__icon {
+    font-size: 28px;
+}
+
+.welcome__card {
+    text-decoration: none;
+    color: inherit;
+    transition: transform .06s ease;
+}
+
+    .welcome__card:hover {
+        transform: translateY(-1px);
+    }
 
 /* Recovery details */
 details.re-step summary {
@@ -314,15 +327,4 @@ details.re-step summary {
     overflow: hidden;
     clip: rect(0,0,0,0);
     border: 0;
-}
-
-/* Print */
-@media print {
-    header, .site-footer, .nav, .mobile-nav, .btn, .icon-btn {
-        display: none !important;
-    }
-
-    .tab {
-        padding: 0;
-    }
 }

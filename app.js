@@ -28,8 +28,13 @@ const mapHashToId = (hash) => {
     return t === "recovery" ? "recovery-plan" : t;
 };
 
+function hideAllSections() {
+    // Support both the welcome hero and tabbed sections (original structure)
+    $$(".welcome, .tab-section").forEach(s => s.classList.add("hidden"));
+}
+
 function showTabById(id) {
-    $$(".tab").forEach(s => s.classList.add("hidden"));
+    hideAllSections();
     const sec = document.getElementById(id);
     if (sec) sec.classList.remove("hidden");
 
@@ -42,7 +47,9 @@ function showTabById(id) {
     if (location.hash !== desiredHash) history.replaceState(null, "", desiredHash);
 }
 
-function showTab(tabKey) { showTabById(mapHashToId("#" + tabKey)); }
+function showTab(tabKey) {
+    showTabById(mapHashToId("#" + tabKey));
+}
 
 // navbar buttons
 $$(".nav-btn").forEach(btn => {
@@ -58,87 +65,7 @@ window.addEventListener("hashchange", () => showTabById(mapHashToId(location.has
 // initial render
 showTabById(mapHashToId(location.hash || "#welcome"));
 
-/* ========= Recovery: Print ========= */
-function serializeRecoveryForPrint(root) {
-    const clone = root.cloneNode(true);
-    clone.querySelectorAll("details").forEach(d => d.setAttribute("open", ""));
-
-    // convert inputs/selects/textarea into static values
-    clone.querySelectorAll("input, textarea, select").forEach(el => {
-        let value = "";
-        if (el.tagName === "TEXTAREA") value = el.value.trim();
-        else if (el.tagName === "SELECT") value = el.options[el.selectedIndex]?.text ?? "";
-        else if (el.type === "checkbox") value = el.checked ? "? Yes" : "—";
-        else if (el.type === "radio") { if (!el.checked) { el.remove(); return; } else value = el.value; }
-        else value = el.value ?? "";
-
-        const span = document.createElement("span");
-        span.className = "print-value";
-        span.textContent = value || "—";
-
-        const wrapper = document.createElement("div");
-        wrapper.className = "print-field";
-
-        let labelText = "";
-        if (el.id) {
-            const lbl = clone.querySelector(`label[for="${el.id}"]`);
-            if (lbl) labelText = lbl.textContent.trim();
-        } else {
-            const lbl = el.closest("label");
-            if (lbl) labelText = lbl.textContent.trim();
-        }
-
-        if (labelText) {
-            const strong = document.createElement("strong");
-            strong.textContent = labelText.replace(/\*\s*$/, "") + ": ";
-            wrapper.appendChild(strong);
-            wrapper.appendChild(span);
-            el.replaceWith(wrapper);
-        } else {
-            el.replaceWith(span);
-        }
-    });
-
-    // remove UI-only controls inside the print clone
-    clone.querySelectorAll("button,.icon-btn,dialog").forEach(n => n.remove());
-    return clone.outerHTML;
-}
-
-function openPrintWindow(htmlBody, title = "Recovery Plan") {
-    const win = window.open("", "PrintPlan", "width=900,height=700,noopener");
-    if (!win) { alert("Popup was blocked. Allow popups for this site and try again."); return; }
-    const styles = `
-    <style>
-      :root { color-scheme: light dark; }
-      body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; line-height:1.5; padding:24px; }
-      h1 { margin:0 0 .5rem; font-size:1.6rem; }
-      .meta { color:#666; font-size:.95rem; margin-bottom:1rem; }
-      .print-field { margin:.25rem 0; }
-      .print-field strong { font-weight:600; }
-      .print-value { white-space:pre-wrap; }
-      details { margin:12px 0; }
-      summary { font-weight:600; margin-bottom:6px; }
-      @media print { body { padding:0; } }
-    </style>
-  `;
-    const now = new Date();
-    win.document.open();
-    win.document.write(`<!doctype html>
-<html><head><meta charset="utf-8"><title>${title}</title>${styles}</head>
-<body>
-  <h1>${title}</h1>
-  <div class="meta">Generated on ${now.toLocaleString()}</div>
-  ${htmlBody}
-  <script>window.onload=function(){setTimeout(function(){window.print();},120);};<\/script>
-</body></html>`);
-    win.document.close();
-}
-
-$("#printPlanBtn")?.addEventListener("click", () => {
-    const source = document.getElementById("recovery-plan");
-    if (!source) return alert("Recovery Plan section not found.");
-    openPrintWindow(serializeRecoveryForPrint(source), "Recovery Plan");
-});
+/* ========= (Reverted) — No print plan logic ========= */
 
 /* ========= Church: minimal Leaflet init ========= */
 (function initMap() {
@@ -149,3 +76,43 @@ $("#printPlanBtn")?.addEventListener("click", () => {
         maxZoom: 18, attribution: "&copy; OpenStreetMap"
     }).addTo(map);
 })();
+
+/* ========= Optional: basic Community demo handlers (unchanged) ========= */
+$("#startCamBtn")?.addEventListener("click", async () => {
+    const v = $("#communityVideo");
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        v.srcObject = stream;
+    } catch (e) { alert("Camera error: " + e.message); }
+});
+$("#stopCamBtn")?.addEventListener("click", () => {
+    const v = $("#communityVideo");
+    const s = v?.srcObject;
+    if (s) s.getTracks().forEach(t => t.stop());
+    v.srcObject = null;
+});
+$("#sendCommunityMsgBtn")?.addEventListener("click", () => {
+    const input = $("#communityChatInput");
+    const list = $("#communityChatMessages");
+    const msg = (input.value || "").trim();
+    if (!msg) return;
+    const p = document.createElement("div");
+    p.textContent = msg;
+    list.appendChild(p);
+    input.value = "";
+    list.scrollTop = list.scrollHeight;
+});
+$("#clearCommunityChatBtn")?.addEventListener("click", () => {
+    $("#communityChatMessages").innerHTML = "";
+});
+
+/* ========= Dialogs (Prayer/Recovery) basic wiring (unchanged) ========= */
+const prayerDialog = $("#prayerDialog");
+$("#btnPrayerRequest")?.addEventListener("click", () => prayerDialog?.showModal());
+$("#prayerModalClose")?.addEventListener("click", () => prayerDialog?.close());
+document.querySelector('[data-close-modal]')?.addEventListener("click", () => prayerDialog?.close());
+
+const recModal = $("#recoveryModal");
+$("#recoverySignUpBtn")?.addEventListener("click", () => recModal?.showModal());
+$("#recoveryModalClose")?.addEventListener("click", () => recModal?.close());
+$("#recoveryCancel")?.addEventListener("click", () => recModal?.close());
