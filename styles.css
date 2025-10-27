@@ -32,6 +32,19 @@
     box-sizing: border-box;
 }
 
+/* Make native inputs/dialogs honor theme colors */
+html {
+    color-scheme: light;
+}
+
+    html.dark {
+        color-scheme: dark;
+    }
+
+/* You can remove `.dark :root,` – it's redundant.
+   Keeping `html.dark` is enough to override variables. */
+
+
 html, body {
     height: 100%;
 }
@@ -42,6 +55,41 @@ body {
     color: var(--fg);
     font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
+
+/* Center everything in the header rows */
+.site-header {
+    display: grid;
+    row-gap: 4px;
+    justify-items: center; /* centers brand, nav, mobile rows */
+}
+
+/* Brand row also centered if it widens */
+.brand {
+    justify-content: center;
+}
+
+/* Ensure the nav line itself centers its contents and spans full width */
+.nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center; /* center horizontally */
+    align-items: center;
+    padding: 12px 16px;
+    width: 100%;
+}
+
+/* Mobile row centered too */
+.mobile-nav {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px 12px 16px;
+}
+
+/* You no longer need .nav-centered, but it's harmless to keep */
+
 
 /* LAYOUT */
 .site-header, .site-footer {
