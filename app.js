@@ -1558,3 +1558,124 @@ ${(c.refs || []).join("\n")}
     renderLinks();
     renderCards();
 })();
+
+(function () {
+    const printBtn = document.getElementById('printPlanBtn');
+
+    function serializeForPrint(root) {
+        const clone = root.cloneNode(true);
+
+        // Replace input-like controls with their current values
+        clone.querySelectorAll('input, textarea, select').forEach(el => {
+            let value = '';
+            if (el.tagName === 'TEXTAREA') {
+                value = el.value.trim();
+            } else if (el.tagName === 'SELECT') {
+                value = el.options[el.selectedIndex]?.text ?? '';
+            } else if (el.type === 'checkbox') {
+                value = el.checked ? '? Yes' : '—';
+            } else if (el.type === 'radio') {
+                if (!el.checked) {
+                    // Remove unchecked radios entirely for cleaner output
+                    el.remove();
+                    return;
+                }
+                value = el.value;
+            } else {
+                value = el.value ?? '';
+            }
+
+            // Create a printable replacement
+            const span = document.createElement('span');
+            span.className = 'print-value';
+            span.textContent = value || '—';
+
+            // If the control has a label nearby, keep the layout tidy
+            const wrapper = document.createElement('div');
+            wrapper.className = 'print-field';
+            // Try to capture label text if available
+            let labelText = '';
+            if (el.id) {
+                const lbl = clone.querySelector(`label[for="${el.id}"]`);
+                if (lbl) labelText = lbl.textContent.trim();
+            } else {
+                const lbl = el.closest('label');
+                if (lbl) labelText = lbl.textContent.trim();
+            }
+            if (labelText) {
+                const strong = document.createElement('strong');
+                strong.textContent = labelText.replace(/\*\s*$/, '') + ': ';
+                wrapper.appendChild(strong);
+                wrapper.appendChild(span);
+                el.replaceWith(wrapper);
+            } else {
+                el.replaceWith(span);
+            }
+        });
+
+        return clone.outerHTML;
+    }
+
+    function openPrintWindow(htmlBody, title = 'Recovery Plan') {
+        const win = window.open('', 'PrintPlan', 'width=900,height=700,noopener');
+        if (!win) {
+            alert('Your browser blocked the print preview popup. Please allow popups for this site and try again.');
+            return;
+        }
+        const styles = `
+      <style>
+        :root { color-scheme: light dark; }
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; line-height: 1.5; padding: 24px; }
+        h1 { margin: 0 0 0.5rem; font-size: 1.5rem; }
+        .meta { color: #666; font-size: 0.95rem; margin-bottom: 1rem; }
+        .print-field { margin: 0.25rem 0; }
+        .print-field strong { font-weight: 600; }
+        .print-value { white-space: pre-wrap; }
+        .step { margin: 1rem 0; padding: .75rem 1rem; border: 1px solid #ddd; border-radius: 10px; }
+        .step h3 { margin: 0 0 .5rem; font-size: 1.05rem; }
+        @media print {
+          body { padding: 0; }
+          a { color: inherit; text-decoration: none; }
+        }
+      </style>
+    `;
+        const now = new Date();
+        win.document.open();
+        win.document.write(`<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>${title}</title>
+${styles}
+</head>
+<body>
+  <h1>${title}</h1>
+  <div class="meta">Generated on ${now.toLocaleString()}</div>
+  ${htmlBody}
+  <script>
+    // Give the browser a tick to render, then print
+    window.onload = function(){ setTimeout(function(){ window.print(); }, 150); };
+  <\/script>
+</body>
+</html>`);
+        win.document.close();
+    }
+
+    function handlePrint() {
+        const source =
+            document.getElementById('recovery-plan') ||
+            document.querySelector('[data-print="recovery"]');
+
+        if (!source) {
+            alert('Could not find the Recovery Plan section. Please ensure it has id="recovery-plan" or data-print="recovery".');
+            return;
+        }
+
+        const html = serializeForPrint(source);
+        openPrintWindow(html, 'Recovery Plan');
+    }
+
+    if (printBtn) {
+        printBtn.addEventListener('click', handlePrint);
+    }
+})();

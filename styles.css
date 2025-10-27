@@ -655,3 +655,13 @@ main {
         line-height: 1;
         color: var(--muted);
     }
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    /* If your site uses a fixed/sticky header, hide it in print */
+    header, nav, .site-header {
+        display: none !important;
+    }
+}
