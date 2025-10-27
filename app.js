@@ -17,7 +17,6 @@ function toggleTheme() {
     setTheme(isDark ? "light" : "dark");
 }
 $("#themeToggle")?.addEventListener("click", toggleTheme);
-$("#themeToggleMobile")?.addEventListener("click", toggleTheme);
 
 /* ========= Router (tabs) =========
    - We have ONE Recovery section with id "recovery-plan".
@@ -29,7 +28,6 @@ const mapHashToId = (hash) => {
 };
 
 function hideAllSections() {
-    // Support both the welcome hero and tabbed sections (original structure)
     $$(".welcome, .tab-section").forEach(s => s.classList.add("hidden"));
 }
 
@@ -38,11 +36,7 @@ function showTabById(id) {
     const sec = document.getElementById(id);
     if (sec) sec.classList.remove("hidden");
 
-    // sync mobile <select> and hash
     const tab = (id === "recovery-plan") ? "recovery" : id;
-    const mobile = $("#mobileNav");
-    if (mobile && mobile.value !== tab) mobile.value = tab;
-
     const desiredHash = "#" + tab;
     if (location.hash !== desiredHash) history.replaceState(null, "", desiredHash);
 }
@@ -56,16 +50,11 @@ $$(".nav-btn").forEach(btn => {
     btn.addEventListener("click", () => showTab(btn.dataset.tab));
 });
 
-// mobile select
-$("#mobileNav")?.addEventListener("change", (e) => showTab(e.target.value));
-
 // hash navigation (deep links like #recovery)
 window.addEventListener("hashchange", () => showTabById(mapHashToId(location.hash)));
 
 // initial render
 showTabById(mapHashToId(location.hash || "#welcome"));
-
-/* ========= (Reverted) — No print plan logic ========= */
 
 /* ========= Church: minimal Leaflet init ========= */
 (function initMap() {
@@ -77,7 +66,7 @@ showTabById(mapHashToId(location.hash || "#welcome"));
     }).addTo(map);
 })();
 
-/* ========= Optional: basic Community demo handlers (unchanged) ========= */
+/* ========= Optional: community helpers (unchanged) ========= */
 $("#startCamBtn")?.addEventListener("click", async () => {
     const v = $("#communityVideo");
     try {
@@ -106,7 +95,7 @@ $("#clearCommunityChatBtn")?.addEventListener("click", () => {
     $("#communityChatMessages").innerHTML = "";
 });
 
-/* ========= Dialogs (Prayer/Recovery) basic wiring (unchanged) ========= */
+/* ========= Dialogs (Prayer/Recovery) ========= */
 const prayerDialog = $("#prayerDialog");
 $("#btnPrayerRequest")?.addEventListener("click", () => prayerDialog?.showModal());
 $("#prayerModalClose")?.addEventListener("click", () => prayerDialog?.close());
