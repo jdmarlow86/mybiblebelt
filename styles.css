@@ -13,7 +13,7 @@
     --shadow: 0 1px 2px rgba(0,0,0,.06);
 }
 
-.dark :root, html.dark {
+html.dark {
     --bg: #0f1115;
     --fg: #eef0f3;
     --muted: #9aa5b1;
@@ -27,12 +27,7 @@
     --shadow: 0 1px 2px rgba(0,0,0,.4);
 }
 
-/* BASICS */
-* {
-    box-sizing: border-box;
-}
-
-/* Make native inputs/dialogs honor theme colors */
+/* Make native controls follow theme */
 html {
     color-scheme: light;
 }
@@ -41,9 +36,10 @@ html {
         color-scheme: dark;
     }
 
-/* You can remove `.dark :root,` – it's redundant.
-   Keeping `html.dark` is enough to override variables. */
-
+/* BASICS */
+* {
+    box-sizing: border-box;
+}
 
 html, body {
     height: 100%;
@@ -53,55 +49,16 @@ body {
     margin: 0;
     background: var(--bg);
     color: var(--fg);
-    font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    font: 16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 }
 
-/* Center everything in the header rows */
+/* HEADER + NAV (centered rows) */
 .site-header {
     display: grid;
     row-gap: 4px;
-    justify-items: center; /* centers brand, nav, mobile rows */
-}
-
-/* Brand row also centered if it widens */
-.brand {
-    justify-content: center;
-}
-
-/* Ensure the nav line itself centers its contents and spans full width */
-.nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center; /* center horizontally */
-    align-items: center;
-    padding: 12px 16px;
-    width: 100%;
-}
-
-/* Mobile row centered too */
-.mobile-nav {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    justify-content: center;
-    padding: 0 16px 12px 16px;
-}
-
-/* You no longer need .nav-centered, but it's harmless to keep */
-
-
-/* LAYOUT */
-.site-header, .site-footer {
+    justify-items: center;
     border-bottom: 1px solid var(--border);
     background: var(--bg);
-}
-
-.site-footer {
-    border-top: 1px solid var(--border);
-    border-bottom: 0;
-    padding: 16px;
-    text-align: center;
 }
 
 .brand {
@@ -109,6 +66,7 @@ body {
     align-items: center;
     gap: 8px;
     padding: 12px 16px 0 16px;
+    justify-content: center;
 }
 
 .brand__img {
@@ -121,23 +79,29 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    justify-content: center; /* center horizontally */
+    justify-content: center;
     align-items: center;
     padding: 12px 16px;
+    width: 100%;
 }
-
-.nav-centered {
-    justify-content: center;
-}
-
 
 .mobile-nav {
     display: flex;
     gap: 8px;
     align-items: center;
+    justify-content: center;
     padding: 0 16px 12px 16px;
 }
 
+/* FOOTER */
+.site-footer {
+    border-top: 1px solid var(--border);
+    padding: 16px;
+    text-align: center;
+    background: var(--bg);
+}
+
+/* PAGE LAYOUT */
 .tab {
     padding: 16px;
     max-width: 1100px;
@@ -242,7 +206,7 @@ body {
     gap: 16px;
 }
 
-@media (min-width: 900px) {
+@media (min-width:900px) {
     .grid-2 {
         grid-template-columns: 1fr 1fr;
     }
@@ -250,32 +214,11 @@ body {
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill,minmax(240px,1fr));
     gap: 12px;
 }
 
-/* Welcome cards */
-.welcome__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 12px;
-}
-
-.welcome__icon {
-    font-size: 28px;
-}
-
-.welcome__card {
-    text-decoration: none;
-    color: inherit;
-    transition: transform .06s ease;
-}
-
-    .welcome__card:hover {
-        transform: translateY(-1px);
-    }
-
-/* Details (Recovery steps) */
+/* Recovery details */
 details.re-step summary {
     cursor: pointer;
     display: flex;
@@ -299,7 +242,7 @@ details.re-step summary {
     margin-top: 6px;
 }
 
-/* Dialog */
+/* Dialog (if used) */
 .pg-dialog {
     border: none;
     border-radius: 14px;
@@ -317,7 +260,7 @@ details.re-step summary {
     border: 1px solid var(--border);
     border-radius: 14px;
     padding: 16px;
-    min-width: min(560px, 92vw);
+    min-width: min(560px,92vw);
     position: relative;
 }
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>My Bible Belt — Clean Starter</title>
 
-    <!-- Early theme -->
+    <!-- Early theme (prevents flash) -->
     <script>
         (function () {
             const stored = localStorage.getItem("theme");
@@ -17,11 +17,10 @@
     </script>
 
     <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            crossorigin=""></script>
+
+    <!-- Leaflet (for Church map) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
 </head>
 
 <body>
@@ -31,8 +30,8 @@
             <span>My Bible Belt</span>
         </div>
 
-        <!-- centered nav -->
-        <nav class="nav nav-centered">
+        <!-- Centered nav -->
+        <nav class="nav">
             <button class="nav-btn" data-tab="welcome">Welcome</button>
             <button class="nav-btn" data-tab="church">Church</button>
             <button class="nav-btn" data-tab="resources">Resources</button>
@@ -44,7 +43,7 @@
             <button id="themeToggle" class="icon-btn" title="Toggle theme">🌓</button>
         </nav>
 
-        <!-- mobile nav (Recovery option removed) -->
+        <!-- Mobile nav (Recovery option removed per your request) -->
         <div class="mobile-nav">
             <label for="mobileNav" class="sr-only">Navigate</label>
             <select id="mobileNav">
@@ -60,12 +59,130 @@
         </div>
     </header>
 
-    <!-- main content and sections unchanged -->
     <main>
-        <!-- your existing sections (Welcome, Church, Resources, Prayer, Study, Community, Recovery-plan, Support) -->
+        <!-- WELCOME -->
+        <section id="welcome" class="tab">
+            <div class="card">
+                <h2>Welcome</h2>
+                <p class="muted">Pick a tab above to explore the app.</p>
+            </div>
+        </section>
+
+        <!-- CHURCH -->
+        <section id="church" class="tab hidden">
+            <h1 class="page-title">Church Finder</h1>
+            <p class="page-sub">Find nearby churches by location or city.</p>
+
+            <div class="card">
+                <div class="row gap">
+                    <label class="pg-field grow">
+                        <span class="pg-label">Search by city/town</span>
+                        <input id="churchSearch" class="pg-input" placeholder="e.g., Knoxville, TN" />
+                    </label>
+
+                    <label class="pg-field w-160">
+                        <span class="pg-label">Radius (miles)</span>
+                        <select id="churchRadius" class="pg-input">
+                            <option>3</option>
+                            <option selected>5</option>
+                            <option>10</option>
+                            <option>15</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div class="row gap mt">
+                    <button id="churchUseMyLocation" class="btn primary">Use My Location</button>
+                    <button id="churchSearchBtn" class="btn">Search City</button>
+                    <button id="churchClearBtn" class="btn">Clear</button>
+                </div>
+
+                <div id="churchStatus" class="muted mt-8"></div>
+            </div>
+
+            <div class="grid-2 mt-16">
+                <div class="card">
+                    <div class="section-title">Map</div>
+                    <div id="churchMap" class="map"></div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title">Nearby Churches</div>
+                    <div id="churchResults" class="list mt"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RESOURCES -->
+        <section id="resources" class="tab hidden">
+            <div class="card">
+                <h2>Resources</h2>
+                <p class="muted">Add or browse study resources (persisted locally).</p>
+                <div id="kitsGrid" class="grid mt"></div>
+            </div>
+        </section>
+
+        <!-- PRAYER -->
+        <section id="prayer" class="tab hidden">
+            <div class="card">
+                <h2>Prayer</h2>
+                <p class="muted">Simple tools for prayer and requests.</p>
+            </div>
+        </section>
+
+        <!-- STUDY -->
+        <section id="study" class="tab hidden">
+            <div class="card">
+                <h2>Study</h2>
+                <p class="muted">Create quick study cards and export.</p>
+            </div>
+        </section>
+
+        <!-- COMMUNITY -->
+        <section id="community" class="tab hidden">
+            <div class="card">
+                <h2>Community</h2>
+                <p class="muted">Local chat, notes, and projects.</p>
+            </div>
+        </section>
+
+        <!-- RECOVERY (id is recovery-plan; router maps #recovery to this) -->
+        <section id="recovery-plan" class="tab hidden" data-print="recovery">
+            <div class="card">
+                <h2>Recovery Power in Christ</h2>
+                <p class="muted">10-step plan with space for your reflections.</p>
+
+                <div class="row gap mt">
+                    <button id="printPlanBtn" class="btn">Print this Plan</button>
+                    <div class="grow"></div>
+                </div>
+
+                <details class="re-step" open>
+                    <summary><span class="step-num">1</span> Surrender & Honesty</summary>
+                    <div class="re-body">
+                        <p>Admit powerlessness; invite Christ with total honesty.</p>
+                        <label class="mt">
+                            My note
+                            <textarea class="pg-textarea" rows="3" placeholder="Personal reflection…"></textarea>
+                        </label>
+                    </div>
+                </details>
+
+                <!-- keep the rest minimal for demo -->
+            </div>
+        </section>
+
+        <!-- SUPPORT -->
+        <section id="support" class="tab hidden">
+            <div class="card">
+                <h2>Support</h2>
+                <p>If this project helps you, you can support it below.</p>
+            </div>
+        </section>
     </main>
 
     <footer class="site-footer">© <span id="year"></span> My Bible Belt</footer>
+
     <script src="app.js"></script>
 </body>
 </html>

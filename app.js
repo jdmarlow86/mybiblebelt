@@ -1,17 +1,16 @@
-/* ===== Helpers ===== */
+/* ========= Helpers ========= */
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
-const storage = {
-    get(k, fallback) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
-    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { } }
-};
 
-/* ===== Theme ===== */
+/* ========= Year ========= */
+$("#year").textContent = new Date().getFullYear();
+
+/* ========= Theme ========= */
 function setTheme(theme) {
     const html = document.documentElement;
     html.classList.toggle("dark", theme === "dark");
     html.classList.toggle("light", theme !== "dark");
-    storage.set("theme", theme);
+    try { localStorage.setItem("theme", theme); } catch { }
 }
 function toggleTheme() {
     const isDark = document.documentElement.classList.contains("dark");
@@ -20,9 +19,9 @@ function toggleTheme() {
 $("#themeToggle")?.addEventListener("click", toggleTheme);
 $("#themeToggleMobile")?.addEventListener("click", toggleTheme);
 
-/* ===== Router (tabs) =====
-   We keep only ONE Recovery section (#recovery-plan).
-   Links like #recovery are mapped to #recovery-plan internally.
+/* ========= Router (tabs) =========
+   - We have ONE Recovery section with id "recovery-plan".
+   - The nav/hash "recovery" maps to that id.
 */
 const mapHashToId = (hash) => {
     const t = (hash || "#welcome").replace("#", "");
@@ -34,58 +33,44 @@ function showTabById(id) {
     const sec = document.getElementById(id);
     if (sec) sec.classList.remove("hidden");
 
-    // Sync mobile select & hash
+    // sync mobile <select> and hash
     const tab = (id === "recovery-plan") ? "recovery" : id;
     const mobile = $("#mobileNav");
     if (mobile && mobile.value !== tab) mobile.value = tab;
-    const desiredHash = `#${tab}`;
+
+    const desiredHash = "#" + tab;
     if (location.hash !== desiredHash) history.replaceState(null, "", desiredHash);
 }
 
-function showTab(tabKey) {
-    showTabById(mapHashToId("#" + tabKey));
-}
+function showTab(tabKey) { showTabById(mapHashToId("#" + tabKey)); }
 
+// navbar buttons
 $$(".nav-btn").forEach(btn => {
     btn.addEventListener("click", () => showTab(btn.dataset.tab));
 });
 
+// mobile select
 $("#mobileNav")?.addEventListener("change", (e) => showTab(e.target.value));
 
-window.addEventListener("hashchange", () => {
-    showTabById(mapHashToId(location.hash));
-});
+// hash navigation (deep links like #recovery)
+window.addEventListener("hashchange", () => showTabById(mapHashToId(location.hash)));
 
-// Initial tab (default welcome)
+// initial render
 showTabById(mapHashToId(location.hash || "#welcome"));
 
-/* ===== Footer year ===== */
-$("#year").textContent = new Date().getFullYear();
-
-/* ===== Recovery: Modal ===== */
-const recModal = $("#recoveryModal");
-$("#recoverySignUpBtn")?.addEventListener("click", () => recModal.showModal());
-$("#recoveryModalClose")?.addEventListener("click", () => recModal.close());
-$("#recoveryCancel")?.addEventListener("click", () => recModal.close());
-$("[data-close-modal]")?.addEventListener("click", () => recModal.close());
-
-/* ===== Recovery: Print ===== */
+/* ========= Recovery: Print ========= */
 function serializeRecoveryForPrint(root) {
     const clone = root.cloneNode(true);
-
-    // Expand all details
     clone.querySelectorAll("details").forEach(d => d.setAttribute("open", ""));
 
-    // Convert inputs/selects/textareas to plain text values
+    // convert inputs/selects/textarea into static values
     clone.querySelectorAll("input, textarea, select").forEach(el => {
         let value = "";
         if (el.tagName === "TEXTAREA") value = el.value.trim();
         else if (el.tagName === "SELECT") value = el.options[el.selectedIndex]?.text ?? "";
         else if (el.type === "checkbox") value = el.checked ? "? Yes" : "—";
-        else if (el.type === "radio") {
-            if (!el.checked) { el.remove(); return; }
-            value = el.value;
-        } else value = el.value ?? "";
+        else if (el.type === "radio") { if (!el.checked) { el.remove(); return; } else value = el.value; }
+        else value = el.value ?? "";
 
         const span = document.createElement("span");
         span.className = "print-value";
@@ -114,30 +99,26 @@ function serializeRecoveryForPrint(root) {
         }
     });
 
-    // Remove UI-only elements inside the clone
-    clone.querySelectorAll("#recoveryAdminBar, #recoveryAdminBtn, #recoverySignUpBtn, #printPlanBtn, dialog, button.icon-close").forEach(n => n.remove());
-
+    // remove UI-only controls inside the print clone
+    clone.querySelectorAll("button,.icon-btn,dialog").forEach(n => n.remove());
     return clone.outerHTML;
 }
 
 function openPrintWindow(htmlBody, title = "Recovery Plan") {
     const win = window.open("", "PrintPlan", "width=900,height=700,noopener");
-    if (!win) {
-        alert("Popup was blocked. Please allow popups for this site and try again.");
-        return;
-    }
+    if (!win) { alert("Popup was blocked. Allow popups for this site and try again."); return; }
     const styles = `
     <style>
       :root { color-scheme: light dark; }
-      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; line-height: 1.5; padding: 24px; }
-      h1 { margin: 0 0 .5rem; font-size: 1.6rem; }
-      .meta { color: #666; font-size: .95rem; margin-bottom: 1rem; }
-      .print-field { margin: .25rem 0; }
-      .print-field strong { font-weight: 600; }
-      .print-value { white-space: pre-wrap; }
-      details { margin: 12px 0; }
-      summary { font-weight: 600; margin-bottom: 6px; }
-      @media print { body { padding: 0; } }
+      body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; line-height:1.5; padding:24px; }
+      h1 { margin:0 0 .5rem; font-size:1.6rem; }
+      .meta { color:#666; font-size:.95rem; margin-bottom:1rem; }
+      .print-field { margin:.25rem 0; }
+      .print-field strong { font-weight:600; }
+      .print-value { white-space:pre-wrap; }
+      details { margin:12px 0; }
+      summary { font-weight:600; margin-bottom:6px; }
+      @media print { body { padding:0; } }
     </style>
   `;
     const now = new Date();
@@ -153,52 +134,18 @@ function openPrintWindow(htmlBody, title = "Recovery Plan") {
     win.document.close();
 }
 
-function handlePrint() {
+$("#printPlanBtn")?.addEventListener("click", () => {
     const source = document.getElementById("recovery-plan");
-    if (!source) { alert("Recovery Plan section not found."); return; }
-    const html = serializeRecoveryForPrint(source);
-    openPrintWindow(html, "Recovery Plan");
-}
+    if (!source) return alert("Recovery Plan section not found.");
+    openPrintWindow(serializeRecoveryForPrint(source), "Recovery Plan");
+});
 
-$("#printPlanBtn")?.addEventListener("click", handlePrint);
-
-/* ===== Church: simple Leaflet init (no external API) ===== */
+/* ========= Church: minimal Leaflet init ========= */
 (function initMap() {
     const el = $("#churchMap");
     if (!el || typeof L === "undefined") return;
-    const map = L.map(el).setView([36.0, -84.0], 8); // East TN general area
+    const map = L.map(el).setView([36.0, -84.0], 8);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 18,
-        attribution: "&copy; OpenStreetMap"
+        maxZoom: 18, attribution: "&copy; OpenStreetMap"
     }).addTo(map);
 })();
-
-/* ===== Community: very small chat/cam demo ===== */
-$("#startCamBtn")?.addEventListener("click", async () => {
-    const v = $("#communityVideo");
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-        v.srcObject = stream;
-    } catch (e) { alert("Camera error: " + e.message); }
-});
-$("#stopCamBtn")?.addEventListener("click", () => {
-    const v = $("#communityVideo");
-    const s = v?.srcObject;
-    if (s) s.getTracks().forEach(t => t.stop());
-    v.srcObject = null;
-});
-$("#sendCommunityMsgBtn")?.addEventListener("click", () => {
-    const input = $("#communityChatInput");
-    const list = $("#communityChatMessages");
-    const msg = (input.value || "").trim();
-    if (!msg) return;
-    const p = document.createElement("div");
-    p.textContent = msg;
-    list.appendChild(p);
-    input.value = "";
-    list.scrollTop = list.scrollHeight;
-});
-$("#clearCommunityChatBtn")?.addEventListener("click", () => {
-    const list = $("#communityChatMessages");
-    list.innerHTML = "";
-});
