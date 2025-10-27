@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>My Bible Belt — Clean Starter</title>
 
-    <!-- Early theme (prevents flash) -->
+    <!-- Early theme (prevent flash) -->
     <script>
         (function () {
             const stored = localStorage.getItem("theme");
@@ -18,9 +18,12 @@
 
     <link rel="stylesheet" href="styles.css" />
 
-    <!-- Leaflet (for Church map) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
+    <!-- Leaflet -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          crossorigin />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            crossorigin></script>
 </head>
 
 <body>
@@ -30,7 +33,7 @@
             <span>My Bible Belt</span>
         </div>
 
-        <!-- Centered nav -->
+        <!-- Centered desktop nav (no mobile dropdown) -->
         <nav class="nav">
             <button class="nav-btn" data-tab="welcome">Welcome</button>
             <button class="nav-btn" data-tab="church">Church</button>
@@ -42,29 +45,63 @@
             <button class="nav-btn" data-tab="support">Support</button>
             <button id="themeToggle" class="icon-btn" title="Toggle theme">🌓</button>
         </nav>
-
-        <!-- Mobile nav (Recovery option removed per your request) -->
-        <div class="mobile-nav">
-            <label for="mobileNav" class="sr-only">Navigate</label>
-            <select id="mobileNav">
-                <option value="welcome">Welcome</option>
-                <option value="church">Church</option>
-                <option value="resources">Resources</option>
-                <option value="prayer">Prayer</option>
-                <option value="study">Study</option>
-                <option value="community">Community</option>
-                <option value="support">Support</option>
-            </select>
-            <button id="themeToggleMobile" class="icon-btn" title="Toggle theme (mobile)">🌓</button>
-        </div>
     </header>
 
     <main>
         <!-- WELCOME -->
-        <section id="welcome" class="tab">
-            <div class="card">
-                <h2>Welcome</h2>
-                <p class="muted">Pick a tab above to explore the app.</p>
+        <section id="welcome" class="welcome tab">
+            <div class="welcome__inner">
+                <header class="welcome__header">
+                    <h1 class="welcome__title">Welcome to MyBibleBelt.org</h1>
+                    <p class="welcome__lead">
+                        A place to grow in faith, find support, and connect with a caring community.
+                        Explore the sections below to get started.
+                    </p>
+                </header>
+
+                <div class="welcome__grid">
+                    <a class="welcome__card card" href="#recovery">
+                        <div class="welcome__icon" aria-hidden="true">📖</div>
+                        <h3 class="welcome__cardTitle">Recovery</h3>
+                        <p class="welcome__cardText">A guided 10-step plan for spiritual and personal restoration with space for reflection.</p>
+                        <span class="welcome__cta">Open Recovery</span>
+                    </a>
+
+                    <a class="welcome__card card" href="#prayer">
+                        <div class="welcome__icon" aria-hidden="true">🙏</div>
+                        <h3 class="welcome__cardTitle">Prayer</h3>
+                        <p class="welcome__cardText">Share requests, join others in prayer, and receive strength through daily devotionals.</p>
+                        <span class="welcome__cta">Go to Prayer</span>
+                    </a>
+
+                    <a class="welcome__card card" href="#resources">
+                        <div class="welcome__icon" aria-hidden="true">🌍</div>
+                        <h3 class="welcome__cardTitle">Resources</h3>
+                        <p class="welcome__cardText">Study tools and teachings from across Christian traditions, including Seventh-day Adventist materials.</p>
+                        <span class="welcome__cta">Browse Resources</span>
+                    </a>
+
+                    <a class="welcome__card card" href="#community">
+                        <div class="welcome__icon" aria-hidden="true">💬</div>
+                        <h3 class="welcome__cardTitle">Community</h3>
+                        <p class="welcome__cardText">Watch, chat, take notes, and collaborate on local projects with others.</p>
+                        <span class="welcome__cta">Enter Community</span>
+                    </a>
+
+                    <a class="welcome__card card" href="#church">
+                        <div class="welcome__icon" aria-hidden="true">🕊️</div>
+                        <h3 class="welcome__cardTitle">Church Finder</h3>
+                        <p class="welcome__cardText">Locate nearby churches and ministries using your current location and an interactive map.</p>
+                        <span class="welcome__cta">Find a Church</span>
+                    </a>
+
+                    <a class="welcome__card card" href="#support">
+                        <div class="welcome__icon" aria-hidden="true">🤝</div>
+                        <h3 class="welcome__cardTitle">Support</h3>
+                        <p class="welcome__cardText">If this project helps you, here’s how you can support it.</p>
+                        <span class="welcome__cta">Ways to Support</span>
+                    </a>
+                </div>
             </div>
         </section>
 
@@ -75,20 +112,19 @@
 
             <div class="card">
                 <div class="row gap">
-                    <label class="pg-field grow">
-                        <span class="pg-label">Search by city/town</span>
+                    <div class="pg-field" style="flex:1;">
+                        <label class="pg-label" for="churchSearch">Search by city/town</label>
                         <input id="churchSearch" class="pg-input" placeholder="e.g., Knoxville, TN" />
-                    </label>
-
-                    <label class="pg-field w-160">
-                        <span class="pg-label">Radius (miles)</span>
+                    </div>
+                    <div class="pg-field" style="width:160px;">
+                        <label class="pg-label" for="churchRadius">Radius (miles)</label>
                         <select id="churchRadius" class="pg-input">
                             <option>3</option>
                             <option selected>5</option>
                             <option>10</option>
                             <option>15</option>
                         </select>
-                    </label>
+                    </div>
                 </div>
 
                 <div class="row gap mt">
@@ -116,60 +152,499 @@
         <!-- RESOURCES -->
         <section id="resources" class="tab hidden">
             <div class="card">
-                <h2>Resources</h2>
-                <p class="muted">Add or browse study resources (persisted locally).</p>
+                <h2>Starter Kits</h2>
+
+                <div class="row gap mt">
+                    <input id="kitTitle" class="input" placeholder="Kit title e.g. Baptist — Starter Kit" />
+                    <input id="kitIntro" class="input" placeholder="Short intro" />
+                </div>
+                <div class="row gap mt">
+                    <input id="kitStudy" class="input" placeholder="One study item (optional)" />
+                    <button id="addKitBtn" class="btn">Add Kit</button>
+                    <button id="clearKitFormBtn" class="btn ghost">Clear</button>
+                </div>
+
                 <div id="kitsGrid" class="grid mt"></div>
             </div>
         </section>
 
         <!-- PRAYER -->
         <section id="prayer" class="tab hidden">
-            <div class="card">
-                <h2>Prayer</h2>
-                <p class="muted">Simple tools for prayer and requests.</p>
+            <div id="prayer-section" class="card">
+                <h2>Prayer Tools</h2>
+                <p class="muted" id="prayerInfo">Build a simple prayer rule or use a timed prayer session.</p>
+
+                <div class="row gap mt">
+                    <button id="btnCreateRule" class="btn">Create a Prayer Rule</button>
+                    <button id="btnPrayNow" class="btn">Pray Now (Timer)</button>
+                    <button id="btnPrayerRequest" class="btn ghost">Add Prayer Request</button>
+                </div>
+
+                <!-- Rule Builder -->
+                <div id="ruleBuilder" class="mt hidden">
+                    <h3>Create Rule</h3>
+                    <form id="ruleForm" class="stack">
+                        <fieldset>
+                            <legend>Times of day</legend>
+                            <label><input type="checkbox" name="times" value="Morning" /> Morning</label>
+                            <label><input type="checkbox" name="times" value="Midday" /> Midday</label>
+                            <label><input type="checkbox" name="times" value="Evening" /> Evening</label>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>Focus areas</legend>
+                            <label><input type="checkbox" name="focus" value="Praise" checked /> Praise</label>
+                            <label><input type="checkbox" name="focus" value="Confession" checked /> Confession</label>
+                            <label><input type="checkbox" name="focus" value="Intercession" checked /> Intercession</label>
+                            <label><input type="checkbox" name="focus" value="Listening" checked /> Listening</label>
+                        </fieldset>
+
+                        <div class="row gap">
+                            <label>Minutes: <input id="duration" type="number" min="1" max="120" value="10" class="input w-xs" /></label>
+                            <input id="scripture" class="input grow" placeholder="Scripture (optional)" />
+                            <input id="notes" class="input grow" placeholder="Notes (optional)" />
+                        </div>
+
+                        <div class="row gap">
+                            <button type="button" id="btnGenerateRule" class="btn">Generate</button>
+                            <button type="button" id="btnClearRule" class="btn ghost">Clear</button>
+                            <button type="button" id="btnCopyRule" class="btn ghost">Copy</button>
+                            <button type="button" id="btnDownloadRule" class="btn ghost">Download</button>
+                        </div>
+                    </form>
+
+                    <pre id="ruleOutput" class="pre hidden"><code id="ruleText"></code></pre>
+                </div>
+
+                <!-- Pray Now Timer -->
+                <div id="prayPanel" class="mt hidden">
+                    <h3>Timed Prayer</h3>
+                    <div class="row gap">
+                        <label>
+                            Minutes:
+                            <input id="prayMinutes" type="number" class="input w-xs" min="1" max="180" value="10" />
+                        </label>
+                        <button id="btnStartTimer" class="btn">Start</button>
+                        <button id="btnPauseTimer" class="btn ghost" disabled>Pause</button>
+                        <button id="btnResetTimer" class="btn ghost" disabled>Reset</button>
+                    </div>
+
+                    <div class="timer mt">
+                        <div class="timer-bar" id="timerBar"></div>
+                    </div>
+                    <div class="row spread">
+                        <div id="timerDisplay" class="timer-display">0:00</div>
+                        <div id="timerHints" class="muted"></div>
+                    </div>
+                </div>
             </div>
+
+            <!-- Prayer Request Modal -->
+            <dialog id="prayerDialog" class="pg-dialog">
+                <div class="pg-dialog-card">
+                    <h3>Prayer Request</h3>
+                    <form id="prayerForm" method="dialog" class="stack">
+                        <div class="row gap">
+                            <label><input type="radio" name="reqType" value="For myself" checked /> For myself</label>
+                            <label><input type="radio" name="reqType" value="For someone else" /> For someone else</label>
+                        </div>
+                        <input id="reqName" class="input" placeholder="Your name (optional)" />
+                        <input id="reqEmail" class="input" placeholder="Your email (optional)" />
+                        <textarea id="reqMessage" class="input" placeholder="What can we pray for?" rows="4"></textarea>
+                        <div class="row gap">
+                            <label><input type="radio" name="privacy" value="Private" checked /> Private</label>
+                            <label><input type="radio" name="privacy" value="Share with group" /> Share with group</label>
+                        </div>
+                        <div class="row gap mt">
+                            <button class="btn">Save</button>
+                            <button value="cancel" class="btn ghost">Cancel</button>
+                        </div>
+                    </form>
+                    <button id="prayerModalClose" class="icon-close" title="Close" aria-label="Close">×</button>
+                    <div data-close-modal class="pg-backdrop-close" aria-hidden="true"></div>
+                </div>
+            </dialog>
         </section>
 
         <!-- STUDY -->
         <section id="study" class="tab hidden">
             <div class="card">
-                <h2>Study</h2>
-                <p class="muted">Create quick study cards and export.</p>
+                <h2>Study Library</h2>
+                <p class="muted">Links to materials by tradition. Add your own favorites; everything is saved on this device.</p>
+
+                <div id="studyLinksGrid" class="grid mt"></div>
+
+                <div class="row gap mt">
+                    <button id="studyExportLinksBtn" class="btn">Export Links CSV</button>
+                    <button id="studyClearLinksBtn" class="btn ghost">Clear All Links</button>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:16px;">
+                <h2>My Study Card</h2>
+                <p class="muted">Create a quick study plan or note you can save, copy, or download.</p>
+
+                <div class="grid-2 mt">
+                    <label>
+                        Title
+                        <input id="scTitle" class="input" placeholder="e.g., Beatitudes Study">
+                    </label>
+                    <label>
+                        Passage / Source
+                        <input id="scPassage" class="input" placeholder="e.g., Matthew 5:1–12 or “Intro to Dharma”">
+                    </label>
+                </div>
+
+                <div class="grid-2 mt">
+                    <label>
+                        Summary / Aim
+                        <input id="scAim" class="input" placeholder="What you want to learn or focus on">
+                    </label>
+                    <label>
+                        Tags (comma-separated)
+                        <input id="scTags" class="input" placeholder="e.g., Sermon, Compassion, Ethics">
+                    </label>
+                </div>
+
+                <label class="mt">
+                    Key Notes (Markdown ok)
+                    <textarea id="scNotes" class="pg-textarea" rows="6" placeholder="- Main points
+- Questions
+- Cross references"></textarea>
+                </label>
+
+                <label class="mt">
+                    References (comma-separated URLs)
+                    <input id="scRefs" class="input" placeholder="https://example.org, https://another.example">
+                </label>
+
+                <div class="row gap mt">
+                    <button id="scSaveBtn" class="btn">Save Card</button>
+                    <button id="scCopyBtn" class="btn ghost">Copy</button>
+                    <button id="scDownloadBtn" class="btn">Download .txt</button>
+                    <button id="scClearBtn" class="btn ghost">Clear</button>
+                </div>
+
+                <div class="row gap mt">
+                    <button id="scExportCsvBtn" class="btn">Export Cards CSV</button>
+                    <button id="scClearAllBtn" class="btn ghost">Delete All Cards</button>
+                </div>
+
+                <div id="studyCardsGrid" class="grid mt"></div>
             </div>
         </section>
 
         <!-- COMMUNITY -->
         <section id="community" class="tab hidden">
-            <div class="card">
-                <h2>Community</h2>
-                <p class="muted">Local chat, notes, and projects.</p>
+            <h1 class="page-title">Community</h1>
+            <p class="page-sub">Connect, collaborate, and care for one another.</p>
+
+            <!-- Row: Video + Chat -->
+            <div class="grid-2">
+                <!-- Video -->
+                <div class="card">
+                    <div class="section-title">Video (Local Preview)</div>
+                    <p class="muted" style="margin-top:6px">
+                        This is a private, on-device camera preview (no upload). You can later swap to a room link or WebRTC server.
+                    </p>
+                    <div class="mt">
+                        <video id="communityVideo" playsinline autoplay muted class="video"></video>
+                    </div>
+                    <div class="row gap mt">
+                        <button id="startCamBtn" class="btn">Start Camera</button>
+                        <button id="stopCamBtn" class="btn">Stop</button>
+                    </div>
+                </div>
+
+                <!-- Chat -->
+                <div class="card">
+                    <div class="section-title">Chat</div>
+                    <div id="communityChatMessages" class="chat"></div>
+                    <div class="row gap mt">
+                        <input id="communityChatInput" class="input" placeholder="Type a message…" />
+                        <button id="sendCommunityMsgBtn" class="btn">Send</button>
+                        <button id="clearCommunityChatBtn" class="btn">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row: Join + Notes -->
+            <div class="grid-2" style="margin-top:16px;">
+                <!-- Join community -->
+                <div class="card">
+                    <div class="section-title">Join the Community</div>
+                    <div class="pg-row" style="margin-top:10px;">
+                        <div class="pg-field">
+                            <label class="pg-label" for="communityName">Full Name</label>
+                            <input id="communityName" class="pg-input" placeholder="Jane Doe" />
+                        </div>
+                        <div class="pg-field">
+                            <label class="pg-label" for="communityEmail">Email</label>
+                            <input id="communityEmail" type="email" class="pg-input" placeholder="you@example.com" />
+                        </div>
+                    </div>
+                    <div class="row gap mt">
+                        <button id="joinCommunityBtn" class="btn primary">Join Community</button>
+                        <button id="downloadCommunityCsvBtn" class="btn">Download Members CSV</button>
+                    </div>
+                    <p class="muted" style="margin-top:8px">Saved locally; you can later wire this to your backend or a Google Sheet.</p>
+
+                    <div id="communityMembersCount" class="muted" style="margin-top:8px"></div>
+                </div>
+
+                <!-- Notes -->
+                <div class="card">
+                    <div class="section-title">Community Notes</div>
+                    <textarea id="communityNotesText" class="pg-textarea" rows="7" placeholder="Shared agenda, ideas, or reminders…"></textarea>
+                    <div class="row gap mt">
+                        <button id="saveCommunityNotesBtn" class="btn">Save</button>
+                        <button id="clearCommunityNotesBtn" class="btn">Clear</button>
+                    </div>
+                    <div id="communityNotesSaved" class="muted" style="margin-top:6px;"></div>
+                </div>
+            </div>
+
+            <!-- Row: Help + Projects -->
+            <div class="grid-2" style="margin-top:16px;">
+                <!-- Help -->
+                <div class="card">
+                    <div class="section-title">Need Help?</div>
+                    <p class="muted">Click the button to email the coordinator.</p>
+                    <button id="helpBtn" class="btn">Email jonmarlow@gmail.com</button>
+                </div>
+
+                <!-- Projects -->
+                <div class="card">
+                    <div class="section-title">Local Projects</div>
+                    <p class="muted">Start something practical for your area.</p>
+                    <div class="pg-row" style="margin-top:8px;">
+                        <div class="pg-field">
+                            <label class="pg-label" for="projectTitle">Project Title</label>
+                            <input id="projectTitle" class="pg-input" placeholder="Food Pantry Drive" />
+                        </div>
+                        <div class="pg-field">
+                            <label class="pg-label" for="projectOwner">Owner</label>
+                            <input id="projectOwner" class="pg-input" placeholder="Your name" />
+                        </div>
+                    </div>
+                    <div class="pg-field" style="margin-top:8px;">
+                        <label class="pg-label" for="projectDesc">Short Description</label>
+                        <textarea id="projectDesc" class="pg-textarea" rows="3" placeholder="What is it, when, where…"></textarea>
+                    </div>
+                    <div class="row gap mt">
+                        <button id="newProjectBtn" class="btn primary">Create Project</button>
+                        <button id="clearProjectsBtn" class="btn">Clear All</button>
+                    </div>
+                    <div id="communityProjectsList" class="mt"></div>
+                </div>
             </div>
         </section>
 
-        <!-- RECOVERY (id is recovery-plan; router maps #recovery to this) -->
-        <section id="recovery-plan" class="tab hidden" data-print="recovery">
+        <!-- RECOVERY -->
+        <section id="recovery-plan" data-print="recovery" class="tab hidden">
             <div class="card">
                 <h2>Recovery Power in Christ</h2>
-                <p class="muted">10-step plan with space for your reflections.</p>
+                <p class="muted">A gentle, practical plan with steps, scriptures, and local follow-up. All data stays in your browser unless you export it.</p>
 
                 <div class="row gap mt">
                     <button id="printPlanBtn" class="btn">Print this Plan</button>
+                    <button id="recoverySignUpBtn" class="btn">Sign Up for Follow-Up</button>
+
+                    <span id="recoveryAdminBadge" class="badge hidden">Admin</span>
                     <div class="grow"></div>
+                    <button id="recoveryAdminBtn" class="btn ghost">Admin</button>
                 </div>
 
-                <details class="re-step" open>
-                    <summary><span class="step-num">1</span> Surrender & Honesty</summary>
-                    <div class="re-body">
-                        <p>Admit powerlessness; invite Christ with total honesty.</p>
-                        <label class="mt">
-                            My note
-                            <textarea class="pg-textarea" rows="3" placeholder="Personal reflection…"></textarea>
-                        </label>
-                    </div>
-                </details>
+                <!-- Admin toolbar -->
+                <div id="recoveryAdminBar" class="admin-bar hidden">
+                    <label class="row gap">
+                        <input id="recoveryHidePublic" type="checkbox" />
+                        <span>Hide signups publicly on this device</span>
+                    </label>
+                    <div class="grow"></div>
+                    <button id="recoveryDownloadCsvBtn" class="btn ghost">Download CSV</button>
+                    <button id="recoveryClearAllBtn" class="btn ghost">Clear All</button>
+                </div>
 
-                <!-- keep the rest minimal for demo -->
+                <div id="recovery-steps-appendix" class="mt">
+                    <h3>Your Recovery Steps</h3>
+
+                    <div id="recoverySteps" class="re-steps">
+                        <!-- 1 -->
+                        <details class="re-step" data-step="1" open>
+                            <summary><span class="step-num">1</span> Surrender & Honesty</summary>
+                            <div class="re-body">
+                                <p>Admit powerlessness over addiction and invite Christ into the mess with total honesty.</p>
+                                <ul>
+                                    <li>Pray Psalm 51 (short & honest).</li>
+                                    <li>Tell one trusted person “I need help.”</li>
+                                    <li>Remove obvious access/temptations today.</li>
+                                </ul>
+                                <label class="mt">My note<textarea class="pg-textarea" rows="3" placeholder="Personal reflection…"></textarea></label>
+                            </div>
+                        </details>
+
+                        <!-- 2 -->
+                        <details class="re-step" data-step="2">
+                            <summary><span class="step-num">2</span> Safety & Daily Rhythm</summary>
+                            <div class="re-body">
+                                <p>Stabilize your day. Sleep, food, movement, and a short devotional block.</p>
+                                <ul>
+                                    <li>Morning: 10 minutes (scripture + prayer).</li>
+                                    <li>Text a check-in buddy by noon.</li>
+                                    <li>Evening: brief review; gratitude for 3 things.</li>
+                                </ul>
+                                <label class="mt">My note<textarea class="pg-textarea" rows="3"></textarea></label>
+                            </div>
+                        </details>
+
+                        <!-- 3 -->
+                        <details class="re-step" data-step="3">
+                            <summary><span class="step-num">3</span> Confession & Clean-up</summary>
+                            <div class="re-body">
+                                <p>Bring secrets into the light in safe community; start repairing fallout in small pieces.</p>
+                                <ul>
+                                    <li>Confess to a trusted leader/mentor.</li>
+                                    <li>Identify one immediate mess to clean up this week.</li>
+                                </ul>
+                                <label class="mt">My note<textarea class="pg-textarea" rows="3"></textarea></label>
+                            </div>
+                        </details>
+
+                        <!-- 4 -->
+                        <details class="re-step" data-step="4">
+                            <summary><span class="step-num">4</span> Triggers & Replacement</summary>
+                            <div class="re-body">
+                                <p>Spot your top triggers and practice replacement habits instead of white-knuckling.</p>
+                                <ul>
+                                    <li>List top 5 triggers (people/places/feelings).</li>
+                                    <li>Pair each trigger with a 5-minute replacement action.</li>
+                                </ul>
+                                <label class="mt">My triggers<textarea class="pg-textarea" rows="3" placeholder="- …&#10;- …"></textarea></label>
+                            </div>
+                        </details>
+
+                        <!-- 5 -->
+                        <details class="re-step" data-step="5">
+                            <summary><span class="step-num">5</span> Scripture & Prayer Habits</summary>
+                            <div class="re-body">
+                                <p>Build a simple, repeatable devotional plan that fits your real life.</p>
+                                <ul>
+                                    <li>Read one Psalm + one Gospel paragraph daily.</li>
+                                    <li>Use breath prayers when cravings rise (e.g., “Lord Jesus, have mercy”).</li>
+                                </ul>
+                                <label class="mt">Plan<textarea class="pg-textarea" rows="3"></textarea></label>
+                            </div>
+                        </details>
+
+                        <!-- 6 -->
+                        <details class="re-step" data-step="6">
+                            <summary><span class="step-num">6</span> Community & Mentor</summary>
+                            <div class="re-body">
+                                <p>Recovery is a team sport—don’t walk alone.</p>
+                                <ul>
+                                    <li>Choose a mentor/sponsor and set a weekly check-in.</li>
+                                    <li>Join a small group or recovery meeting.</li>
+                                </ul>
+                                <label class="mt">Names & group<textarea class="pg-textarea" rows="3"></textarea></label>
+                            </div>
+                        </details>
+
+                        <!-- 7 -->
+                        <details class="re-step" data-step="7">
+                            <summary><span class="step-num">7</span> Inventory & Amends Plan</summary>
+                            <div class="re-body">
+                                <p>Make a gentle, honest inventory and draft safe amends with counsel.</p>
+                                <ul>
+                                    <li>Write a short moral inventory (facts, not self-hate).</li>
+                                    <li>With guidance, identify one safe amends to attempt first.</li>
+                                </ul>
+                                <label class="mt">Notes<textarea class="pg-textarea" rows="3"></textarea></label>
+                            </div>
+                        </details>
+
+                        <!-- 8 -->
+                        <details class="re-step" data-step="8">
+                            <summary><span class="step-num">8</span> Boundaries & Tech Hygiene</summary>
+                            <div class="re-body">
+                                <p>Reduce friction toward relapse; increase friction toward health.</p>
+                                <ul>
+                                    <li>Content filters, app limits, bedtime mode, accountability tools.</li>
+                                    <li>Physical boundaries: routes, environments, cash/card limits.</li>
+                                </ul>
+                                <label class="mt">Boundaries<textarea class="pg-textarea" rows="3"></textarea></label>
+                            </div>
+                        </details>
+
+                        <!-- 9 -->
+                        <details class="re-step" data-step="9">
+                            <summary><span class="step-num">9</span> Service & Mission</summary>
+                            <div class="re-body">
+                                <p>Move from only avoiding harm to doing good—service fuels hope.</p>
+                                <ul>
+                                    <li>Pick a weekly act of service (small, consistent).</li>
+                                    <li>Share your story carefully with someone who needs hope.</li>
+                                </ul>
+                                <label class="mt">Service idea<textarea class="pg-textarea" rows="3"></textarea></label>
+                            </div>
+                        </details>
+
+                        <!-- 10 -->
+                        <details class="re-step" data-step="10">
+                            <summary><span class="step-num">10</span> Long-term Maintenance & Relapse Plan</summary>
+                            <div class="re-body">
+                                <p>Expect turbulence; prepare responses ahead of time.</p>
+                                <ul>
+                                    <li>Write a 1-page relapse response: who to call, what to do first.</li>
+                                    <li>Monthly review: triggers, wins, amends progress, next right step.</li>
+                                </ul>
+                                <label class="mt">Relapse plan<textarea class="pg-textarea" rows="3"></textarea></label>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Signups List -->
+                <div class="mt">
+                    <h3>Follow-Up Signups</h3>
+                    <div id="recoverySignupList" class="signup-wrap">
+                        <div class="muted">No sign ups yet.</div>
+                    </div>
+                </div>
             </div>
+
+            <!-- Signup Modal -->
+            <dialog id="recoveryModal" class="pg-dialog">
+                <div class="pg-dialog-card">
+                    <h3>Sign Up for Follow-Up</h3>
+                    <form id="recoveryForm" class="stack">
+                        <input name="fullName" class="input" placeholder="Full name" />
+                        <input name="email" type="email" class="input" placeholder="Email (optional)" />
+                        <input name="phone" class="input" placeholder="Phone (optional)" />
+                        <label>
+                            Preferred contact
+                            <select name="preferred" class="input">
+                                <option value="">Choose…</option>
+                                <option>Email</option>
+                                <option>Phone</option>
+                                <option>Text</option>
+                            </select>
+                        </label>
+                        <textarea name="notes" class="input" rows="3" placeholder="Notes (optional)"></textarea>
+                        <label class="row gap">
+                            <input name="consent" type="checkbox" />
+                            <span>I consent to be contacted for follow-up.</span>
+                        </label>
+
+                        <div class="row gap mt">
+                            <button class="btn">Submit</button>
+                            <button id="recoveryCancel" type="button" class="btn ghost">Cancel</button>
+                        </div>
+                    </form>
+                    <button id="recoveryModalClose" class="icon-close" title="Close" aria-label="Close">×</button>
+                    <div data-close-modal class="pg-backdrop-close" aria-hidden="true"></div>
+                </div>
+            </dialog>
         </section>
 
         <!-- SUPPORT -->
@@ -177,12 +652,234 @@
             <div class="card">
                 <h2>Support</h2>
                 <p>If this project helps you, you can support it below.</p>
+
+                <div class="grid-2" style="margin-top:12px;">
+                    <label>
+                        Amount (optional)
+                        <input id="supAmount" class="input" type="number" min="1" placeholder="e.g. 25" />
+                    </label>
+                    <label>
+                        Note (optional)
+                        <input id="supNote" class="input" type="text" placeholder="e.g. Keep it up!" />
+                    </label>
+                </div>
+
+                <div class="grid-2" style="margin-top:16px;">
+                    <div class="info-tile">
+                        <h4 style="margin:0 0 6px;">PayPal</h4>
+                        <div class="row gap">
+                            <button id="ppOpen" class="btn">Open</button>
+                            <button id="ppCopy" class="btn ghost">Copy handle</button>
+                        </div>
+                    </div>
+
+                    <div class="info-tile">
+                        <h4 style="margin:0 0 6px;">Cash App</h4>
+                        <div class="row gap">
+                            <button id="caOpen" class="btn">Open</button>
+                            <button id="caCopy" class="btn ghost">Copy $tag</button>
+                        </div>
+                    </div>
+
+                    <div class="info-tile">
+                        <h4 style="margin:0 0 6px;">Venmo</h4>
+                        <div class="row gap">
+                            <button id="vmApp" class="btn">Open app</button>
+                            <button id="vmWeb" class="btn">Open web</button>
+                            <button id="vmCopy" class="btn ghost">Copy @user</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
+
     </main>
 
-    <footer class="site-footer">© <span id="year"></span> My Bible Belt</footer>
+    <footer class="site-footer">
+        <div>© <span id="year"></span> My Bible Belt</div>
+    </footer>
 
-    <script src="app.js"></script>
+    <!-- Inline JS: tabs, dark mode toggle, dialogs, print, map, simple community features -->
+    <script>
+        const $ = (sel, ctx = document) => ctx.querySelector(sel);
+        const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+
+        // Footer year
+        $('#year').textContent = new Date().getFullYear();
+
+        // Theme
+        function setTheme(theme) {
+            const html = document.documentElement;
+            html.classList.toggle('dark', theme === 'dark');
+            html.classList.toggle('light', theme !== 'dark');
+            try { localStorage.setItem('theme', theme); } catch { }
+        }
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            setTheme(isDark ? 'light' : 'dark');
+        }
+        $('#themeToggle')?.addEventListener('click', toggleTheme);
+
+        // Tabs (map #recovery -> #recovery-plan)
+        const mapHashToId = (hash) => {
+            const t = (hash || '#welcome').replace('#', '');
+            return t === 'recovery' ? 'recovery-plan' : t;
+        };
+        function showTabById(id) {
+            $$('.tab').forEach(s => s.classList.add('hidden'));
+            const sec = document.getElementById(id);
+            if (sec) sec.classList.remove('hidden');
+
+            const tab = (id === 'recovery-plan') ? 'recovery' : id;
+            const desiredHash = '#' + tab;
+            if (location.hash !== desiredHash) history.replaceState(null, '', desiredHash);
+        }
+        function showTab(tabKey) { showTabById(mapHashToId('#' + tabKey)); }
+
+        $$('.nav-btn').forEach(btn => btn.addEventListener('click', () => showTab(btn.dataset.tab)));
+        window.addEventListener('hashchange', () => showTabById(mapHashToId(location.hash)));
+        showTabById(mapHashToId(location.hash || '#welcome'));
+
+        // Prayer modal open/close
+        const prayerDialog = $('#prayerDialog');
+        $('#btnPrayerRequest')?.addEventListener('click', () => prayerDialog.showModal());
+        $('#prayerModalClose')?.addEventListener('click', () => prayerDialog.close());
+        $('[data-close-modal]')?.addEventListener('click', () => prayerDialog.close());
+
+        // Recovery modal
+        const recModal = $('#recoveryModal');
+        $('#recoverySignUpBtn')?.addEventListener('click', () => recModal.showModal());
+        $('#recoveryModalClose')?.addEventListener('click', () => recModal.close());
+        $('#recoveryCancel')?.addEventListener('click', () => recModal.close());
+        $('[data-close-modal]')?.addEventListener('click', () => recModal.close());
+
+        // Recovery: Print plan
+        function serializeRecoveryForPrint(root) {
+            const clone = root.cloneNode(true);
+            clone.querySelectorAll('details').forEach(d => d.setAttribute('open', ''));
+
+            clone.querySelectorAll('input, textarea, select').forEach(el => {
+                let value = '';
+                if (el.tagName === 'TEXTAREA') value = el.value.trim();
+                else if (el.tagName === 'SELECT') value = el.options[el.selectedIndex]?.text ?? '';
+                else if (el.type === 'checkbox') value = el.checked ? '✓ Yes' : '—';
+                else if (el.type === 'radio') { if (!el.checked) { el.remove(); return; } else value = el.value; }
+                else value = el.value ?? '';
+
+                const span = document.createElement('span');
+                span.className = 'print-value';
+                span.textContent = value || '—';
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'print-field';
+
+                let labelText = '';
+                if (el.id) {
+                    const lbl = clone.querySelector(\`label[for="\${el.id}"]\`);
+              if (lbl) labelText = lbl.textContent.trim();
+            } else {
+              const lbl = el.closest('label');
+              if (lbl) labelText = lbl.textContent.trim();
+            }
+
+            if (labelText){
+              const strong = document.createElement('strong');
+              strong.textContent = labelText.replace(/\\*\\s*$/, '') + ': ';
+              wrapper.appendChild(strong);
+              wrapper.appendChild(span);
+              el.replaceWith(wrapper);
+            } else {
+              el.replaceWith(span);
+            }
+          });
+
+          clone.querySelectorAll('#recoveryAdminBar, #recoveryAdminBtn, #recoverySignUpBtn, #printPlanBtn, dialog, button.icon-close').forEach(n => n.remove());
+          return clone.outerHTML;
+        }
+
+        function openPrintWindow(htmlBody, title = 'Recovery Plan') {
+          const win = window.open('', 'PrintPlan', 'width=900,height=700,noopener');
+          if (!win) { alert('Popup was blocked. Please allow popups and try again.'); return; }
+          const styles = \`
+            <style>
+              :root { color-scheme: light dark; }
+              body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; line-height:1.5; padding:24px; }
+              h1 { margin:0 0 .5rem; font-size:1.6rem; }
+              .meta { color:#666; font-size:.95rem; margin-bottom:1rem; }
+              .print-field { margin:.25rem 0; }
+              .print-field strong { font-weight:600; }
+              .print-value { white-space:pre-wrap; }
+              details { margin:12px 0; }
+              summary { font-weight:600; margin-bottom:6px; }
+              @media print { body { padding:0; } }
+            </style>
+          \`;
+          const now = new Date();
+          win.document.open();
+          win.document.write(\`<!doctype html>
+<html><head><meta charset="utf-8"><title>\${title}</title>\${styles}</head>
+<body>
+      <h1>\${title}</h1>
+      <div class="meta">Generated on \${now.toLocaleString()}</div>
+      \${htmlBody}
+      <script>window.onload=function(){setTimeout(function(){window.print();},120);};<\\/script>
+</body></html>\`);
+          win.document.close();
+        }
+
+        $('#printPlanBtn')?.addEventListener('click', () => {
+          const section = document.getElementById('recovery-plan');
+          if (!section) return alert('Recovery Plan section not found.');
+          openPrintWindow(serializeRecoveryForPrint(section));
+        });
+
+        // Leaflet map (simple)
+        (function initMap(){
+          const el = $('#churchMap');
+          if (!el || typeof L === 'undefined') return;
+          const map = L.map(el).setView([36.0, -84.0], 8); // East TN area
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18, attribution: '&copy; OpenStreetMap'
+          }).addTo(map);
+        })();
+
+        // Community mini features
+        $('#startCamBtn')?.addEventListener('click', async () => {
+          const v = $('#communityVideo');
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            v.srcObject = stream;
+          } catch (e) { alert('Camera error: ' + e.message); }
+        });
+        $('#stopCamBtn')?.addEventListener('click', () => {
+          const v = $('#communityVideo');
+          const s = v?.srcObject;
+          if (s) s.getTracks().forEach(t => t.stop());
+          v.srcObject = null;
+        });
+        $('#sendCommunityMsgBtn')?.addEventListener('click', () => {
+          const input = $('#communityChatInput');
+          const list = $('#communityChatMessages');
+          const msg = (input.value || '').trim();
+          if (!msg) return;
+          const p = document.createElement('div');
+          p.textContent = msg;
+          list.appendChild(p);
+          input.value = '';
+          list.scrollTop = list.scrollHeight;
+        });
+        $('#clearCommunityChatBtn')?.addEventListener('click', () => {
+          $('#communityChatMessages').innerHTML = '';
+        });
+
+        // Quick helpers for Support buttons (stubs)
+        $('#ppOpen')?.addEventListener('click', () => window.open('https://paypal.me/', '_blank'));
+        $('#ppCopy')?.addEventListener('click', () => navigator.clipboard.writeText('paypal-handle'));
+        $('#caOpen')?.addEventListener('click', () => window.open('https://cash.app/', '_blank'));
+        $('#caCopy')?.addEventListener('click', () => navigator.clipboard.writeText('$yourtag'));
+        $('#vmApp')?.addEventListener('click', () => window.location.href = 'venmo://paycharge');
+        $('#vmWeb')?.addEventListener('click', () => window.open('https://venmo.com/', '_blank'));
+        $('#vmCopy')?.addEventListener('click', () => navigator.clipboard.writeText('@youruser'));
+    </script>
 </body>
 </html>
