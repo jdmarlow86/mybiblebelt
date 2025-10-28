@@ -308,3 +308,258 @@ $btnSubmitRequest?.addEventListener("click", (e) => {
 });
 
 /* ESC to close dialog backdrop click is native; no extra wiring needed */
+/* =========================
+   STUDY LIBRARY: links list
+   ========================= */
+(function initStudyLibrary() {
+    const grid = document.getElementById("studyLinksGrid");
+    if (!grid) return;
+
+    const STORAGE_KEY = "study_links";
+
+    const DEFAULT_STUDY_LINKS = [
+        // — General Tools —
+        {
+            title: "BibleProject — Learn", url: "https://bibleproject.com/explore/",
+            desc: "Animated explanations of biblical themes, books, and word studies.",
+            tags: ["General"]
+        },
+
+        {
+            title: "Blue Letter Bible", url: "https://www.blueletterbible.org/",
+            desc: "Deep word tools: lexicons, interlinear, cross-references.",
+            tags: ["General"]
+        },
+
+        {
+            title: "STEP Bible", url: "https://www.stepbible.org/",
+            desc: "Multi-language Bible study with original-language helps.",
+            tags: ["General"]
+        },
+
+        {
+            title: "Bible Gateway", url: "https://www.biblegateway.com/",
+            desc: "Read and compare translations; audio and reading plans.",
+            tags: ["General"]
+        },
+
+        {
+            title: "GotQuestions", url: "https://www.gotquestions.org/",
+            desc: "Short, searchable answers to thousands of Bible questions.",
+            tags: ["General", "Apologetics"]
+        },
+
+        // — Seventh-day Adventist —
+        {
+            title: "SDA: Sabbath School (Adult Bible Study Guide)",
+            url: "https://absg.adventist.org/",
+            desc: "Weekly lessons with teacher helps and archives.",
+            tags: ["Seventh-day Adventist"]
+        },
+
+        {
+            title: "SDA: Amazing Facts — Study Guides",
+            url: "https://www.amazingfacts.org/media-library/study-guides",
+            desc: "27 illustrated, foundational Bible study lessons.",
+            tags: ["Seventh-day Adventist"]
+        },
+
+        // — Baptist —
+        {
+            title: "Baptist Faith & Message (2000)",
+            url: "https://bfm.sbc.net/",
+            desc: "Doctrinal statement with Scripture references (SBC).",
+            tags: ["Baptist", "Confessions"]
+        },
+
+        {
+            title: "IMB: Foundations — 40 Essentials",
+            url: "https://www.imb.org/foundations/",
+            desc: "Core discipleship lessons used broadly in Baptist missions.",
+            tags: ["Baptist", "Discipleship"]
+        },
+
+        // — Methodist / Wesleyan —
+        {
+            title: "UMC: What We Believe",
+            url: "https://www.umc.org/en/what-we-believe",
+            desc: "Articles on doctrine, grace, and Christian living.",
+            tags: ["Methodist"]
+        },
+
+        {
+            title: "Seedbed (Wesleyan Resources)",
+            url: "https://seedbed.com/",
+            desc: "Wesleyan formation: class meetings, bands, and studies.",
+            tags: ["Methodist", "Wesleyan"]
+        },
+
+        // — Catholic —
+        {
+            title: "USCCB: Catechism of the Catholic Church",
+            url: "https://www.usccb.org/faith-and-doctrine/catechism",
+            desc: "Official catechism text and teaching resources.",
+            tags: ["Catholic", "Catechism"]
+        },
+
+        {
+            title: "Formed (Intro & Parish Finder)",
+            url: "https://watch.formed.org/browse",
+            desc: "Video studies and devotionals (many parishes provide access).",
+            tags: ["Catholic", "Media"]
+        },
+
+        // — Orthodox —
+        {
+            title: "OCA: The Orthodox Faith",
+            url: "https://www.oca.org/orthodoxy/the-orthodox-faith",
+            desc: "Concise articles on doctrine, worship, and history.",
+            tags: ["Orthodox"]
+        },
+
+        {
+            title: "Ancient Faith Ministries",
+            url: "https://www.ancientfaith.com/",
+            desc: "Podcasts, blogs, and catechesis from the Orthodox tradition.",
+            tags: ["Orthodox", "Media"]
+        },
+
+        // — Reformed —
+        {
+            title: "Ligonier — Learn",
+            url: "https://www.ligonier.org/learn",
+            desc: "Courses and articles on Reformed theology and Bible.",
+            tags: ["Reformed"]
+        },
+
+        {
+            title: "The Gospel Coalition — Topics",
+            url: "https://www.thegospelcoalition.org/topics/",
+            desc: "Biblical essays, sermons, and guides across many themes.",
+            tags: ["Reformed", "Evangelical"]
+        },
+
+        // — Pentecostal / Charismatic —
+        {
+            title: "Assemblies of God — Fundamental Truths",
+            url: "https://ag.org/Beliefs/Statement-of-Fundamental-Truths",
+            desc: "Doctrinal summary with Scripture.",
+            tags: ["Pentecostal"]
+        },
+
+        {
+            title: "Vineyard Resources",
+            url: "https://resources.vineyardusa.org/",
+            desc: "Vineyard training guides, theology, and small-group helps.",
+            tags: ["Charismatic", "Pentecostal"]
+        },
+
+        // — Anglican / Lutheran —
+        {
+            title: "Church of England — Daily Prayer",
+            url: "https://www.churchofengland.org/prayer-and-worship/join-us-in-daily-prayer",
+            desc: "Morning/Evening prayer and lectionary readings.",
+            tags: ["Anglican", "Prayer"]
+        },
+
+        {
+            title: "Luther’s Small Catechism (LCMS)",
+            url: "https://catechism.cph.org/",
+            desc: "Interactive catechism with explanations and Scripture.",
+            tags: ["Lutheran", "Catechism"]
+        },
+    ];
+
+    const storage = {
+        get() {
+            try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+            catch { return []; }
+        },
+        set(val) {
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(val)); } catch { }
+        },
+        ensureDefaults() {
+            const cur = this.get();
+            if (!cur || cur.length === 0) this.set(DEFAULT_STUDY_LINKS);
+        }
+    };
+
+    function render(links) {
+        grid.innerHTML = "";
+        if (!links || links.length === 0) {
+            grid.innerHTML = `<div class="muted">No links yet. (They’re saved on this device.)</div>`;
+            return;
+        }
+        const frag = document.createDocumentFragment();
+
+        links.forEach(link => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+        <div class="row" style="justify-content:space-between; align-items:flex-start;">
+          <div style="min-width:200px;">
+            <div style="font-weight:600; margin-bottom:2px;">
+              <a href="${link.url}" target="_blank" rel="noopener">${escapeHtml(link.title)}</a>
+            </div>
+            <div class="muted" style="margin:4px 0;">${escapeHtml(link.desc || "")}</div>
+            <div class="muted" style="font-size:.9em;">${(link.tags || []).map(t => `<span class="badge" style="margin-right:6px;">${escapeHtml(t)}</span>`).join(" ")}</div>
+          </div>
+          <div style="text-align:right; min-width:120px;">
+            <a class="btn" href="${link.url}" target="_blank" rel="noopener">Open</a>
+            <button class="btn ghost" data-copy="${link.url}">Copy URL</button>
+          </div>
+        </div>
+      `;
+            frag.appendChild(card);
+        });
+
+        grid.appendChild(frag);
+
+        // copy buttons
+        grid.querySelectorAll("button[data-copy]").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const url = btn.getAttribute("data-copy");
+                try { await navigator.clipboard.writeText(url); btn.textContent = "Copied!"; setTimeout(() => btn.textContent = "Copy URL", 1200); }
+                catch { btn.textContent = "Failed"; setTimeout(() => btn.textContent = "Copy URL", 1200); }
+            });
+        });
+    }
+
+    function escapeHtml(s = "") {
+        return s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]));
+    }
+
+    // Export CSV of links
+    function exportLinksCsv() {
+        const rows = [["Title", "URL", "Description", "Tags"]];
+        const links = storage.get();
+        links.forEach(l => rows.push([
+            l.title, l.url, (l.desc || ""), (l.tags || []).join("|")
+        ]));
+        const csv = rows.map(r => r.map(field => {
+            const val = String(field ?? "");
+            return /[",\n]/.test(val) ? `"${val.replace(/"/g, '""')}"` : val;
+        }).join(",")).join("\n");
+
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url; a.download = `study-links-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    // Clear links
+    function clearLinks() {
+        if (!confirm("Delete all links from this device?")) return;
+        storage.set([]);
+        render([]);
+    }
+
+    // Init
+    storage.ensureDefaults();
+    render(storage.get());
+
+    // Wire buttons
+    document.getElementById("studyExportLinksBtn")?.addEventListener("click", exportLinksCsv);
+    document.getElementById("studyClearLinksBtn")?.addEventListener("click", clearLinks);
+})();
