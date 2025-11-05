@@ -251,6 +251,18 @@ details.re-step summary {
     user-select: none;
 }
 
+details.re-step summary::after {
+    content: "▸";
+    display: inline-block;
+    margin-left: auto;
+    color: var(--muted);
+    transition: transform .18s ease;
+}
+
+details.re-step[open] summary::after {
+    transform: rotate(90deg);
+}
+
 .step-num {
     display: inline-grid;
     place-items: center;
