@@ -319,6 +319,58 @@ details.re-step[open] summary::after {
     overflow: hidden;
 }
 
+#churchStatus.error {
+    color: #b3261e;
+}
+
+#churchResults {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.church-result {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: var(--shadow);
+}
+
+.church-result__title {
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 4px;
+}
+
+.church-result__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.church-result__distance {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 2px 8px;
+    margin-left: auto;
+}
+
+.church-result__address {
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+.church-result__actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 .video {
     width: 100%;
     min-height: 220px;

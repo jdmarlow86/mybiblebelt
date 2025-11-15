@@ -52,7 +52,325 @@ window.addEventListener("hashchange", () => showTabById(mapHashToId(location.has
 showTabById(mapHashToId(location.hash || "#welcome"));
 
 /* =========================================================
-   PRAYER ó Rule Builder, Timer, and Requests
+   CHURCH FINDER MAP & SEARCH
+   ========================================================= */
+
+const ChurchFinder = (() => {
+    const mapEl = document.getElementById("churchMap");
+    if (!mapEl || typeof L === "undefined") return null;
+
+    const statusEl = document.getElementById("churchStatus");
+    const resultsEl = document.getElementById("churchResults");
+    const searchInput = document.getElementById("churchSearch");
+    const radiusSelect = document.getElementById("churchRadius");
+    const useLocationBtn = document.getElementById("churchUseMyLocation");
+    const searchBtn = document.getElementById("churchSearchBtn");
+    const clearBtn = document.getElementById("churchClearBtn");
+
+    let map;
+    let markersLayer;
+    let radiusCircle;
+    let searchMarker;
+    let lastCenter;
+
+    function initMap() {
+        map = L.map(mapEl, {
+            center: [35.9606, -83.9207],
+            zoom: 12,
+            zoomControl: true
+        });
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; OpenStreetMap contributors"
+        }).addTo(map);
+
+        markersLayer = L.layerGroup().addTo(map);
+    }
+
+    function setStatus(message, type = "info") {
+        if (!statusEl) return;
+        statusEl.textContent = message ? String(message) : "";
+        statusEl.classList.toggle("error", type === "error");
+    }
+
+    function clearResults() {
+        if (markersLayer) markersLayer.clearLayers();
+        if (radiusCircle) {
+            radiusCircle.remove();
+            radiusCircle = null;
+        }
+        if (resultsEl) {
+            resultsEl.innerHTML = "";
+        }
+    }
+
+    function formatAddress(tags = {}) {
+        const parts = [
+            tags["addr:housenumber"],
+            tags["addr:street"],
+            tags["addr:city"] || tags["addr:town"],
+            tags["addr:state"],
+            tags["addr:postcode"]
+        ].filter(Boolean);
+        return parts.join(", ");
+    }
+
+    function escapeHtml(str = "") {
+        return String(str).replace(/[&<>"']/g, (ch) => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[ch] || ch);
+    }
+
+    function distanceInMiles(lat1, lon1, lat2, lon2) {
+        const toRad = (deg) => (deg * Math.PI) / 180;
+        const earthRadiusMeters = 6371000;
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return (earthRadiusMeters * c) / 1609.34;
+    }
+
+    function renderResults(results, origin) {
+        if (!resultsEl) return;
+        resultsEl.innerHTML = "";
+
+        if (!results || results.length === 0) {
+            resultsEl.innerHTML = '<div class="muted">No churches found within this radius.</div>';
+            return;
+        }
+
+        const frag = document.createDocumentFragment();
+
+        results.forEach((item, idx) => {
+            const div = document.createElement("div");
+            div.className = "church-result";
+
+            const distance = origin ? distanceInMiles(origin.lat, origin.lon, item.lat, item.lon) : null;
+            const distanceText = distance ? `${distance.toFixed(distance < 10 ? 1 : 0)} mi` : "";
+
+            div.innerHTML = `
+                <div class="church-result__title">${escapeHtml(item.name || "Unnamed Church")}</div>
+                <div class="church-result__meta">
+                    ${escapeHtml(item.denomination || item.tradition || "")}
+                    ${distanceText ? `<span class="church-result__distance">${distanceText} away</span>` : ""}
+                </div>
+                <div class="church-result__address">${escapeHtml(item.address || "")}</div>
+                <div class="church-result__actions">
+                    <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${item.lat},${item.lon}">Open in Maps</a>
+                    <button class="btn ghost" data-marker-index="${idx}">Show on map</button>
+                </div>
+            `;
+
+            frag.appendChild(div);
+        });
+
+        resultsEl.appendChild(frag);
+
+        resultsEl.querySelectorAll("button[data-marker-index]").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const index = Number(btn.dataset.markerIndex || 0);
+                const item = results[index];
+                if (item && item.marker) {
+                    item.marker.openPopup();
+                    map.flyTo([item.lat, item.lon], Math.max(map.getZoom(), 14), { duration: 0.5 });
+                }
+            });
+        });
+    }
+
+    async function fetchChurches(lat, lon, radiusMiles) {
+        const radiusMeters = Math.max(500, Math.round(Number(radiusMiles || 5) * 1609.34));
+        const query = `
+[out:json][timeout:25];
+(
+  node["amenity"="place_of_worship"]["religion"="christian"](around:${radiusMeters},${lat},${lon});
+  way["amenity"="place_of_worship"]["religion"="christian"](around:${radiusMeters},${lat},${lon});
+  relation["amenity"="place_of_worship"]["religion"="christian"](around:${radiusMeters},${lat},${lon});
+  node["building"="church"](around:${radiusMeters},${lat},${lon});
+  way["building"="church"](around:${radiusMeters},${lat},${lon});
+  relation["building"="church"](around:${radiusMeters},${lat},${lon});
+);
+out center tags 40;
+`;
+
+        const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+        const res = await fetch(url, { headers: { Accept: "application/json" } });
+        if (!res.ok) throw new Error("Unable to load church data");
+        const data = await res.json();
+        const seen = new Map();
+
+        (data.elements || []).forEach((el) => {
+            const id = `${el.type}-${el.id}`;
+            if (seen.has(id)) return;
+            const point = el.lat != null ? { lat: el.lat, lon: el.lon } : el.center;
+            if (!point || point.lat == null || point.lon == null) return;
+            const tags = el.tags || {};
+            const record = {
+                id,
+                lat: point.lat,
+                lon: point.lon,
+                name: tags.name || "Unnamed Church",
+                denomination: tags.denomination || tags["denomination:en"] || "",
+                tradition: tags.religion === "christian" ? (tags.denomination || "Christian Church") : "Church",
+                address: formatAddress(tags)
+            };
+            seen.set(id, record);
+        });
+
+        return Array.from(seen.values());
+    }
+
+    function updateMap(center, items, radiusMiles) {
+        clearResults();
+        if (!center) return;
+
+        lastCenter = center;
+        map.setView([center.lat, center.lon], 13);
+
+        if (markersLayer) markersLayer.clearLayers();
+
+        if (radiusCircle) {
+            radiusCircle.remove();
+        }
+
+        if (radiusMiles) {
+            const radiusMeters = Math.max(500, Math.round(radiusMiles * 1609.34));
+            radiusCircle = L.circle([center.lat, center.lon], {
+                radius: radiusMeters,
+                color: "#3b5bfd",
+                fillColor: "#3b5bfd",
+                fillOpacity: 0.08,
+                weight: 1
+            }).addTo(map);
+        }
+
+        if (searchMarker) {
+            searchMarker.remove();
+        }
+
+        searchMarker = L.marker([center.lat, center.lon]).addTo(map).bindPopup("Search center");
+
+        const mapped = items.map((item) => {
+            const marker = L.marker([item.lat, item.lon]).addTo(markersLayer);
+            marker.bindPopup(`<strong>${escapeHtml(item.name || "Church")}</strong><br>${escapeHtml(item.address || "")}`);
+            return { ...item, marker };
+        });
+
+        renderResults(mapped, center);
+    }
+
+    async function searchAround(center, statusPrefix) {
+        const radiusMiles = Number(radiusSelect?.value || 5);
+        setStatus(statusPrefix ? `${statusPrefix}...` : "Searching...");
+        try {
+            const churches = await fetchChurches(center.lat, center.lon, radiusMiles);
+            updateMap(center, churches, radiusMiles);
+            if (churches.length === 0) {
+                setStatus("No churches were found. Try a larger radius or a nearby city.");
+            } else {
+                setStatus(`Found ${churches.length} churches within ${radiusMiles} miles.`);
+            }
+        } catch (err) {
+            console.error(err);
+            setStatus("Sorry, we couldn't load church data right now.", "error");
+        }
+    }
+
+    async function handleUseLocation() {
+        if (!navigator.geolocation) {
+            setStatus("Location not supported on this device.", "error");
+            return;
+        }
+        setStatus("Getting your location...");
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const { latitude, longitude } = pos.coords;
+            await searchAround({ lat: latitude, lon: longitude }, "Searching near you");
+        }, (err) => {
+            console.warn(err);
+            setStatus("We couldn't access your location. You can search by city instead.", "error");
+        }, { enableHighAccuracy: true, timeout: 10000 });
+    }
+
+    async function handleSearchCity() {
+        const query = (searchInput?.value || "").trim();
+        if (!query) {
+            setStatus("Enter a city or town to search.", "error");
+            return;
+        }
+        setStatus("Looking up that location...");
+        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`;
+        try {
+            const res = await fetch(url, {
+                headers: {
+                    Accept: "application/json",
+                    "User-Agent": "mybiblebelt-app"
+                }
+            });
+            if (!res.ok) throw new Error("Failed to geocode city");
+            const data = await res.json();
+            if (!Array.isArray(data) || data.length === 0) {
+                setStatus("We couldn't find that place. Try another city.", "error");
+                return;
+            }
+            const item = data[0];
+            const center = { lat: Number(item.lat), lon: Number(item.lon) };
+            const label = String(item.display_name || query).split(",")[0];
+            await searchAround(center, `Searching near ${label}`);
+        } catch (err) {
+            console.error(err);
+            setStatus("There was a problem searching that city.", "error");
+        }
+    }
+
+    function handleClear() {
+        clearResults();
+        if (statusEl) {
+            statusEl.textContent = "";
+            statusEl.classList.remove("error");
+        }
+        if (searchInput) searchInput.value = "";
+        if (searchMarker) {
+            searchMarker.remove();
+            searchMarker = null;
+        }
+        if (lastCenter) {
+            map.setView([lastCenter.lat, lastCenter.lon], 12);
+        }
+    }
+
+    initMap();
+
+    useLocationBtn?.addEventListener("click", handleUseLocation);
+    searchBtn?.addEventListener("click", handleSearchCity);
+    clearBtn?.addEventListener("click", handleClear);
+
+    return {
+        invalidate() {
+            setTimeout(() => map?.invalidateSize(), 200);
+        }
+    };
+})();
+
+if (typeof showTabById === "function" && ChurchFinder && typeof ChurchFinder.invalidate === "function") {
+    const originalShowTabById = showTabById;
+    showTabById = function(id) {
+        originalShowTabById(id);
+        if (id === "church") {
+            ChurchFinder.invalidate();
+        }
+    };
+
+    if ((location.hash || "#welcome").replace(/^#/, "") === "church") {
+        setTimeout(() => ChurchFinder.invalidate(), 400);
+    }
+}
+/* =========================================================
+   PRAYER ‚Äî Rule Builder, Timer, and Requests
    ========================================================= */
 
 /* ---------- Elements ---------- */
@@ -143,9 +461,9 @@ $btnGenerateRule?.addEventListener("click", () => {
     storage.set("prayer_rule_inputs", { times, focus, duration: mins, scripture: scr, notes: note });
 
     const blocks = [
-        times.includes("Morning") && `ï Morning ó ${Math.ceil(mins / 3)} min: Scripture + short prayer${scr ? ` (e.g., ${scr})` : ""}`,
-        times.includes("Midday") && `ï Midday ó ${Math.ceil(mins / 3)} min: Breath prayer (ìLord Jesus, have mercyî) + intercession`,
-        times.includes("Evening") && `ï Evening ó ${Math.ceil(mins / 3)} min: Examen (gratitude x3, confession, resolve)`
+        times.includes("Morning") && `‚Ä¢ Morning ‚Äî ${Math.ceil(mins / 3)} min: Scripture + short prayer${scr ? ` (e.g., ${scr})` : ""}`,
+        times.includes("Midday") && `‚Ä¢ Midday ‚Äî ${Math.ceil(mins / 3)} min: Breath prayer (‚ÄúLord Jesus, have mercy‚Äù) + intercession`,
+        times.includes("Evening") && `‚Ä¢ Evening ‚Äî ${Math.ceil(mins / 3)} min: Examen (gratitude x3, confession, resolve)`
     ].filter(Boolean).join("\n");
 
     const focusLine = focus.length ? `Focus areas: ${focus.join(", ")}.` : "Focus areas: (choose at least one).";
@@ -154,7 +472,7 @@ $btnGenerateRule?.addEventListener("click", () => {
         "Personal Prayer Rule",
         "---------------------",
         focusLine,
-        blocks || "ï Choose a time of day to begin (Morning, Midday, Evening).",
+        blocks || "‚Ä¢ Choose a time of day to begin (Morning, Midday, Evening).",
         note && `Notes: ${note}`
     ].filter(Boolean).join("\n");
 
@@ -232,7 +550,7 @@ $btnPauseTimer?.addEventListener("click", () => {
         timer.intervalId = null;
         timer.running = false;
         $btnPauseTimer.textContent = "Resume";
-        $timerHints.textContent = "Paused. Breathe: ìLord Jesus, have mercy.î";
+        $timerHints.textContent = "Paused. Breathe: ‚ÄúLord Jesus, have mercy.‚Äù";
     } else {
         timer.intervalId = setInterval(tick, 1000);
         timer.running = true;
@@ -259,11 +577,11 @@ function tick() {
     // Gentle rotating hints based on progress thirds
     const third = timer.total / 3;
     if (elapsed < third) {
-        $timerHints.textContent = "Praise ó thank God for 3 specific gifts today.";
+        $timerHints.textContent = "Praise ‚Äî thank God for 3 specific gifts today.";
     } else if (elapsed < 2 * third) {
-        $timerHints.textContent = "Confession ó be honest about the hardest thing this week.";
+        $timerHints.textContent = "Confession ‚Äî be honest about the hardest thing this week.";
     } else {
-        $timerHints.textContent = "Intercession ó pray for others by name.";
+        $timerHints.textContent = "Intercession ‚Äî pray for others by name.";
     }
 
     if (timer.remaining <= 0) {
@@ -271,7 +589,7 @@ function tick() {
         timer.intervalId = null;
         timer.running = false;
         $btnPauseTimer.disabled = true;
-        $timerHints.textContent = "Amen. Consider one next step youíll take today.";
+        $timerHints.textContent = "Amen. Consider one next step you‚Äôll take today.";
         try { new AudioContext(); } catch { }
     }
 }
@@ -318,9 +636,9 @@ $btnSubmitRequest?.addEventListener("click", (e) => {
     const STORAGE_KEY = "study_links";
 
     const DEFAULT_STUDY_LINKS = [
-        // ó General Tools ó
+        // ‚Äî General Tools ‚Äî
         {
-            title: "BibleProject ó Learn", url: "https://bibleproject.com/explore/",
+            title: "BibleProject ‚Äî Learn", url: "https://bibleproject.com/explore/",
             desc: "Animated explanations of biblical themes, books, and word studies.",
             tags: ["General"]
         },
@@ -349,7 +667,7 @@ $btnSubmitRequest?.addEventListener("click", (e) => {
             tags: ["General", "Apologetics"]
         },
 
-        // ó Seventh-day Adventist ó
+        // ‚Äî Seventh-day Adventist ‚Äî
         {
             title: "SDA: Sabbath School (Adult Bible Study Guide)",
             url: "https://absg.adventist.org/",
@@ -358,13 +676,13 @@ $btnSubmitRequest?.addEventListener("click", (e) => {
         },
 
         {
-            title: "SDA: Amazing Facts ó Study Guides",
+            title: "SDA: Amazing Facts ‚Äî Study Guides",
             url: "https://www.amazingfacts.org/media-library/study-guides",
             desc: "27 illustrated, foundational Bible study lessons.",
             tags: ["Seventh-day Adventist"]
         },
 
-        // ó Baptist ó
+        // ‚Äî Baptist ‚Äî
         {
             title: "Baptist Faith & Message (2000)",
             url: "https://bfm.sbc.net/",
@@ -373,13 +691,13 @@ $btnSubmitRequest?.addEventListener("click", (e) => {
         },
 
         {
-            title: "IMB: Foundations ó 40 Essentials",
+            title: "IMB: Foundations ‚Äî 40 Essentials",
             url: "https://www.imb.org/foundations/",
             desc: "Core discipleship lessons used broadly in Baptist missions.",
             tags: ["Baptist", "Discipleship"]
         },
 
-        // ó Methodist / Wesleyan ó
+        // ‚Äî Methodist / Wesleyan ‚Äî
         {
             title: "UMC: What We Believe",
             url: "https://www.umc.org/en/what-we-believe",
@@ -394,7 +712,7 @@ $btnSubmitRequest?.addEventListener("click", (e) => {
             tags: ["Methodist", "Wesleyan"]
         },
 
-        // ó Catholic ó
+        // ‚Äî Catholic ‚Äî
         {
             title: "USCCB: Catechism of the Catholic Church",
             url: "https://www.usccb.org/faith-and-doctrine/catechism",
@@ -409,7 +727,7 @@ $btnSubmitRequest?.addEventListener("click", (e) => {
             tags: ["Catholic", "Media"]
         },
 
-        // ó Orthodox ó
+        // ‚Äî Orthodox ‚Äî
         {
             title: "OCA: The Orthodox Faith",
             url: "https://www.oca.org/orthodoxy/the-orthodox-faith",
@@ -424,24 +742,24 @@ $btnSubmitRequest?.addEventListener("click", (e) => {
             tags: ["Orthodox", "Media"]
         },
 
-        // ó Reformed ó
+        // ‚Äî Reformed ‚Äî
         {
-            title: "Ligonier ó Learn",
+            title: "Ligonier ‚Äî Learn",
             url: "https://www.ligonier.org/learn",
             desc: "Courses and articles on Reformed theology and Bible.",
             tags: ["Reformed"]
         },
 
         {
-            title: "The Gospel Coalition ó Topics",
+            title: "The Gospel Coalition ‚Äî Topics",
             url: "https://www.thegospelcoalition.org/topics/",
             desc: "Biblical essays, sermons, and guides across many themes.",
             tags: ["Reformed", "Evangelical"]
         },
 
-        // ó Pentecostal / Charismatic ó
+        // ‚Äî Pentecostal / Charismatic ‚Äî
         {
-            title: "Assemblies of God ó Fundamental Truths",
+            title: "Assemblies of God ‚Äî Fundamental Truths",
             url: "https://ag.org/Beliefs/Statement-of-Fundamental-Truths",
             desc: "Doctrinal summary with Scripture.",
             tags: ["Pentecostal"]
@@ -454,16 +772,16 @@ $btnSubmitRequest?.addEventListener("click", (e) => {
             tags: ["Charismatic", "Pentecostal"]
         },
 
-        // ó Anglican / Lutheran ó
+        // ‚Äî Anglican / Lutheran ‚Äî
         {
-            title: "Church of England ó Daily Prayer",
+            title: "Church of England ‚Äî Daily Prayer",
             url: "https://www.churchofengland.org/prayer-and-worship/join-us-in-daily-prayer",
             desc: "Morning/Evening prayer and lectionary readings.",
             tags: ["Anglican", "Prayer"]
         },
 
         {
-            title: "Lutherís Small Catechism (LCMS)",
+            title: "Luther‚Äôs Small Catechism (LCMS)",
             url: "https://catechism.cph.org/",
             desc: "Interactive catechism with explanations and Scripture.",
             tags: ["Lutheran", "Catechism"]
@@ -487,7 +805,7 @@ $btnSubmitRequest?.addEventListener("click", (e) => {
     function render(links) {
         grid.innerHTML = "";
         if (!links || links.length === 0) {
-            grid.innerHTML = `<div class="muted">No links yet. (Theyíre saved on this device.)</div>`;
+            grid.innerHTML = `<div class="muted">No links yet. (They‚Äôre saved on this device.)</div>`;
             return;
         }
         const frag = document.createDocumentFragment();
