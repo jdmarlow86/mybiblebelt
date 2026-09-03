@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prayer - My Bible Belt</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>My Bible Belt</h1>
+            <p class="tagline">"Pray without ceasing" - 1 Thessalonians 5:17</p>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Daily Devotional</a></li>
+                <li><a href="bible-study.html">Bible Study</a></li>
+                <li><a href="prayer.html" class="active">Prayer</a></li>
+                <li><a href="prophecy.html">Prophecy</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <h2>Prayer Center</h2>
+            <p>"The effectual fervent prayer of a righteous man availeth much" - James 5:16</p>
+        </section>
+
+        <section class="prayer-form-section">
+            <h3>Submit a Prayer Request</h3>
+            <form id="prayerForm" class="prayer-form">
+                <div class="form-group">
+                    <label for="name">Your Name (Optional):</label>
+                    <input type="text" id="name" name="name" placeholder="Anonymous">
+                </div>
+                <div class="form-group">
+                    <label for="request">Prayer Request:</label>
+                    <textarea id="request" name="request" rows="5" placeholder="Share your prayer request here..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="category">Category:</label>
+                    <select id="category" name="category">
+                        <option value="healing">Healing</option>
+                        <option value="guidance">Guidance</option>
+                        <option value="family">Family</option>
+                        <option value="thanksgiving">Thanksgiving</option>
+                        <option value="spiritual">Spiritual Growth</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">Submit Prayer Request</button>
+            </form>
+            <div id="prayerMessage" class="message" style="display:none;"></div>
+        </section>
+
+        <section class="prayer-guide">
+            <h3>How to Pray</h3>
+            <div class="guide-content">
+                <div class="guide-card">
+                    <h4>The Lord's Prayer</h4>
+                    <p>"After this manner therefore pray ye: Our Father which art in heaven, Hallowed be thy name. Thy kingdom come. Thy will be done in earth, as it is in heaven. Give us this day our daily bread. And forgive us our debts, as we forgive our debtors. And lead us not into temptation, but deliver us from evil: For thine is the kingdom, and the power, and the glory, for ever. Amen." - Matthew 6:9-13</p>
+                </div>
+                <div class="guide-card">
+                    <h4>ACTS Method</h4>
+                    <ul>
+                        <li><strong>A</strong>doration - Praise God for who He is</li>
+                        <li><strong>C</strong>onfession - Confess sins and seek forgiveness</li>
+                        <li><strong>T</strong>hanksgiving - Give thanks for God's blessings</li>
+                        <li><strong>S</strong>upplication - Present requests to God</li>
+                    </ul>
+                </div>
+                <div class="guide-card">
+                    <h4>Promises for Prayer</h4>
+                    <p>"If my people, which are called by my name, shall humble themselves, and pray, and seek my face, and turn from their wicked ways; then will I hear from heaven, and will forgive their sin, and will heal their land." - 2 Chronicles 7:14</p>
+                    <p>"Ask, and it shall be given you; seek, and ye shall find; knock, and it shall be opened unto you." - Matthew 7:7</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="prayer-times">
+            <h3>Daily Prayer Times</h3>
+            <div class="times-grid">
+                <div class="time-card">
+                    <h4>Morning</h4>
+                    <p>"My voice shalt thou hear in the morning, O LORD" - Psalm 5:3</p>
+                </div>
+                <div class="time-card">
+                    <h4>Midday</h4>
+                    <p>"Evening, and morning, and at noon, will I pray" - Psalm 55:17</p>
+                </div>
+                <div class="time-card">
+                    <h4>Evening</h4>
+                    <p>"When I remember thee upon my bed, and meditate on thee in the night watches" - Psalm 63:6</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="prayer-requests-list">
+            <h3>Community Prayer Requests</h3>
+            <div id="requestsList" class="requests-container">
+                <div class="request-item">
+                    <p class="request-text">"Pray for healing and strength for all those facing illness."</p>
+                    <p class="request-meta">Category: Healing | Submitted: Community</p>
+                </div>
+                <div class="request-item">
+                    <p class="request-text">"Pray for families to be drawn closer to God and to each other."</p>
+                    <p class="request-meta">Category: Family | Submitted: Community</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>"Call unto me, and I will answer thee, and shew thee great and mighty things, which thou knowest not" - Jeremiah 33:3</p>
+        <p>My Bible Belt &copy; 2026 | Non-denominational | Sabbath-Centered</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

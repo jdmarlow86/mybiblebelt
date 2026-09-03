@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bible Belt - Daily Devotional</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>My Bible Belt</h1>
+            <p class="tagline">"Thy word is a lamp unto my feet" - Psalm 119:105</p>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active">Daily Devotional</a></li>
+                <li><a href="bible-study.html">Bible Study</a></li>
+                <li><a href="prayer.html">Prayer</a></li>
+                <li><a href="prophecy.html">Prophecy</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="date-display" id="currentDate"></div>
+            <h2>Today's Devotional</h2>
+        </section>
+
+        <section class="devotional-content">
+            <div class="scripture-card">
+                <h3>Scripture Reading</h3>
+                <div class="scripture-text" id="dailyScripture">
+                    <p class="verse-reference" id="verseRef"></p>
+                    <p class="verse-text" id="verseText"></p>
+                </div>
+                <button onclick="loadNewScripture()" class="refresh-btn">New Scripture</button>
+            </div>
+
+            <div class="devotional-card">
+                <h3>Daily Devotional</h3>
+                <div class="devotional-text" id="devotionalText"></div>
+            </div>
+
+            <div class="sabbath-reminder">
+                <h3>Sabbath Memorial</h3>
+                <p>"Remember the sabbath day, to keep it holy." - Exodus 20:8</p>
+                <p class="sabbath-note">The Sabbath is the seventh day (Saturday) - God's holy day of rest and worship.</p>
+            </div>
+        </section>
+
+        <section class="featured-section">
+            <h2>Explore</h2>
+            <div class="featured-grid">
+                <a href="bible-study.html" class="featured-card">
+                    <h3>Bible Study</h3>
+                    <p>Deepen your understanding of God's Word through systematic study</p>
+                </a>
+                <a href="prayer.html" class="featured-card">
+                    <h3>Prayer</h3>
+                    <p>Connect with God through prayer - the breath of the soul</p>
+                </a>
+                <a href="prophecy.html" class="featured-card">
+                    <h3>Prophecy</h3>
+                    <p>Understand the prophecies of Daniel and Revelation for our time</p>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>"For the word of God is quick, and powerful, and sharper than any twoedged sword" - Hebrews 4:12</p>
+        <p>My Bible Belt &copy; 2026 | Non-denominational | Sabbath-Centered</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
