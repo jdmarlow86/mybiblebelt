@@ -89,84 +89,103 @@ function loadDevotional() {
     }
 }
 
-// Handle prayer form submission
-function handlePrayerForm() {
-    const form = document.getElementById('prayerForm');
-    const messageDiv = document.getElementById('prayerMessage');
+// Prayer requests use a hosted Google Form and a separately published,
+// moderator-approved Google Sheets view. No requests are stored in this browser.
+function configurePrayerForm() {
+    const setupNotice = document.getElementById('prayerFormSetup');
+    const embed = document.getElementById('prayerFormEmbed');
+    const formUrl = window.PRAYER_CONFIG && window.PRAYER_CONFIG.formEmbedUrl;
 
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
+    if (!setupNotice || !embed) return;
 
-            const name = document.getElementById('name').value || 'Anonymous';
-            const request = document.getElementById('request').value;
-            const category = document.getElementById('category').value;
-
-            if (!request.trim()) {
-                return;
-            }
-
-            // Save to localStorage
-            const requests = JSON.parse(localStorage.getItem('prayerRequests') || '[]');
-            requests.unshift({
-                name: name,
-                request: request,
-                category: category,
-                date: new Date().toLocaleDateString()
-            });
-            localStorage.setItem('prayerRequests', JSON.stringify(requests));
-
-            // Show success message
-            messageDiv.style.display = 'block';
-            messageDiv.textContent = 'Thank you! Your prayer request has been submitted.';
-            messageDiv.style.background = '#d4edda';
-            messageDiv.style.color = '#155724';
-
-            // Reset form
-            form.reset();
-
-            // Reload prayer requests
-            loadPrayerRequests();
-
-            // Hide message after 3 seconds
-            setTimeout(() => {
-                messageDiv.style.display = 'none';
-            }, 3000);
-        });
+    if (formUrl && /^https:\/\/docs\.google\.com\/forms\/.*viewform/.test(formUrl)) {
+        const iframe = document.createElement('iframe');
+        iframe.src = formUrl;
+        iframe.title = 'Submit a prayer request';
+        iframe.loading = 'lazy';
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        iframe.width = '100%';
+        iframe.height = '850';
+        iframe.style.border = '0';
+        iframe.setAttribute('allowfullscreen', '');
+        embed.appendChild(iframe);
+        embed.hidden = false;
+        setupNotice.hidden = true;
     }
 }
 
-// Load prayer requests from localStorage
-function loadPrayerRequests() {
-    const requestsList = document.getElementById('requestsList');
-    if (requestsList) {
-        const requests = JSON.parse(localStorage.getItem('prayerRequests') || '[]');
+function parseCsvLine(line) {
+    const values = [];
+    let value = '';
+    let quoted = false;
 
-        let html = '';
-        requests.forEach(req => {
-            html += `
-                <div class="request-item">
-                    <p class="request-text">"${req.request}"</p>
-                    <p class="request-meta">Category: ${req.category} | Submitted: ${req.name} on ${req.date}</p>
-                </div>
-            `;
-        });
-
-        // Add default requests if none exist
-        if (requests.length === 0) {
-            html = `
-                <div class="request-item">
-                    <p class="request-text">"Pray for healing and strength for all those facing illness."</p>
-                    <p class="request-meta">Category: Healing | Submitted: Community</p>
-                </div>
-                <div class="request-item">
-                    <p class="request-text">"Pray for families to be drawn closer to God and to each other."</p>
-                    <p class="request-meta">Category: Family | Submitted: Community</p>
-                </div>
-            `;
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"' && quoted && line[i + 1] === '"') {
+            value += '"';
+            i++;
+        } else if (char === '"') {
+            quoted = !quoted;
+        } else if (char === ',' && !quoted) {
+            values.push(value);
+            value = '';
+        } else {
+            value += char;
         }
+    }
+    values.push(value);
+    return values;
+}
 
-        requestsList.innerHTML = html;
+async function loadApprovedPrayerRequests() {
+    const list = document.getElementById('requestsList');
+    const csvUrl = window.PRAYER_CONFIG && window.PRAYER_CONFIG.approvedRequestsCsvUrl;
+    if (!list || !csvUrl || !/^https:\/\/docs\.google\.com\/spreadsheets\/.*output=csv/.test(csvUrl)) return;
+
+    try {
+        const response = await fetch(csvUrl, { cache: 'no-store' });
+        if (!response.ok) throw new Error('Could not load approved requests');
+        const text = await response.text();
+        const rows = text.trim().split(/\r?\n/).filter(Boolean).map(parseCsvLine);
+        if (rows.length < 2) return;
+
+        const headers = rows.shift().map(value => value.trim().toLowerCase());
+        const requestIndex = headers.indexOf('request');
+        const categoryIndex = headers.indexOf('category');
+        const nameIndex = headers.indexOf('display name');
+        if (requestIndex < 0) return;
+
+        const approved = rows.map(row => ({
+            request: row[requestIndex] || '',
+            category: categoryIndex >= 0 ? row[categoryIndex] : '',
+            name: nameIndex >= 0 ? row[nameIndex] : ''
+        })).filter(item => item.request.trim());
+
+        if (!approved.length) return;
+        list.replaceChildren();
+
+        approved.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'request-item';
+            const request = document.createElement('p');
+            request.className = 'request-text';
+            request.textContent = '“' + item.request + '”';
+            card.appendChild(request);
+
+            const meta = document.createElement('p');
+            meta.className = 'request-meta';
+            const parts = [];
+            if (item.category) parts.push('Category: ' + item.category);
+            if (item.name) parts.push('Shared by: ' + item.name);
+            if (parts.length) {
+                meta.textContent = parts.join(' | ');
+                card.appendChild(meta);
+            }
+            list.appendChild(card);
+        });
+    } catch (error) {
+        // Keep the privacy-safe empty state if the public approved list is unavailable.
+        console.warn('Approved prayer requests are temporarily unavailable.');
     }
 }
 
@@ -175,6 +194,6 @@ document.addEventListener('DOMContentLoaded', function() {
     displayDate();
     loadNewScripture();
     loadDevotional();
-    handlePrayerForm();
-    loadPrayerRequests();
+    configurePrayerForm();
+    loadApprovedPrayerRequests();
 });
