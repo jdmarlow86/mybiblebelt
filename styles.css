@@ -543,3 +543,35 @@ footer p:last-child {
         padding: 20px 15px;
     }
 }
+
+/* Prayer request privacy and hosted form */
+.prayer-setup-notice {
+    padding: 20px;
+    border: 1px solid #d8e1e8;
+    border-radius: 8px;
+    background: #f8f9fa;
+    color: #465563;
+    margin-bottom: 15px;
+}
+.prayer-setup-notice h4 {
+    color: #1a3a5c;
+    margin-bottom: 8px;
+}
+.prayer-form-embed {
+    width: 100%;
+    overflow: hidden;
+    margin: 10px 0 20px;
+}
+.prayer-form-embed iframe {
+    display: block;
+    max-width: 100%;
+    background: white;
+}
+.privacy-note, .empty-requests {
+    color: #626d76;
+    font-size: 0.95em;
+    margin: 10px 0 18px;
+}
+[hidden] {
+    display: none !important;
+}
