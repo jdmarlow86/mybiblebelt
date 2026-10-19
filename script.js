@@ -43,7 +43,7 @@ const devotionals = [
     },
     {
         title: "The Sabbath Rest",
-        content: "The Sabbath is God's gift to humanity - a weekly memorial of Creation and a foretaste of the eternal rest we have in Christ. As Seventh-day Adventists understand, Saturday is the seventh day when we cease from our own works and delight in God's presence, just as He rested after creating the world."
+        content: "The Sabbath is presented in Scripture as a day of rest and worship, rooted in Creation. Genesis 2:2-3 describes God resting on the seventh day and blessing it; Exodus 20:8-11 calls people to remember the Sabbath and keep it holy."
     },
     {
         title: "Walking by Faith",
