@@ -30,29 +30,12 @@
 
         <section class="prayer-form-section">
             <h3>Submit a Prayer Request</h3>
-            <form id="prayerForm" class="prayer-form">
-                <div class="form-group">
-                    <label for="name">Your Name (Optional):</label>
-                    <input type="text" id="name" name="name" placeholder="Anonymous">
-                </div>
-                <div class="form-group">
-                    <label for="request">Prayer Request:</label>
-                    <textarea id="request" name="request" rows="5" placeholder="Share your prayer request here..." required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="category">Category:</label>
-                    <select id="category" name="category">
-                        <option value="healing">Healing</option>
-                        <option value="guidance">Guidance</option>
-                        <option value="family">Family</option>
-                        <option value="thanksgiving">Thanksgiving</option>
-                        <option value="spiritual">Spiritual Growth</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <button type="submit" class="submit-btn">Submit Prayer Request</button>
-            </form>
-            <div id="prayerMessage" class="message" style="display:none;"></div>
+            <div id="prayerFormSetup" class="prayer-setup-notice">
+                <h4>Prayer request form setup in progress</h4>
+                <p>The online submission form is not configured yet. Please check back soon.</p>
+            </div>
+            <div id="prayerFormEmbed" class="prayer-form-embed" hidden></div>
+            <p class="privacy-note">Prayer requests are received privately. They will only be shown in the Community Prayer Requests section after a reviewer explicitly approves them. Please avoid including sensitive personal details about yourself or others.</p>
         </section>
 
         <section class="prayer-guide">
@@ -99,15 +82,9 @@
 
         <section class="prayer-requests-list">
             <h3>Community Prayer Requests</h3>
-            <div id="requestsList" class="requests-container">
-                <div class="request-item">
-                    <p class="request-text">"Pray for healing and strength for all those facing illness."</p>
-                    <p class="request-meta">Category: Healing | Submitted: Community</p>
-                </div>
-                <div class="request-item">
-                    <p class="request-text">"Pray for families to be drawn closer to God and to each other."</p>
-                    <p class="request-meta">Category: Family | Submitted: Community</p>
-                </div>
+            <p class="privacy-note">Only requests reviewed and approved for public sharing appear here.</p>
+            <div id="requestsList" class="requests-container" aria-live="polite">
+                <p class="empty-requests">There are no approved public prayer requests to display right now.</p>
             </div>
         </section>
     </main>
@@ -117,6 +94,7 @@
         <p>My Bible Belt &copy; 2026 | Non-denominational | Sabbath-Centered</p>
     </footer>
 
+    <script src="prayer-config.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
