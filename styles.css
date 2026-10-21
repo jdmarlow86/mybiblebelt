@@ -873,3 +873,78 @@ footer p:last-child {
         transition: none;
     }
 }
+
+
+/* Reading detail spacing and alignment refinements */
+.reading-detail-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+    margin: 22px 0 26px;
+}
+.reading-detail-actions .reading-link {
+    align-self: flex-start;
+    max-width: 100%;
+    padding: 12px 18px;
+    text-align: center;
+}
+.reading-detail-actions .completion-toggle {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px solid #e1e7ed;
+    border-radius: 7px;
+    background: #f8fafc;
+    line-height: 1.45;
+}
+.reading-detail-actions .completion-toggle input {
+    flex: 0 0 auto;
+    margin: 2px 0 0;
+}
+.reflection-box {
+    margin-top: 26px;
+    padding-top: 22px;
+}
+.reflection-box label[for="reflectionNotes"] {
+    display: block;
+    margin: 0 0 10px;
+}
+.reflection-box textarea {
+    box-sizing: border-box;
+    min-height: 130px;
+    margin: 0 0 14px;
+}
+.reflection-box .reading-plan-hint {
+    margin: 0 0 16px;
+    line-height: 1.5;
+}
+#saveNotes {
+    min-width: 125px;
+    margin: 0 0 8px;
+}
+#notesStatus {
+    display: block;
+    min-height: 1.3em;
+    margin: 4px 0 0;
+    line-height: 1.4;
+}
+@media (max-width: 760px) {
+    .reading-detail-actions {
+        gap: 14px;
+        margin: 18px 0 24px;
+    }
+    .reading-detail-actions .reading-link {
+        align-self: stretch;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .reading-detail-actions .completion-toggle {
+        padding: 13px;
+    }
+    .reflection-box textarea {
+        min-height: 145px;
+    }
+}
