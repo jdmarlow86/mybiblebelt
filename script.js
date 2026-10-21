@@ -196,4 +196,15 @@ document.addEventListener('DOMContentLoaded', function() {
     loadDevotional();
     configurePrayerForm();
     loadApprovedPrayerRequests();
+
+    const printStudyGuideButton = document.getElementById('printStudyGuide');
+    if (printStudyGuideButton) {
+        printStudyGuideButton.addEventListener('click', function() {
+            document.body.classList.add('print-study-guide');
+            window.print();
+        });
+        window.addEventListener('afterprint', function() {
+            document.body.classList.remove('print-study-guide');
+        });
+    }
 });
