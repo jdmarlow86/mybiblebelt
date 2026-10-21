@@ -629,3 +629,247 @@ footer p:last-child {
 .study-article blockquote p:last-child {
     margin-bottom: 0;
 }
+
+
+/* Interactive Bible reading plan */
+.reading-plan-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 22px;
+    margin-bottom: 24px;
+}
+.reading-plan-controls > div,
+.reading-list-panel,
+.reading-detail-panel {
+    background: #fff;
+    border-radius: 10px;
+    padding: 24px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    min-width: 0;
+}
+.reading-plan-controls h3,
+.reading-list-heading h3,
+.reading-detail-panel h3 {
+    color: #1a3a5c;
+    margin-bottom: 12px;
+}
+.reading-plan-controls label,
+.reading-list-heading label,
+.reflection-box label {
+    display: block;
+    font-weight: 600;
+    color: #34495e;
+    margin: 8px 0;
+}
+.reading-plan-controls select,
+.reading-list-heading select {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccd5dd;
+    border-radius: 6px;
+    background: #fff;
+    color: #333;
+    font: inherit;
+}
+.reading-plan-hint {
+    color: #687681;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+.progress-heading,
+.reading-list-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.progress-heading span {
+    color: #2c5f8a;
+    font-size: 0.95em;
+}
+.progress-track {
+    height: 12px;
+    background: #e5ebf0;
+    border-radius: 99px;
+    overflow: hidden;
+    margin: 14px 0 10px;
+}
+.progress-fill {
+    width: 0;
+    height: 100%;
+    background: #2c5f8a;
+    border-radius: inherit;
+    transition: width 0.25s ease;
+}
+#progressMessage {
+    color: #586775;
+    font-size: 0.95em;
+    margin-bottom: 14px;
+}
+.reading-plan-actions,
+.reading-detail-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.secondary-btn {
+    padding: 10px 16px;
+    border: 1px solid #c9d3dc;
+    border-radius: 5px;
+    background: #fff;
+    color: #33495c;
+    font: inherit;
+    cursor: pointer;
+}
+.secondary-btn:hover {
+    background: #f2f5f8;
+}
+.reading-plan-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 22px;
+}
+.reading-list-heading {
+    margin-bottom: 12px;
+}
+.reading-list-heading label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+.reading-list-heading select {
+    width: auto;
+    margin: 0;
+}
+.reading-list {
+    display: grid;
+    gap: 8px;
+}
+.reading-list-item {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 8px;
+    align-items: center;
+    border: 1px solid #e1e7ed;
+    border-radius: 7px;
+    padding: 10px;
+    background: #fff;
+}
+.reading-list-item.selected {
+    border-color: #2c5f8a;
+    box-shadow: 0 0 0 1px #2c5f8a;
+}
+.reading-list-item.completed {
+    background: #f4f8f5;
+}
+.reading-list-item input {
+    width: 18px;
+    height: 18px;
+    accent-color: #2c5f8a;
+}
+.reading-item-open {
+    display: grid;
+    gap: 2px;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    background: transparent;
+    padding: 2px;
+    color: #333;
+    cursor: pointer;
+    font: inherit;
+    min-width: 0;
+}
+.reading-item-open strong {
+    color: #1a3a5c;
+    overflow-wrap: anywhere;
+}
+.reading-item-day,
+.reading-item-reference,
+.eyebrow {
+    color: #687681;
+    font-size: 0.82em;
+}
+.reading-detail-panel {
+    position: sticky;
+    top: 16px;
+}
+.reading-detail-panel h3 {
+    font-size: 1.5em;
+}
+.reading-reference {
+    font-weight: 700;
+    color: #2c5f8a;
+    margin-bottom: 14px;
+}
+.reading-detail-panel > p:not(.eyebrow):not(.reading-reference) {
+    margin-bottom: 18px;
+}
+.reading-link {
+    display: inline-block;
+    text-decoration: none;
+    white-space: normal;
+}
+.completion-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+.completion-toggle input {
+    width: 18px;
+    height: 18px;
+    accent-color: #2c5f8a;
+}
+.reflection-box {
+    border-top: 1px solid #e3e8ed;
+    margin-top: 22px;
+    padding-top: 18px;
+}
+.reflection-box textarea {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccd5dd;
+    border-radius: 6px;
+    font: inherit;
+    line-height: 1.5;
+    resize: vertical;
+}
+#notesStatus {
+    display: inline-block;
+    margin-left: 8px;
+    color: #2f6842;
+    font-size: 0.9em;
+}
+.reading-tips ol {
+    margin: 0 0 16px 22px;
+}
+.reading-tips li {
+    margin-bottom: 8px;
+}
+@media (max-width: 760px) {
+    .reading-plan-controls,
+    .reading-plan-layout {
+        grid-template-columns: 1fr;
+    }
+    .reading-detail-panel {
+        position: static;
+    }
+    .reading-plan-controls > div,
+    .reading-list-panel,
+    .reading-detail-panel {
+        padding: 18px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .progress-fill {
+        transition: none;
+    }
+}
