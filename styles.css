@@ -1206,3 +1206,68 @@ footer p:last-child {
         break-after: avoid;
     }
 }
+
+
+/* Explicit visibility rules for the standalone worksheet print preview */
+@media print {
+    html,
+    body.standalone-print-guide,
+    body.standalone-print-guide main,
+    body.standalone-print-guide .printable-guide-page,
+    body.standalone-print-guide article.printable-guide {
+        display: block !important;
+        visibility: visible !important;
+        position: static !important;
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
+        opacity: 1 !important;
+        background: #fff !important;
+        color: #111 !important;
+    }
+    body.standalone-print-guide .printable-guide-page {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    body.standalone-print-guide article.printable-guide {
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: 0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    body.standalone-print-guide .print-toolbar,
+    body.standalone-print-guide .print-help {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    body.standalone-print-guide .worksheet-heading,
+    body.standalone-print-guide .worksheet-meta,
+    body.standalone-print-guide .worksheet-section,
+    body.standalone-print-guide .worksheet-footer {
+        display: block !important;
+        visibility: visible !important;
+        color: #111 !important;
+    }
+    body.standalone-print-guide .worksheet-meta {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+    }
+    body.standalone-print-guide .worksheet-section h2,
+    body.standalone-print-guide .worksheet-section p,
+    body.standalone-print-guide .worksheet-section li,
+    body.standalone-print-guide .worksheet-heading h1,
+    body.standalone-print-guide .worksheet-heading p {
+        color: #111 !important;
+        visibility: visible !important;
+    }
+    body.standalone-print-guide .writing-lines {
+        display: block !important;
+        min-height: 52px;
+        visibility: visible !important;
+    }
+}
