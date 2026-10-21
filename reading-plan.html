@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An interactive, beginner-friendly Bible reading plan with daily passages, reflection prompts, and progress tracking.">
+    <title>Bible Reading Plan - My Bible Belt</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>My Bible Belt</h1>
+            <p class="tagline">"Thy word is a lamp unto my feet" - Psalm 119:105</p>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Daily Devotional</a></li>
+                <li><a href="bible-basics.html">Bible Basics</a></li>
+                <li><a href="bible-study.html">Bible Study</a></li>
+                <li><a href="reading-plan.html" class="active">Reading Plan</a></li>
+                <li><a href="prayer.html">Prayer</a></li>
+                <li><a href="prophecy.html">Prophecy</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <h2>Interactive Bible Reading Plan</h2>
+            <p>Start small, read in context, and build a steady habit. Your checkmarks and notes are saved in this browser on this device.</p>
+        </section>
+
+        <section class="reading-plan-controls" aria-labelledby="plan-choice-heading">
+            <div>
+                <h3 id="plan-choice-heading">Choose your plan</h3>
+                <label for="readingPlanSelect">Reading plan</label>
+                <select id="readingPlanSelect">
+                    <option value="jesus">30 Days: Start with Jesus</option>
+                    <option value="overview">60 Days: A Bible Overview</option>
+                </select>
+                <p class="reading-plan-hint">Missed a day? No problem. Continue where you left off—there is no need to catch up all at once.</p>
+            </div>
+            <div class="reading-progress-panel">
+                <div class="progress-heading">
+                    <strong>Your progress</strong>
+                    <span id="progressText" aria-live="polite">0 of 30 completed</span>
+                </div>
+                <div class="progress-track" role="progressbar" aria-label="Reading plan progress" aria-valuemin="0" aria-valuemax="30" aria-valuenow="0" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p id="progressMessage">Every reading is a step forward.</p>
+                <div class="reading-plan-actions">
+                    <button type="button" class="refresh-btn" id="showNextReading">Go to next reading</button>
+                    <button type="button" class="secondary-btn" id="resetPlan">Reset this plan</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="reading-plan-layout">
+            <div class="reading-list-panel">
+                <div class="reading-list-heading">
+                    <h3>Daily readings</h3>
+                    <label for="readingFilter">Show
+                        <select id="readingFilter">
+                            <option value="all">All days</option>
+                            <option value="incomplete">Not completed</option>
+                            <option value="complete">Completed</option>
+                        </select>
+                    </label>
+                </div>
+                <div id="readingList" class="reading-list" aria-live="polite"></div>
+            </div>
+
+            <aside class="reading-detail-panel" id="readingDetail" aria-labelledby="detailTitle">
+                <p class="eyebrow" id="detailDay">DAY 1</p>
+                <h3 id="detailTitle">Jesus and the beginning</h3>
+                <p class="reading-reference" id="detailReference">John 1:1-18</p>
+                <p id="detailSummary">Begin by noticing how John introduces Jesus.</p>
+                <div class="reading-detail-actions">
+                    <a class="refresh-btn reading-link" id="openPassage" href="https://www.biblegateway.com/" target="_blank" rel="noopener noreferrer">Read passage online</a>
+                    <label class="completion-toggle">
+                        <input type="checkbox" id="detailComplete">
+                        <span>Mark this reading complete</span>
+                    </label>
+                </div>
+                <div class="reflection-box">
+                    <label for="reflectionNotes">Reflection notes (optional)</label>
+                    <textarea id="reflectionNotes" rows="5" placeholder="What stood out? What questions do you have?"></textarea>
+                    <p class="reading-plan-hint">Notes are stored only in this browser on this device. Avoid entering private information.</p>
+                    <button type="button" class="refresh-btn" id="saveNotes">Save notes</button>
+                    <span id="notesStatus" role="status" aria-live="polite"></span>
+                </div>
+            </aside>
+        </section>
+
+        <section class="study-article reading-tips">
+            <h3>A simple way to read each passage</h3>
+            <ol>
+                <li><strong>Observe:</strong> What does the passage actually say? Notice repeated words, people, and actions.</li>
+                <li><strong>Understand:</strong> Read the surrounding verses. Ask who is speaking, to whom, and why.</li>
+                <li><strong>Reflect:</strong> What does this passage show about God, people, or faithful living?</li>
+                <li><strong>Respond:</strong> Write one question, prayer, or practical step. It is fine to leave questions unanswered for now.</li>
+            </ol>
+            <p>Reading plans are guides, not a test. Take more than one day when a passage needs careful attention.</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>"All scripture is given by inspiration of God, and is profitable for doctrine, for reproof, for correction, for instruction in righteousness" - 2 Timothy 3:16</p>
+        <p>My Bible Belt &copy; 2026 | Non-denominational | Sabbath-Centered</p>
+    </footer>
+    <script src="reading-plan.js"></script>
+</body>
+</html>
