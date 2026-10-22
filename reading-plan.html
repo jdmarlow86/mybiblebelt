@@ -61,13 +61,19 @@
             <div class="reading-list-panel">
                 <div class="reading-list-heading">
                     <h3>Daily readings</h3>
-                    <label for="readingFilter">Show
-                        <select id="readingFilter">
-                            <option value="all">All days</option>
-                            <option value="incomplete">Not completed</option>
-                            <option value="complete">Completed</option>
-                        </select>
-                    </label>
+                    <div class="reading-list-options">
+                        <label for="readingFilter">Show
+                            <select id="readingFilter">
+                                <option value="all">All days</option>
+                                <option value="incomplete">Not completed</option>
+                                <option value="complete">Completed</option>
+                            </select>
+                        </label>
+                        <label class="checkbox-visibility-toggle" for="showReadingCheckboxes">
+                            <input type="checkbox" id="showReadingCheckboxes" checked>
+                            <span>Show checkboxes</span>
+                        </label>
+                    </div>
                 </div>
                 <div id="readingList" class="reading-list" aria-live="polite"></div>
             </div>
