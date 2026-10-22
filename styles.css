@@ -777,10 +777,7 @@ footer p:last-child {
     outline: 2px solid #2c5f8a;
     outline-offset: 2px;
 }
-.reading-list.hide-reading-checkboxes .reading-list-item {
-    grid-template-columns: minmax(0, 1fr);
-}
-.reading-list.hide-reading-checkboxes .reading-list-item > input[type="checkbox"] {
+.reading-list.hide-reading-cards .reading-list-item {
     display: none;
 }
 .reading-list {
