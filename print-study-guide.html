@@ -5,7 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex">
     <title>Printable Bible Study Worksheet - My Bible Belt</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        * { box-sizing: border-box; }
+        html, body { display: block; width: 100%; min-height: 100%; margin: 0; padding: 0; background: #eef2f5; color: #111; font: 16px/1.5 Arial, Helvetica, sans-serif; }
+        .printable-guide-page { display: block; width: 100%; max-width: 900px; margin: 0 auto; padding: 24px; }
+        .print-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+        .print-toolbar a, .print-toolbar button { font: inherit; padding: 10px 16px; border-radius: 5px; }
+        .print-toolbar a { color: #1a3a5c; background: #fff; border: 1px solid #c9d3dc; text-decoration: none; }
+        .print-toolbar button { color: #fff; background: #2c5f8a; border: 0; cursor: pointer; }
+        .print-help { margin: 0 0 18px; padding: 12px 15px; border: 1px solid #dce4eb; border-radius: 7px; background: #fff; color: #465563; }
+        article.printable-guide { display: block; width: 100%; padding: 38px; background: #fff; color: #111; }
+        .worksheet-heading { display: block; text-align: center; border-bottom: 2px solid #1a3a5c; padding-bottom: 14px; margin-bottom: 20px; }
+        .worksheet-brand { font-size: 9pt; letter-spacing: 1px; margin: 0 0 6px; }
+        .worksheet-heading h1 { color: #1a3a5c; font-size: 24pt; margin: 0 0 4px; }
+        .worksheet-subtitle { font-size: 10pt; margin: 0; }
+        .worksheet-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 22px; margin-bottom: 22px; }
+        .worksheet-meta p { display: flex; align-items: baseline; gap: 7px; margin: 0; min-width: 0; }
+        .worksheet-meta span { display: inline-block; flex: 1; min-height: 20px; border-bottom: 1px solid #555; }
+        .worksheet-section { display: block; margin: 0 0 20px; break-inside: avoid; page-break-inside: avoid; }
+        .worksheet-section h2 { color: #1a3a5c; font-size: 13pt; border-bottom: 1px solid #aab8c4; padding-bottom: 4px; margin: 0 0 7px; }
+        .worksheet-section p, .worksheet-section li { font-size: 10pt; line-height: 1.45; margin: 0 0 6px; }
+        .worksheet-section ul { margin: 7px 0 8px 20px; padding-left: 16px; }
+        .worksheet-prompt { font-weight: 600; margin-top: 8px !important; }
+        .writing-lines { display: block; width: 100%; background-image: linear-gradient(to bottom, transparent calc(100% - 1px), #aab2ba calc(100% - 1px)); background-size: 100% 26px; }
+        .lines-2 { height: 52px; } .lines-3 { height: 78px; }
+        .worksheet-footer { display: block; text-align: center; border-top: 1px solid #aab8c4; padding-top: 10px; margin-top: 22px; font-size: 9pt; font-style: italic; }
+        @media screen and (max-width: 650px) {
+            .printable-guide-page { padding: 12px; }
+            article.printable-guide { padding: 20px 16px; }
+            .print-toolbar > * { width: 100%; text-align: center; }
+            .worksheet-meta { grid-template-columns: 1fr; gap: 12px; }
+        }
+        @media print {
+            @page { size: auto; margin: 0.5in; }
+            html, body { display: block !important; width: auto !important; min-height: 0 !important; height: auto !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; background: #fff !important; color: #111 !important; }
+            .printable-guide-page { display: block !important; width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
+            .print-toolbar, .print-help { display: none !important; }
+            article.printable-guide { display: block !important; visibility: visible !important; position: static !important; width: 100% !important; height: auto !important; max-height: none !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; opacity: 1 !important; background: #fff !important; color: #111 !important; box-shadow: none !important; border: 0 !important; }
+            .worksheet-heading, .worksheet-meta, .worksheet-section, .worksheet-footer { display: block !important; visibility: visible !important; opacity: 1 !important; color: #111 !important; }
+            .worksheet-meta { display: grid !important; grid-template-columns: 1fr 1fr !important; }
+            .worksheet-heading h1, .worksheet-heading p, .worksheet-section h2, .worksheet-section p, .worksheet-section li { color: #111 !important; visibility: visible !important; }
+            .writing-lines { display: block !important; height: auto !important; min-height: 52px !important; background-image: linear-gradient(to bottom, transparent calc(100% - 1px), #999 calc(100% - 1px)) !important; background-size: 100% 26px !important; }
+            .worksheet-section { break-inside: auto !important; page-break-inside: auto !important; }
+            .worksheet-section h2 { break-after: avoid; page-break-after: avoid; }
+        }
+    </style>
 </head>
 <body class="standalone-print-guide">
     <main class="printable-guide-page">
