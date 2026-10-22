@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore Bible passages connected by shared themes, quotations, and ideas.">
+    <title>Scripture Cross-Reference Tool - My Bible Belt</title>
+    <link rel="stylesheet" href="styles.css?v=20261022-1">
+    <style>
+        .crossref-intro, .crossref-search, .crossref-results, .crossref-note {
+            background: white; padding: 24px; border-radius: 10px; margin-bottom: 22px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.05);
+        }
+        .crossref-intro h2, .crossref-search h3, .crossref-results h3, .crossref-note h3 { color: #1a3a5c; margin-bottom: 10px; }
+        .crossref-search label { display: block; font-weight: 600; margin: 12px 0 6px; }
+        .crossref-search input, .crossref-search select {
+            width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font: inherit;
+        }
+        .crossref-search-controls { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 14px; align-items: end; }
+        .crossref-search button { margin-top: 14px; }
+        .crossref-results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+        .crossref-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; background: #fbfcfe; }
+        .crossref-card h4 { color: #2c5f8a; margin-bottom: 8px; }
+        .crossref-card p { margin-bottom: 10px; }
+        .crossref-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .crossref-links a { display: inline-block; background: #eaf1f8; color: #1a3a5c; padding: 6px 9px; border-radius: 5px; text-decoration: none; font-weight: 600; }
+        .crossref-links a:hover { background: #d7e6f4; text-decoration: underline; }
+        .crossref-meta { color: #666; font-size: .9em; }
+        .crossref-status { margin-top: 14px; color: #555; }
+        .crossref-empty { padding: 16px; border-left: 4px solid #d6a63b; background: #fff9e8; border-radius: 5px; }
+        .crossref-back { display: inline-block; margin: 0 0 20px; }
+        @media (max-width: 620px) { .crossref-search-controls { grid-template-columns: 1fr; } .crossref-intro, .crossref-search, .crossref-results, .crossref-note { padding: 18px; } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>My Bible Belt</h1>
+            <p class="tagline">“Study to shew thyself approved unto God” - 2 Timothy 2:15</p>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Daily Devotional</a></li>
+                <li><a href="bible-basics.html">Bible Basics</a></li>
+                <li><a href="reading-plan.html">Reading Plan</a></li>
+                <li><a href="bible-study.html" class="active">Bible Study</a></li>
+                <li><a href="prayer.html">Prayer</a></li>
+                <li><a href="prophecy.html">Prophecy</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="crossref-intro">
+            <h2>Scripture Cross-Reference Tool</h2>
+            <p>Explore passages that connect through a shared subject, quotation, image, or idea. Search by a topic (such as <em>grace</em>, <em>Sabbath</em>, or <em>resurrection</em>) or by a passage included in a study set (such as <em>John 3:16</em>).</p>
+            <p class="crossref-meta">Passage suggestions are curated study aids, not an exhaustive or authoritative list. Open each passage and read its surrounding context before drawing conclusions.</p>
+        </section>
+        <section class="crossref-search" aria-labelledby="crossref-search-title">
+            <h3 id="crossref-search-title">Find related passages</h3>
+            <form id="crossrefForm">
+                <div class="crossref-search-controls">
+                    <div>
+                        <label for="crossrefQuery">Topic or Scripture reference</label>
+                        <input id="crossrefQuery" name="q" type="search" placeholder="e.g., grace, John 3:16, Sabbath" autocomplete="off">
+                    </div>
+                    <div>
+                        <label for="crossrefCategory">Browse a topic</label>
+                        <select id="crossrefCategory" name="topic">
+                            <option value="">All topics</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="submit-btn" type="submit">Find Cross-References</button>
+                <button class="refresh-btn" id="clearCrossref" type="button">Clear</button>
+            </form>
+            <p class="crossref-status" id="crossrefStatus" aria-live="polite">Browse all study topics or enter a keyword or passage.</p>
+        </section>
+        <section class="crossref-results" aria-labelledby="crossref-results-title">
+            <h3 id="crossref-results-title">Study sets</h3>
+            <div class="crossref-results-grid" id="crossrefResults"></div>
+        </section>
+        <section class="crossref-note">
+            <h3>A simple way to study cross-references</h3>
+            <ol>
+                <li>Read the main passage and note its audience, setting, and surrounding argument.</li>
+                <li>Open related passages and check whether they share a subject, quote, image, or wording.</li>
+                <li>Notice both the connections and the differences; don't assume similar words always mean the same thing.</li>
+                <li>Compare translations if useful, and let the context of each passage guide your conclusion.</li>
+            </ol>
+        </section>
+        <a class="crossref-back" href="bible-study.html">← Back to Bible Study Resources</a>
+    </main>
+    <footer>
+        <p>“All scripture is given by inspiration of God” - 2 Timothy 3:16</p>
+        <p>My Bible Belt &copy; 2026 | Non-denominational | Sabbath-Centered</p>
+    </footer>
+    <script src="cross-reference.js?v=20261022-1"></script>
+</body>
+</html>
