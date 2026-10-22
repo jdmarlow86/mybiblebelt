@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore related Bible passages by topic or Scripture reference, with context reminders and reading links.">
+    <title>Scripture Cross-Reference Tool - My Bible Belt</title>
+    <link rel="stylesheet" href="styles.css?v=20261022-1">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>My Bible Belt</h1>
+            <p class="tagline">"Study to shew thyself approved unto God" - 2 Timothy 2:15</p>
+        </div>
+        <nav aria-label="Main navigation">
+            <ul>
+                <li><a href="index.html">Daily Devotional</a></li>
+                <li><a href="bible-basics.html">Bible Basics</a></li>
+                <li><a href="reading-plan.html">Reading Plan</a></li>
+                <li><a href="bible-study.html" class="active">Bible Study</a></li>
+                <li><a href="prayer.html">Prayer</a></li>
+                <li><a href="prophecy.html">Prophecy</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <h2>Scripture Cross-Reference Tool</h2>
+            <p>Explore how Bible passages connect through shared themes, quotations, and ideas.</p>
+        </section>
+
+        <section class="crossref-search-panel" aria-labelledby="crossref-search-title">
+            <h3 id="crossref-search-title">Find related passages</h3>
+            <p>Enter a Bible reference (such as <strong>John 3:16</strong> or <strong>Exodus 20:8-11</strong>) or a topic (such as <strong>Sabbath</strong>, <strong>grace</strong>, or <strong>resurrection</strong>).</p>
+            <form id="crossrefForm" class="crossref-form">
+                <label for="crossrefQuery">Bible reference or topic</label>
+                <div class="crossref-input-row">
+                    <input id="crossrefQuery" name="query" type="search" placeholder="Try “Sabbath” or “John 3:16”" autocomplete="off" required>
+                    <button class="submit-btn" type="submit">Find References</button>
+                </div>
+            </form>
+            <div class="crossref-examples" aria-label="Example topics">
+                <span>Try:</span>
+                <button type="button" class="crossref-chip" data-query="Sabbath">Sabbath</button>
+                <button type="button" class="crossref-chip" data-query="salvation">Salvation</button>
+                <button type="button" class="crossref-chip" data-query="state of the dead">State of the dead</button>
+                <button type="button" class="crossref-chip" data-query="second coming">Second Coming</button>
+                <button type="button" class="crossref-chip" data-query="God's law">God's law</button>
+                <button type="button" class="crossref-chip" data-query="grace">Grace</button>
+            </div>
+            <p class="crossref-status" id="crossrefStatus" role="status" aria-live="polite">Choose a topic or enter a reference to begin.</p>
+        </section>
+
+        <section class="crossref-results-section" aria-labelledby="crossref-results-title">
+            <div class="crossref-results-heading">
+                <h3 id="crossref-results-title">Related passages</h3>
+                <p id="crossrefResultSummary">Results will appear here.</p>
+            </div>
+            <div id="crossrefResults" class="crossref-results" aria-live="polite">
+                <div class="crossref-empty">
+                    <h4>Start with a passage or topic</h4>
+                    <p>This tool uses a curated study index of common Bible themes and references. It does not claim to search every verse in the Bible.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="study-article crossref-howto">
+            <h3>How to use cross-references well</h3>
+            <div class="article-content">
+                <ol>
+                    <li>Read the full paragraph or chapter around your starting verse.</li>
+                    <li>Open each related passage and read it in its own setting.</li>
+                    <li>Ask whether the connection is a quotation, shared theme, parallel account, or similar wording.</li>
+                    <li>Notice differences as well as similarities; a shared word does not automatically mean two passages teach the same thing.</li>
+                </ol>
+                <p>Passage links open the King James Version on BibleGateway for convenient reading. You can change the translation on that site.</p>
+            </div>
+        </section>
+
+        <p class="crossref-back-link"><a href="bible-study.html">← Back to Bible Study Resources</a></p>
+    </main>
+
+    <footer>
+        <p>"All scripture is given by inspiration of God" - 2 Timothy 3:16</p>
+        <p>My Bible Belt &copy; 2026 | Non-denominational | Sabbath-Centered</p>
+    </footer>
+    <script src="scripture-cross-reference.js?v=20261022-1"></script>
+</body>
+</html>
