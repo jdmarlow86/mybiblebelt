@@ -108,6 +108,7 @@
     const planSelect = document.getElementById("readingPlanSelect");
     const readingList = document.getElementById("readingList");
     const readingFilter = document.getElementById("readingFilter");
+    const showReadingCheckboxes = document.getElementById("showReadingCheckboxes");
     const progressText = document.getElementById("progressText");
     const progressBar = document.getElementById("progressBar");
     const progressFill = document.getElementById("progressFill");
@@ -148,6 +149,7 @@
         const plan = plans[planId];
         const state = getState(planId);
         const filter = readingFilter.value;
+        readingList.classList.toggle("hide-reading-checkboxes", !showReadingCheckboxes.checked);
         readingList.replaceChildren();
 
         plan.readings.forEach((reading, index) => {
@@ -230,6 +232,7 @@
     });
 
     readingFilter.addEventListener("change", renderList);
+    showReadingCheckboxes.addEventListener("change", renderList);
 
     detailComplete.addEventListener("change", () => {
         const planId = planSelect.value;
