@@ -227,10 +227,219 @@
         return card;
     }
 
+    const specificReferences = [
+        { source: "John 3:16", related: [
+            ["Romans 5:6-8", "God's love demonstrated", "Paul describes God's love shown while humanity was still sinful."],
+            ["Ephesians 2:4-10", "Saved by grace", "This passage explains God's mercy, grace, faith, and the good works that follow."],
+            ["1 John 4:9-10", "Love made visible", "John describes God's love revealed by sending His Son."],
+            ["Romans 10:9-13", "Calling on the Lord", "Paul discusses faith, confession, and the promise of salvation."]
+        ]},
+        { source: "Genesis 2:2-3", related: [
+            ["Exodus 20:8-11", "The Sabbath commandment", "The commandment points back to God's creation and rest on the seventh day."],
+            ["Mark 2:27-28", "The Sabbath's purpose", "Jesus speaks about the Sabbath being made for humanity."],
+            ["Hebrews 4:1-11", "Entering God's rest", "Read this larger section to consider the writer's use of rest imagery."]
+        ]},
+        { source: "Exodus 20:8-11", related: [
+            ["Genesis 2:1-3", "Creation and the seventh day", "The creation account provides the foundation recalled in the commandment."],
+            ["Deuteronomy 5:12-15", "A second telling of the commandment", "Compare this version, which also recalls deliverance from slavery."],
+            ["Mark 2:27-28", "Jesus and the Sabbath", "Jesus discusses the Sabbath's purpose and His authority."]
+        ]},
+        { source: "Deuteronomy 6:4-5", related: [
+            ["Matthew 22:34-40", "Love God and neighbor", "Jesus identifies love for God and neighbor as the great commandments."],
+            ["Mark 12:28-34", "The greatest commandment", "Mark records a parallel conversation about wholehearted love for God."],
+            ["Luke 10:25-28", "Love and eternal life", "Luke records the commandments in a discussion about inheriting eternal life."]
+        ]},
+        { source: "Matthew 22:37-40", related: [
+            ["Deuteronomy 6:4-5", "Love God wholeheartedly", "Jesus draws on Israel's confession and command to love God."],
+            ["Leviticus 19:18", "Love your neighbor", "This is the command Jesus pairs with loving God."],
+            ["Romans 13:8-10", "Love fulfills the law", "Paul explains how love of neighbor relates to the commandments."]
+        ]},
+        { source: "John 1:1-3", related: [
+            ["Genesis 1:1-3", "In the beginning", "Compare the opening language and creation themes in Genesis and John."],
+            ["Colossians 1:15-17", "Christ and creation", "Paul describes Christ's role in relation to all created things."],
+            ["Hebrews 1:1-3", "God speaks through the Son", "Hebrews describes the Son and His relation to creation."]
+        ]},
+        { source: "John 1:14", related: [
+            ["Matthew 1:18-23", "Jesus' birth and Immanuel", "Matthew recounts Jesus' birth and the name Immanuel."],
+            ["Philippians 2:5-11", "Christ's humility", "Paul describes Christ's self-humbling and exaltation."],
+            ["Hebrews 2:14-18", "Sharing in humanity", "The passage explains why the Son shared in flesh and blood."]
+        ]},
+        { source: "John 14:15", related: [
+            ["1 John 5:2-3", "Love and God's commandments", "John connects love for God with keeping His commandments."],
+            ["1 John 2:3-6", "Knowing God", "The passage discusses knowing God and walking as Jesus walked."],
+            ["Matthew 22:34-40", "Love as the great commandment", "Jesus summarizes the law and prophets through love for God and neighbor."]
+        ]},
+        { source: "Ecclesiastes 9:5-6", related: [
+            ["Psalm 146:3-4", "Human mortality", "The psalm contrasts mortal human plans with trust in God."],
+            ["John 11:11-14", "Jesus and Lazarus", "Jesus uses sleep as a figure for Lazarus' death and then speaks plainly."],
+            ["1 Thessalonians 4:13-18", "Hope in the resurrection", "Paul comforts grieving believers with the resurrection at Christ's coming."]
+        ]},
+        { source: "1 Thessalonians 4:13-18", related: [
+            ["John 11:11-27", "Lazarus and resurrection", "Jesus speaks of resurrection while comforting Martha."],
+            ["1 Corinthians 15:51-55", "Death defeated", "Paul describes transformation and the defeat of death."],
+            ["John 14:1-3", "Jesus promises to return", "Jesus promises to come again and receive His followers."]
+        ]},
+        { source: "1 Corinthians 15:51-55", related: [
+            ["1 Thessalonians 4:13-18", "The Lord's coming and resurrection", "Both passages describe Christian hope connected with Christ's return."],
+            ["Isaiah 25:8", "Death swallowed up", "Paul's language echoes the prophetic promise that death will be swallowed up."],
+            ["Revelation 21:1-4", "Death and sorrow removed", "Revelation describes the future removal of death and pain."]
+        ]},
+        { source: "Ephesians 2:8-10", related: [
+            ["Romans 3:21-24", "Justified by grace", "Paul describes righteousness and justification as gifts of grace."],
+            ["Titus 2:11-14", "Grace trains us", "Grace not only saves but teaches believers to live godly lives."],
+            ["James 2:14-26", "Faith shown in action", "Compare how James describes living faith demonstrated by works."]
+        ]},
+        { source: "Romans 3:23-24", related: [
+            ["Romans 6:23", "Sin and God's gift", "Paul contrasts sin's wages with God's gift of eternal life."],
+            ["Ephesians 2:1-10", "Made alive by grace", "The passage explains humanity's need and God's gracious response."],
+            ["Titus 3:4-7", "Saved by mercy", "Paul emphasizes God's mercy rather than human righteous deeds as the source of salvation."]
+        ]},
+        { source: "James 2:14-26", related: [
+            ["Ephesians 2:8-10", "Grace and good works", "Read the whole passage to see both salvation as a gift and the resulting good works."],
+            ["Romans 4:1-5", "Abraham and faith", "Paul discusses Abraham's faith and righteousness apart from boasting in works."],
+            ["Galatians 5:6", "Faith working through love", "Paul describes faith expressing itself through love."]
+        ]},
+        { source: "Daniel 7:9-14", related: [
+            ["Matthew 24:30-31", "The Son of Man comes", "Jesus uses Son of Man and coming imagery in His teaching."],
+            ["Revelation 1:7", "Every eye will see Him", "Revelation describes the appearing of Christ in public, prophetic language."],
+            ["Mark 14:61-62", "Jesus' answer before the council", "Jesus applies Son of Man imagery in His response."]
+        ]},
+        { source: "Matthew 24:30-31", related: [
+            ["Daniel 7:13-14", "The Son of Man", "Jesus' imagery draws on Daniel's vision of the Son of Man."],
+            ["1 Thessalonians 4:13-18", "Gathering at Christ's coming", "Paul describes the Lord's descent and the gathering of believers."],
+            ["Revelation 1:7", "The appearing of Christ", "The verse emphasizes that every eye will see Him."]
+        ]},
+        { source: "Revelation 20:11-15", related: [
+            ["Daniel 7:9-10", "The heavenly court", "Daniel's vision also portrays a court and books opened for judgment."],
+            ["John 5:28-29", "Resurrection and judgment", "Jesus speaks of a coming resurrection with different outcomes."],
+            ["Revelation 21:1-4", "After judgment: all things new", "The next vision describes the end of death, mourning, and pain."]
+        ]},
+        { source: "Jeremiah 31:31-34", related: [
+            ["Hebrews 8:6-13", "The new covenant quoted", "Hebrews quotes Jeremiah's new-covenant promise."],
+            ["Ezekiel 36:25-27", "A new heart and spirit", "Ezekiel describes cleansing and inward renewal."],
+            ["Hebrews 10:15-18", "Forgiveness and the law in the heart", "Hebrews returns to the promise of the Spirit, the law in hearts, and forgiveness."]
+        ]},
+        { source: "Micah 6:8", related: [
+            ["Matthew 23:23", "Justice, mercy, and faith", "Jesus criticizes neglecting weightier matters while focusing on lesser details."],
+            ["Zechariah 7:8-10", "Practice justice and mercy", "The prophet calls for justice, compassion, and care for the vulnerable."],
+            ["James 1:27", "Practical religion", "James describes care for vulnerable people and keeping oneself unstained by the world."]
+        ]},
+        { source: "Genesis 3:19", related: [
+            ["Ecclesiastes 3:19-20", "Human mortality", "Ecclesiastes reflects on the mortality shared by humans and animals."],
+            ["Psalm 104:29-30", "Life and breath", "The psalm describes creatures depending on God's breath for life."],
+            ["1 Corinthians 15:42-49", "The resurrection body", "Paul contrasts the mortal body with the body raised in incorruption."]
+        ]}
+    ];
+
+    function canonicalBook(book) {
+        const key = normalize(book).replace(/\bfirst\b/g, "1").replace(/\bsecond\b/g, "2").replace(/\bthird\b/g, "3").replace(/\s+/g, " ");
+        const aliases = {
+            "psalm": "psalms", "song of solomon": "song of songs", "canticles": "song of songs",
+            "revelations": "revelation", "apocalypse": "revelation"
+        };
+        return aliases[key] || key;
+    }
+
+    function parseReference(reference) {
+        const match = reference.trim().match(/^(.+?)\s+(\d+)(?::(\d+)(?:\s*[-–]\s*(\d+))?)?$/i);
+        if (!match) return null;
+        const book = canonicalBook(match[1]);
+        const chapter = Number(match[2]);
+        const verseStart = match[3] ? Number(match[3]) : null;
+        const verseEnd = match[4] ? Number(match[4]) : verseStart;
+        if (!book || !chapter || (verseStart !== null && !verseStart)) return null;
+        return { book, chapter, verseStart, verseEnd };
+    }
+
+    function referenceOverlaps(queryReference, indexedReference) {
+        const query = parseReference(queryReference);
+        const indexed = parseReference(indexedReference);
+        if (!query || !indexed || query.book !== indexed.book || query.chapter !== indexed.chapter) return false;
+        if (query.verseStart === null || indexed.verseStart === null) return true;
+        return query.verseStart <= indexed.verseEnd && indexed.verseStart <= query.verseEnd;
+    }
+
+    function renderReferenceResults(rawQuery, related, matchedTopics) {
+        results.replaceChildren();
+        const card = document.createElement("article");
+        card.className = "crossref-topic-card";
+        addText(card, "h4", "", "Cross-references for " + rawQuery.trim());
+        addText(card, "p", "crossref-reference-intro", "These are curated study connections, not a claim that the passages are identical in meaning. Read each passage in its surrounding context.");
+        const list = document.createElement("div");
+        list.className = "crossref-passage-list";
+        related.forEach(([reference, label, note]) => {
+            const item = document.createElement("div");
+            item.className = "crossref-passage";
+            const heading = document.createElement("div");
+            heading.className = "crossref-passage-heading";
+            const link = document.createElement("a");
+            link.href = passageUrl(reference);
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = reference;
+            heading.appendChild(link);
+            addText(heading, "span", "crossref-passage-label", label);
+            item.appendChild(heading);
+            addText(item, "p", "", note);
+            list.appendChild(item);
+        });
+        card.appendChild(list);
+        results.appendChild(card);
+
+        if (matchedTopics.length) {
+            const topicCard = document.createElement("article");
+            topicCard.className = "crossref-topic-card";
+            addText(topicCard, "h4", "", "Topics containing this reference");
+            const topicList = document.createElement("ul");
+            matchedTopics.forEach(topic => addText(topicList, "li", "", topic.topic));
+            topicCard.appendChild(topicList);
+            results.appendChild(topicCard);
+        }
+        summary.textContent = related.length + " curated cross-reference" + (related.length === 1 ? "" : "s") + " found" +
+            (matchedTopics.length ? "; also found in " + matchedTopics.length + " topic group" + (matchedTopics.length === 1 ? "" : "s") : "") + ".";
+        status.textContent = "Showing cross-references for “" + rawQuery.trim() + "”.";
+    }
+
     function search(rawQuery) {
         const query = normalize(rawQuery);
         if (!query) {
             status.textContent = "Enter a Bible reference or topic to search.";
+            return;
+        }
+
+        const parsed = parseReference(rawQuery);
+        if (parsed) {
+            const exact = specificReferences.find(item => normalize(item.source) === query);
+            const related = exact ? exact.related : [];
+            const matchedTopics = crossReferences.filter(topic =>
+                topic.passages.some(([reference]) => referenceOverlaps(rawQuery, reference))
+            );
+            if (related.length || matchedTopics.length) {
+                renderReferenceResults(rawQuery, related, matchedTopics);
+                if (!related.length) {
+                    const note = document.createElement("p");
+                    note.className = "crossref-match-note";
+                    note.textContent = "This reference overlaps an indexed passage, but no dedicated verse-to-verse cross-reference set is available yet.";
+                    results.prepend(note);
+                    summary.textContent = "Found indexed passage matches; no dedicated cross-reference set yet.";
+                }
+                return;
+            }
+            results.replaceChildren();
+            const empty = document.createElement("div");
+            empty.className = "crossref-empty";
+            addText(empty, "h4", "", "No indexed cross-references for this reference yet");
+            addText(empty, "p", "", "The reference is valid search text, but it is not yet connected to a specific cross-reference set in this library. You can open it directly or search a related topic.");
+            const link = document.createElement("a");
+            link.href = passageUrl(rawQuery.trim());
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.className = "submit-btn crossref-direct-link";
+            link.textContent = "Read " + rawQuery.trim() + " on BibleGateway";
+            empty.appendChild(link);
+            results.appendChild(empty);
+            summary.textContent = "No dedicated cross-reference set found.";
+            status.textContent = "No indexed connections yet; direct reading link provided.";
             return;
         }
 
