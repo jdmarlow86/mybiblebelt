@@ -160,6 +160,7 @@
 
             const item = document.createElement("article");
             item.className = "reading-list-item" + (index === activeDay ? " selected" : "") + (isComplete ? " completed" : "");
+            item.hidden = !readingCheckboxesVisible;
 
             const checkbox = document.createElement("input");
             checkbox.type = "checkbox";
