@@ -13,8 +13,7 @@
         .print-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
         .print-toolbar a, .print-toolbar button { font: inherit; padding: 10px 16px; border-radius: 5px; }
         .print-toolbar a { color: #1a3a5c; background: #fff; border: 1px solid #c9d3dc; text-decoration: none; }
-        .print-toolbar button { color: #fff; background: #2c5f8a; border: 0; cursor: pointer; }\n        .print-toolbar button:disabled { opacity: 0.65; cursor: wait; }
-        .print-help { margin: 0 0 18px; padding: 12px 15px; border: 1px solid #dce4eb; border-radius: 7px; background: #fff; color: #465563; }
+        .print-toolbar button { color: #fff; background: #2c5f8a; border: 0; cursor: pointer; }\n        .print-help { margin: 0 0 18px; padding: 12px 15px; border: 1px solid #dce4eb; border-radius: 7px; background: #fff; color: #465563; }
         article.printable-guide { display: block; width: 100%; padding: 38px; background: #fff; color: #111; }
         .worksheet-heading { display: block; text-align: center; border-bottom: 2px solid #1a3a5c; padding-bottom: 14px; margin-bottom: 20px; }
         .worksheet-brand { font-size: 9pt; letter-spacing: 1px; margin: 0 0 6px; }
@@ -56,9 +55,9 @@
     <main class="printable-guide-page">
         <div class="print-toolbar">
             <a href="bible-study.html" class="secondary-btn">← Back to Bible Study</a>
-            <button type="button" class="submit-btn" id="printWorksheet" disabled>Loading worksheet…</button>
+            <button type="button" class="submit-btn" id="printWorksheet">Print / Save as PDF</button>
         </div>
-        <p class="print-help" id="printHelp" role="status">Loading the worksheet… The print button will become available when the page is ready. Once the worksheet appears, press <strong>Print / Save as PDF</strong> to open print preview.</p>
+        <p class="print-help" id="printHelp">Use this reusable worksheet to record observations, interpretation, cross-references, application, and questions. Select <strong>Print / Save as PDF</strong> when you are ready to print or save a copy.</p>
         <article class="printable-guide">
             <div class="worksheet-heading">
                 <p class="worksheet-brand">MY BIBLE BELT · NON-DENOMINATIONAL · SABBATH-CENTERED</p>
