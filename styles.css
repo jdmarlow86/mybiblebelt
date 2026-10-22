@@ -1471,3 +1471,23 @@ footer p:last-child {
         width: 100%;
     }
 }
+
+
+/* Labels for the kind of Scripture cross-reference */
+.crossref-connection-type {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #d8e2ec;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #40566d;
+    padding: 2px 8px;
+    font-size: .76rem;
+    line-height: 1.5;
+    font-weight: 600;
+}
+.crossref-reference-intro {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
