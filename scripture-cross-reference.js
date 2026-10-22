@@ -27,7 +27,7 @@
         ]},
         { topic: "The Second Coming of Christ", tags: ["second coming", "return of jesus", "jesus returns", "advent", "coming of christ", "rapture", "prophecy"], passages: [
             ["John 14:1-3", "Jesus promises to return", "Jesus tells His disciples He will come again and receive them."],
-            ["Matthew 24:-conscious", "Signs and watchfulness", "Read Matthew 24 in full for Jesus' teaching about watchfulness and His coming."],
+            ["Matthew 24:3-44", "Signs and watchfulness", "Read Matthew 24 in full for Jesus' teaching about watchfulness and His coming."],
             ["Acts 1:9-11", "The ascension and return", "The messengers tell the disciples Jesus will return."],
             ["1 Thessalonians 4:13-18", "Resurrection at Christ's coming", "Paul describes the Lord's descent and the gathering of believers."],
             ["Revelation 1:7", "Every eye will see Him", "The verse emphasizes the public, visible character of Christ's appearing."],
