@@ -108,7 +108,8 @@
     const planSelect = document.getElementById("readingPlanSelect");
     const readingList = document.getElementById("readingList");
     const readingFilter = document.getElementById("readingFilter");
-    const showReadingCheckboxes = document.getElementById("showReadingCheckboxes");
+    const toggleReadingCheckboxes = document.getElementById("toggleReadingCheckboxes");
+    let readingCheckboxesVisible = true;
     const progressText = document.getElementById("progressText");
     const progressBar = document.getElementById("progressBar");
     const progressFill = document.getElementById("progressFill");
@@ -149,7 +150,7 @@
         const plan = plans[planId];
         const state = getState(planId);
         const filter = readingFilter.value;
-        readingList.classList.toggle("hide-reading-checkboxes", !showReadingCheckboxes.checked);
+        readingList.classList.toggle("hide-reading-checkboxes", !readingCheckboxesVisible);
         readingList.replaceChildren();
 
         plan.readings.forEach((reading, index) => {
@@ -232,7 +233,12 @@
     });
 
     readingFilter.addEventListener("change", renderList);
-    showReadingCheckboxes.addEventListener("change", renderList);
+    toggleReadingCheckboxes.addEventListener("click", () => {
+        readingCheckboxesVisible = !readingCheckboxesVisible;
+        toggleReadingCheckboxes.textContent = readingCheckboxesVisible ? "Hide" : "Show";
+        toggleReadingCheckboxes.setAttribute("aria-pressed", String(readingCheckboxesVisible));
+        renderList();
+    });
 
     detailComplete.addEventListener("change", () => {
         const planId = planSelect.value;
