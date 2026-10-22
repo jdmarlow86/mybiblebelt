@@ -197,14 +197,6 @@ document.addEventListener('DOMContentLoaded', function() {
     configurePrayerForm();
     loadApprovedPrayerRequests();
 
-    const printStudyGuideButton = document.getElementById('printStudyGuide');
-    if (printStudyGuideButton) {
-        printStudyGuideButton.addEventListener('click', function() {
-            document.body.classList.add('print-study-guide');
-            window.print();
-        });
-        window.addEventListener('afterprint', function() {
-            document.body.classList.remove('print-study-guide');
-        });
-    }
+    // The Bible Study page's worksheet link only navigates to the standalone page.
+    // Print preview is launched by the button on print-study-guide.html.
 });
