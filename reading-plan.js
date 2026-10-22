@@ -150,7 +150,7 @@
         const plan = plans[planId];
         const state = getState(planId);
         const filter = readingFilter.value;
-        readingList.classList.toggle("hide-reading-checkboxes", !readingCheckboxesVisible);
+        readingList.classList.toggle("hide-reading-cards", !readingCheckboxesVisible);
         readingList.replaceChildren();
 
         plan.readings.forEach((reading, index) => {
