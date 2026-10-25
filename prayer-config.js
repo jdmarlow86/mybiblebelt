@@ -5,6 +5,6 @@ window.PRAYER_CONFIG = {
     // Google Forms > Send > Embed HTML: copy only the URL from the iframe src attribute.
     formEmbedUrl: "",
     // Publish an APPROVED-ONLY Google Sheets tab to the web as CSV, then paste its URL here.
-    // Required headers: request, category, display name
+    // Required headers: request, category, display name, date (public approval/publication date)
     approvedRequestsCsvUrl: ""
 };
