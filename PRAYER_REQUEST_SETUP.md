@@ -2,22 +2,30 @@
 
 The prayer page is a static GitHub Pages site. It must not collect submissions into browser storage: browser storage is local to one visitor and is not a private inbox. The page now expects a hosted Google Form and a public feed containing only requests a moderator has explicitly approved.
 
-## 1. Create the private submission form
+The Prayer Center now has a **native form built directly into `prayer.html`**; visitors do not need to open or embed a Google Form. The site is hosted on static GitHub Pages, so the form needs a separate secure server-side endpoint before it can accept submissions. The form is intentionally disabled for sending until that endpoint is configured. Never store requests in browser storage or send them directly to the public board.
 
-1. Sign in to the Google account that will administer prayer requests and create a Google Form.
-2. Add these fields:
-   - **Name (optional)** — short answer.
-   - **Prayer request** — paragraph, required.
-   - **Category** — multiple choice or dropdown with Healing, Guidance, Family, Thanksgiving, Spiritual Growth, and Other.
-   - **Sharing preference** — required multiple choice with exactly these choices:
-     - **Private — keep this request off the public prayer board**
-     - **Public — I give permission for this request to be considered for public display after review**
-3. Explain that public requests are never posted automatically and must be explicitly approved. A Public choice is permission to consider publication, not a guarantee that it will be published.
-4. In Form settings, do not collect email addresses unless you have a clear need and explain it to submitters. Do not allow respondents to view response summaries.
-5. Set the form confirmation message to an encouraging note such as: “Thank you for sharing your prayer request. Your request has been submitted. If you chose Private, it will remain off the public prayer board. If you chose Public, it will only be displayed if reviewed and explicitly approved. May you find comfort in God’s promise: ‘Casting all your care upon him; for he careth for you’ (1 Peter 5:7).”
-6. In **Responses**, link the form to a Google Sheet. Keep this response spreadsheet private; do not publish it to the web or share it publicly.
-7. In Google Forms, use **Send → Embed HTML** and copy the URL inside the iframe `src` attribute. It should be a Google Forms `viewform` URL.
+## 1. Connect a private submission endpoint
 
+Use a server-side endpoint (for example, a Google Apps Script web app connected to a private Google spreadsheet) to receive and store requests. The endpoint must:
+
+- Accept HTTPS POST requests with JSON fields `name`, `category`, `request`, `sharing`, and `website`.
+- Validate and limit the submitted fields; reject requests with an unexpected sharing value; ignore likely spam submissions where the honeypot `website` field is filled.
+- Store **every submission only in a private response spreadsheet**. Do not publish that spreadsheet or make it accessible to the public.
+- Return a JSON response with `{"success": true}` only after the private save succeeds, and a non-success response if it fails.
+- Never copy a submission into the public approved-requests feed automatically, even when the user selected Public.
+
+Once the endpoint has been deployed and tested, set `submissionEndpoint` in `prayer-config.js` to its HTTPS URL. Do not put secrets, private spreadsheet URLs, or credentials in this public configuration file.
+
+### Required form choices and privacy rules
+
+The native form includes an optional name, category, prayer text, and a required sharing preference:
+
+- **Private** — keep this request off the public prayer board.
+- **Public** — permission for the request to be considered for public display after review.
+
+A Public choice is permission to consider publication, not a guarantee that the request will be posted. Every request starts private and must be reviewed and explicitly approved before it is manually copied into the public approved-requests sheet. Do not collect email addresses unless there is a clear need and the submitter is told how they will be used.
+
+The form confirmation message should be encouraging, for example: “Thank you for sharing your prayer request. Your request will be reviewed according to your sharing preference. Public requests will only appear after review and explicit approval. May you find comfort in God’s promise: ‘Casting all your care upon him; for he careth for you’ (1 Peter 5:7).”
 
 ## 1A. Send a notification to the Proton Mail inbox (optional)
 
@@ -82,7 +90,7 @@ Commit the file to the `main` branch. GitHub Pages will redeploy the site. Test 
 
 ## Important limitations
 
-- Google Forms and Sheets are separate Google services; this repository cannot create or configure them inside your Google account. You must create the form and spreadsheets and supply their URLs.
+- The native form is part of this repository, but the site cannot create a secure server-side endpoint or private spreadsheet inside your Google account. You must deploy and test the endpoint and supply its URL.
 - The website reads only the published CSV feed and does not provide an admin dashboard or moderation buttons. Approval is performed by manually copying reviewed, Public-preference requests into the separate public spreadsheet. The board can sort by “Newest first” or “Oldest first” using the public posting date. Private submissions must never be copied into the public sheet.
 - Do not put credentials, private response-sheet URLs, or secrets in `prayer-config.js`; it is a public file.
 - Avoid collecting highly sensitive personal details. A public prayer request can be copied or shared by visitors even if later removed.
