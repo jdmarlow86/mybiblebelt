@@ -1491,3 +1491,25 @@ footer p:last-child {
     line-height: 1.6;
     margin-bottom: 12px;
 }
+
+ 
+/* Prayer center public message-board sorting */
+.prayer-board-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 16px 0 20px;
+}
+.prayer-board-controls label { color: #333; font-weight: 600; }
+.prayer-board-controls select {
+    min-width: 160px;
+    padding: 9px 12px;
+    border: 1px solid #cbd5df;
+    border-radius: 6px;
+    background: #fff;
+    color: #243746;
+    font: inherit;
+}
+.request-item { overflow-wrap: anywhere; }
+.request-meta { line-height: 1.5; }
