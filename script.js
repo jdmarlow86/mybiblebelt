@@ -89,9 +89,8 @@ function loadDevotional() {
     }
 }
 
-// The prayer form is native to this page. Submissions remain disabled until
-// a secure server-side endpoint is configured; static GitHub Pages cannot safely
-// store or email prayer requests on its own.
+// Submit through a hidden HTML form/iframe because Apps Script web apps do not
+// reliably expose JSON responses to cross-origin fetch() from GitHub Pages.
 function configurePrayerForm() {
     const form = document.getElementById('prayerRequestForm');
     const status = document.getElementById('prayerFormStatus');
@@ -108,9 +107,42 @@ function configurePrayerForm() {
         return;
     }
 
-    form.addEventListener('submit', async function(event) {
+    const frameName = 'prayerSubmissionFrame';
+    let iframe = document.getElementById(frameName);
+    if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.name = frameName;
+        iframe.id = frameName;
+        iframe.title = 'Prayer request submission';
+        iframe.hidden = true;
+        document.body.appendChild(iframe);
+    }
+
+    let pendingToken = null;
+    let timeoutId = null;
+    window.addEventListener('message', function(event) {
+        const message = event.data;
+        if (!message || message.type !== 'mybiblebelt-prayer-result' ||
+            !pendingToken || message.token !== pendingToken) return;
+
+        clearTimeout(timeoutId);
+        pendingToken = null;
+        const submitButton = document.getElementById('prayerSubmitButton');
+        submitButton.disabled = false;
+
+        if (message.success === true) {
+            form.reset();
+            status.textContent = 'Thank you for sharing your prayer request. It has been saved to the private inbox. Nothing is published automatically.';
+            status.classList.remove('is-not-connected');
+        } else {
+            status.textContent = 'We could not save your request. Please try again later.';
+        }
+    });
+
+    form.addEventListener('submit', function(event) {
         event.preventDefault();
-        if (!form.reportValidity()) return;
+        if (!form.reportValidity() || pendingToken) return;
+
         const submitButton = document.getElementById('prayerSubmitButton');
         const data = new FormData(form);
         const payload = {
@@ -118,31 +150,42 @@ function configurePrayerForm() {
             category: String(data.get('category') || ''),
             request: String(data.get('request') || '').trim(),
             sharing: String(data.get('sharing') || ''),
-            website: String(data.get('website') || '')
+            website: String(data.get('website') || ''),
+            token: (window.crypto && crypto.randomUUID)
+                ? crypto.randomUUID()
+                : String(Date.now()) + '-' + Math.random().toString(36).slice(2)
         };
+
         if (!payload.request || !['Private', 'Public'].includes(payload.sharing)) {
             status.textContent = 'Please enter a request and choose a sharing preference.';
             return;
         }
+
+        pendingToken = payload.token;
         submitButton.disabled = true;
         status.textContent = 'Sending your request…';
-        try {
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload),
-                redirect: 'follow'
-            });
-            const result = await response.json();
-            if (!response.ok || !result || result.success !== true) throw new Error('Submission was not accepted');
-            form.reset();
-            status.textContent = 'Thank you for sharing your prayer request. It has been received privately. Public requests will only be displayed after explicit moderator approval.';
-            status.classList.remove('is-not-connected');
-        } catch (error) {
-            status.textContent = 'We could not confirm that your request was received. Please try again later; do not assume it was submitted.';
-        } finally {
+
+        const postForm = document.createElement('form');
+        postForm.method = 'POST';
+        postForm.action = endpoint;
+        postForm.target = frameName;
+        postForm.acceptCharset = 'UTF-8';
+
+        const payloadField = document.createElement('input');
+        payloadField.type = 'hidden';
+        payloadField.name = 'payload';
+        payloadField.value = JSON.stringify(payload);
+        postForm.appendChild(payloadField);
+        document.body.appendChild(postForm);
+        postForm.submit();
+        postForm.remove();
+
+        timeoutId = setTimeout(function() {
+            if (!pendingToken) return;
+            pendingToken = null;
             submitButton.disabled = false;
-        }
+            status.textContent = 'We could not confirm that your request was saved. Please try again later and check with the site administrator if this continues.';
+        }, 30000);
     });
 }
 
