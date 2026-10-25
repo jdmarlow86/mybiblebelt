@@ -114,81 +114,67 @@ function configurePrayerForm() {
     }
 }
 
-function parseCsvLine(line) {
-    const values = [];
-    let value = '';
-    let quoted = false;
-
-    for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        if (char === '"' && quoted && line[i + 1] === '"') {
-            value += '"';
-            i++;
-        } else if (char === '"') {
-            quoted = !quoted;
-        } else if (char === ',' && !quoted) {
-            values.push(value);
-            value = '';
-        } else {
-            value += char;
-        }
+function parseCsv(text) {
+    const rows = []; let row = []; let value = ''; let quoted = false;
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (ch === '"' && quoted && text[i + 1] === '"') { value += '"'; i++; }
+        else if (ch === '"') quoted = !quoted;
+        else if (ch === ',' && !quoted) { row.push(value); value = ''; }
+        else if ((ch === '\n' || ch === '\r') && !quoted) {
+            if (ch === '\r' && text[i + 1] === '\n') i++;
+            row.push(value); if (row.some(cell => cell.trim())) rows.push(row); row = []; value = '';
+        } else value += ch;
     }
-    values.push(value);
-    return values;
+    row.push(value); if (row.some(cell => cell.trim())) rows.push(row); return rows;
+}
+
+function parsePrayerDate(value) {
+    if (!value) return null;
+    const raw = String(value).trim();
+    const iso = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    const date = iso ? new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3])) : new Date(raw);
+    return Number.isNaN(date.getTime()) ? null : date;
+}
+function formatPrayerDate(date) {
+    return date ? date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '';
 }
 
 async function loadApprovedPrayerRequests() {
     const list = document.getElementById('requestsList');
+    const sortControl = document.getElementById('requestSort');
     const csvUrl = window.PRAYER_CONFIG && window.PRAYER_CONFIG.approvedRequestsCsvUrl;
-    if (!list || !csvUrl || !/^https:\/\/docs\.google\.com\/spreadsheets\/.*output=csv/.test(csvUrl)) return;
-
+    if (!list || !csvUrl || !csvUrl.startsWith('https://docs.google.com/spreadsheets/') || !csvUrl.includes('output=csv')) return;
     try {
         const response = await fetch(csvUrl, { cache: 'no-store' });
         if (!response.ok) throw new Error('Could not load approved requests');
-        const text = await response.text();
-        const rows = text.trim().split(/\r?\n/).filter(Boolean).map(parseCsvLine);
+        const rows = parseCsv(await response.text());
         if (rows.length < 2) return;
-
         const headers = rows.shift().map(value => value.trim().toLowerCase());
-        const requestIndex = headers.indexOf('request');
-        const categoryIndex = headers.indexOf('category');
-        const nameIndex = headers.indexOf('display name');
-        if (requestIndex < 0) return;
-
-        const approved = rows.map(row => ({
-            request: row[requestIndex] || '',
-            category: categoryIndex >= 0 ? row[categoryIndex] : '',
-            name: nameIndex >= 0 ? row[nameIndex] : ''
-        })).filter(item => item.request.trim());
-
-        if (!approved.length) return;
-        list.replaceChildren();
-
-        approved.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'request-item';
-            const request = document.createElement('p');
-            request.className = 'request-text';
-            request.textContent = '“' + item.request + '”';
-            card.appendChild(request);
-
-            const meta = document.createElement('p');
-            meta.className = 'request-meta';
-            const parts = [];
-            if (item.category) parts.push('Category: ' + item.category);
-            if (item.name) parts.push('Shared by: ' + item.name);
-            if (parts.length) {
-                meta.textContent = parts.join(' | ');
-                card.appendChild(meta);
-            }
-            list.appendChild(card);
-        });
-    } catch (error) {
-        // Keep the privacy-safe empty state if the public approved list is unavailable.
-        console.warn('Approved prayer requests are temporarily unavailable.');
-    }
+        const ri = headers.indexOf('request'), ci = headers.indexOf('category'), ni = headers.indexOf('display name'), di = headers.indexOf('date');
+        if (ri < 0) return;
+        const approved = rows.map((row, index) => ({ request: row[ri] || '', category: ci >= 0 ? row[ci] : '', name: ni >= 0 ? row[ni] : '', date: di >= 0 ? parsePrayerDate(row[di]) : null, originalIndex: index })).filter(item => item.request.trim());
+        function renderRequests() {
+            const direction = sortControl ? sortControl.value : 'newest';
+            approved.sort((a, b) => {
+                if (a.date && !b.date) return -1; if (!a.date && b.date) return 1;
+                if (a.date && b.date) { const delta = a.date.getTime() - b.date.getTime(); if (delta) return direction === 'oldest' ? delta : -delta; }
+                return a.originalIndex - b.originalIndex;
+            });
+            list.replaceChildren();
+            if (!approved.length) { const empty = document.createElement('p'); empty.className = 'empty-requests'; empty.textContent = 'There are no approved public prayer requests to display right now.'; list.appendChild(empty); return; }
+            approved.forEach(item => {
+                const card = document.createElement('article'); card.className = 'request-item';
+                const request = document.createElement('p'); request.className = 'request-text'; request.textContent = '“' + item.request + '”'; card.appendChild(request);
+                const parts = []; if (item.category) parts.push('Category: ' + item.category); if (item.name) parts.push('Shared by: ' + item.name); if (item.date) parts.push('Posted: ' + formatPrayerDate(item.date));
+                if (parts.length) { const meta = document.createElement('p'); meta.className = 'request-meta'; meta.textContent = parts.join(' · '); card.appendChild(meta); }
+                list.appendChild(card);
+            });
+        }
+        if (sortControl) sortControl.addEventListener('change', renderRequests);
+        renderRequests();
+    } catch (error) { console.warn('Approved prayer requests are temporarily unavailable.'); }
 }
-
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     displayDate();
