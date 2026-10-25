@@ -4,7 +4,7 @@
 window.PRAYER_CONFIG = {
     // HTTPS server-side endpoint that privately stores submissions and returns JSON {"success": true}.
     // Do not use a public spreadsheet as the submission destination.
-    submissionEndpoint: "",
+    submissionEndpoint: "https://script.google.com/macros/s/AKfycbz8tC6mdeMddfiVeYepVkwPMzdIsT9xWQzEnTU31lZNLgiCLY0tEF0v6ncChdyePQ/exec",
     // Publish an APPROVED-ONLY Google Sheets tab to the web as CSV, then paste its URL here.
     // Required headers: request, category, display name, date (public approval/publication date)
     approvedRequestsCsvUrl: ""
