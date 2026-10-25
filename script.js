@@ -89,29 +89,61 @@ function loadDevotional() {
     }
 }
 
-// Prayer requests use a hosted Google Form and a separately published,
-// moderator-approved Google Sheets view. No requests are stored in this browser.
+// The prayer form is native to this page. Submissions remain disabled until
+// a secure server-side endpoint is configured; static GitHub Pages cannot safely
+// store or email prayer requests on its own.
 function configurePrayerForm() {
-    const setupNotice = document.getElementById('prayerFormSetup');
-    const embed = document.getElementById('prayerFormEmbed');
-    const formUrl = window.PRAYER_CONFIG && window.PRAYER_CONFIG.formEmbedUrl;
+    const form = document.getElementById('prayerRequestForm');
+    const status = document.getElementById('prayerFormStatus');
+    if (!form || !status) return;
 
-    if (!setupNotice || !embed) return;
-
-    if (formUrl && /^https:\/\/docs\.google\.com\/forms\/.*viewform/.test(formUrl)) {
-        const iframe = document.createElement('iframe');
-        iframe.src = formUrl;
-        iframe.title = 'Submit a prayer request';
-        iframe.loading = 'lazy';
-        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-        iframe.width = '100%';
-        iframe.height = '850';
-        iframe.style.border = '0';
-        iframe.setAttribute('allowfullscreen', '');
-        embed.appendChild(iframe);
-        embed.hidden = false;
-        setupNotice.hidden = true;
+    const endpoint = window.PRAYER_CONFIG && window.PRAYER_CONFIG.submissionEndpoint;
+    if (!endpoint || !/^https:\/\//.test(endpoint)) {
+        status.textContent = 'The form is ready, but secure submission has not been connected yet. Your request will not be sent until this connection is enabled.';
+        status.classList.add('is-not-connected');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            status.textContent = 'This form is not connected to a private inbox yet, so your request was not sent. Please try again later.';
+        });
+        return;
     }
+
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
+        const submitButton = document.getElementById('prayerSubmitButton');
+        const data = new FormData(form);
+        const payload = {
+            name: String(data.get('name') || '').trim(),
+            category: String(data.get('category') || ''),
+            request: String(data.get('request') || '').trim(),
+            sharing: String(data.get('sharing') || ''),
+            website: String(data.get('website') || '')
+        };
+        if (!payload.request || !['Private', 'Public'].includes(payload.sharing)) {
+            status.textContent = 'Please enter a request and choose a sharing preference.';
+            return;
+        }
+        submitButton.disabled = true;
+        status.textContent = 'Sending your request…';
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload),
+                redirect: 'follow'
+            });
+            const result = await response.json();
+            if (!response.ok || !result || result.success !== true) throw new Error('Submission was not accepted');
+            form.reset();
+            status.textContent = 'Thank you for sharing your prayer request. It has been received privately. Public requests will only be displayed after explicit moderator approval.';
+            status.classList.remove('is-not-connected');
+        } catch (error) {
+            status.textContent = 'We could not confirm that your request was received. Please try again later; do not assume it was submitted.';
+        } finally {
+            submitButton.disabled = false;
+        }
+    });
 }
 
 function parseCsv(text) {
