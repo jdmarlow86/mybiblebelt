@@ -18,6 +18,35 @@ The prayer page is a static GitHub Pages site. It must not collect submissions i
 6. In **Responses**, link the form to a Google Sheet. Keep this response spreadsheet private; do not publish it to the web or share it publicly.
 7. In Google Forms, use **Send → Embed HTML** and copy the URL inside the iframe `src` attribute. It should be a Google Forms `viewform` URL.
 
+
+## 1A. Send a notification to the Proton Mail inbox (optional)
+
+Google Forms' built-in “new response” notification is normally sent to the Google account that owns the form. To receive a notification at **mybiblebelt@proton.me** without sending the prayer text itself by email, you can add a small Google Apps Script to the linked private response spreadsheet.
+
+1. Open the **private response spreadsheet** linked to the form.
+2. Select **Extensions → Apps Script**.
+3. Replace the editor contents with the code below and save the project.
+
+```javascript
+function notifyPrayerRequestOwner(e) {
+  MailApp.sendEmail({
+    to: "mybiblebelt@proton.me",
+    subject: "New My Bible Belt prayer request",
+    body:
+      "A new prayer request was submitted. Please open the private Google Forms response spreadsheet to review it.\n\n" +
+      "A request must be marked Public by the submitter AND explicitly approved by you before you copy it to the separate public board. Never copy Private requests."
+  });
+}
+```
+
+4. In Apps Script, open **Triggers** (the alarm-clock icon), choose **Add Trigger**, and select:
+   - Function: `notifyPrayerRequestOwner`
+   - Event source: **From spreadsheet**
+   - Event type: **On form submit**
+5. Save the trigger and complete Google's authorization prompts. Send a test response and verify that the notification reaches **mybiblebelt@proton.me**.
+
+This notification intentionally contains no prayer text or submitter details. The email provider will see the notification, but the private prayer request stays in the private response spreadsheet. Treat the response spreadsheet and Apps Script project as private. If you prefer not to authorize a script, use the form owner's built-in response notifications instead; those go to the Google account administering the form.
+
 ## 2. Create a separate public spreadsheet for approved requests
 
 Use a **different spreadsheet** from the private form responses. This reduces the risk of accidentally exposing unreviewed requests or names.
