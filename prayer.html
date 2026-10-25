@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prayer - My Bible Belt</title>
-    <link rel="stylesheet" href="styles.css?v=20261025-prayer-1">
+    <link rel="stylesheet" href="styles.css?v=20261025-prayer-2">
 </head>
 <body>
     <header>
@@ -32,14 +32,42 @@
 
         <section class="prayer-form-section">
             <h3>Submit a Prayer Request</h3>
-            <div id="prayerFormSetup" class="prayer-setup-notice">
-                <h4>Prayer request form setup in progress</h4>
-                <p>The submission form is being prepared. Once connected, you will be able to share a prayer request as <strong>Private</strong> or ask for it to be considered for the public prayer board.</p>
-                <p>Private requests will not be displayed publicly. Public requests will only appear after they have been reviewed and explicitly approved.</p>
-                <p>May you find comfort in this promise: “Casting all your care upon him; for he careth for you.” — 1 Peter 5:7</p>
-            </div>
-            <div id="prayerFormEmbed" class="prayer-form-embed" hidden></div>
-            <p class="privacy-note">Choose your sharing preference in the form: <strong>Private</strong> means the request stays out of the public prayer board; <strong>Public</strong> means you are asking for it to be considered for publication after review. Public display is never automatic. Please avoid including sensitive personal details about yourself or others.</p>
+            <form id="prayerRequestForm" class="prayer-request-form">
+                <p>Share what's on your heart. Your request starts as private and will never appear on the public board automatically.</p>
+                <div class="form-field">
+                    <label for="prayerName">Name (optional)</label>
+                    <input id="prayerName" name="name" type="text" maxlength="80" autocomplete="name" placeholder="Your name, or leave blank">
+                </div>
+                <div class="form-field">
+                    <label for="prayerCategory">Category</label>
+                    <select id="prayerCategory" name="category" required>
+                        <option value="">Choose a category</option>
+                        <option>Healing</option>
+                        <option>Guidance</option>
+                        <option>Family</option>
+                        <option>Thanksgiving</option>
+                        <option>Spiritual Growth</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="prayerRequest">Prayer request</label>
+                    <textarea id="prayerRequest" name="request" rows="6" maxlength="3000" required placeholder="Write your prayer request here..."></textarea>
+                </div>
+                <fieldset class="sharing-preference">
+                    <legend>How may we share this request?</legend>
+                    <label><input type="radio" name="sharing" value="Private" required> <strong>Private</strong> — keep this request off the public prayer board.</label>
+                    <label><input type="radio" name="sharing" value="Public"> <strong>Public</strong> — I give permission for this request to be considered for public display after review.</label>
+                </fieldset>
+                <div class="prayer-honeypot" aria-hidden="true">
+                    <label for="prayerWebsite">Leave this field empty</label>
+                    <input id="prayerWebsite" name="website" type="text" tabindex="-1" autocomplete="off">
+                </div>
+                <p class="privacy-note">Please avoid including highly sensitive personal details about yourself or others. A Public selection is permission to consider publication, not a guarantee that the request will be posted. Only requests marked Public and explicitly approved by the site moderator can be displayed.</p>
+                <button type="submit" id="prayerSubmitButton">Send Prayer Request</button>
+                <p id="prayerFormStatus" class="prayer-form-status" role="status" aria-live="polite"></p>
+            </form>
+            <p class="prayer-encouragement">“Casting all your care upon him; for he careth for you.” — 1 Peter 5:7</p>
         </section>
 
         <section class="prayer-guide">
@@ -105,7 +133,7 @@
         <p>My Bible Belt &copy; 2026 | Non-denominational | Sabbath-Centered</p>
     </footer>
 
-    <script src="prayer-config.js?v=20261025-prayer-1"></script>
-    <script src="script.js?v=20261025-prayer-1"></script>
+    <script src="prayer-config.js?v=20261025-prayer-2"></script>
+    <script src="script.js?v=20261025-prayer-2"></script>
 </body>
 </html>
