@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prayer - My Bible Belt</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=20261025-prayer-1">
 </head>
 <body>
     <header>
@@ -34,10 +34,12 @@
             <h3>Submit a Prayer Request</h3>
             <div id="prayerFormSetup" class="prayer-setup-notice">
                 <h4>Prayer request form setup in progress</h4>
-                <p>The online submission form is not configured yet. Please check back soon.</p>
+                <p>The submission form is being prepared. Once connected, you will be able to share a prayer request as <strong>Private</strong> or ask for it to be considered for the public prayer board.</p>
+                <p>Private requests will not be displayed publicly. Public requests will only appear after they have been reviewed and explicitly approved.</p>
+                <p>May you find comfort in this promise: “Casting all your care upon him; for he careth for you.” — 1 Peter 5:7</p>
             </div>
             <div id="prayerFormEmbed" class="prayer-form-embed" hidden></div>
-            <p class="privacy-note">Prayer requests are received privately. They will only be shown in the Community Prayer Requests section after a reviewer explicitly approves them. Please avoid including sensitive personal details about yourself or others.</p>
+            <p class="privacy-note">Choose your sharing preference in the form: <strong>Private</strong> means the request stays out of the public prayer board; <strong>Public</strong> means you are asking for it to be considered for publication after review. Public display is never automatic. Please avoid including sensitive personal details about yourself or others.</p>
         </section>
 
         <section class="prayer-guide">
@@ -84,7 +86,14 @@
 
         <section class="prayer-requests-list">
             <h3>Community Prayer Requests</h3>
-            <p class="privacy-note">Only requests reviewed and approved for public sharing appear here.</p>
+            <p class="privacy-note">Only requests reviewed and approved for public sharing appear here. Requests are ordered by the date they were approved for publication, not by when they were privately submitted.</p>
+            <div class="prayer-board-controls">
+                <label for="requestSort">Sort requests</label>
+                <select id="requestSort" aria-label="Sort public prayer requests by date">
+                    <option value="newest">Newest first</option>
+                    <option value="oldest">Oldest first</option>
+                </select>
+            </div>
             <div id="requestsList" class="requests-container" aria-live="polite">
                 <p class="empty-requests">There are no approved public prayer requests to display right now.</p>
             </div>
@@ -96,7 +105,7 @@
         <p>My Bible Belt &copy; 2026 | Non-denominational | Sabbath-Centered</p>
     </footer>
 
-    <script src="prayer-config.js"></script>
-    <script src="script.js"></script>
+    <script src="prayer-config.js?v=20261025-prayer-1"></script>
+    <script src="script.js?v=20261025-prayer-1"></script>
 </body>
 </html>
