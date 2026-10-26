@@ -208,10 +208,22 @@ async function loadApprovedPrayerRequests() {
     const csvUrl = window.PRAYER_CONFIG && window.PRAYER_CONFIG.approvedRequestsCsvUrl;
     if (!list || !csvUrl || !csvUrl.startsWith('https://docs.google.com/spreadsheets/') || !csvUrl.includes('output=csv')) return;
     try {
-        const response = await fetch(csvUrl, { cache: 'no-store' });
+        // Add a unique query parameter to reduce stale browser/proxy cache responses.
+        const freshUrl = new URL(csvUrl);
+        freshUrl.searchParams.set('_refresh', String(Date.now()));
+        const response = await fetch(freshUrl.toString(), { cache: 'no-store' });
         if (!response.ok) throw new Error('Could not load approved requests');
         const rows = parseCsv(await response.text());
-        if (rows.length < 2) return;
+        // Continue even if the CSV contains only its header row. This lets the
+        // renderer clear requests that have been removed from the public sheet.
+        if (rows.length === 0) {
+            list.replaceChildren();
+            const empty = document.createElement('p');
+            empty.className = 'empty-requests';
+            empty.textContent = 'There are no approved public prayer requests to display right now.';
+            list.appendChild(empty);
+            return;
+        }
         const headers = rows.shift().map(value => value.trim().toLowerCase());
         const ri = headers.indexOf('request'), ci = headers.indexOf('category'), ni = headers.indexOf('display name'), di = headers.indexOf('date');
         if (ri < 0) return;
