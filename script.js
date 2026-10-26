@@ -118,30 +118,11 @@ function configurePrayerForm() {
         document.body.appendChild(iframe);
     }
 
-    let pendingToken = null;
-    let timeoutId = null;
-    window.addEventListener('message', function(event) {
-        const message = event.data;
-        if (!message || message.type !== 'mybiblebelt-prayer-result' ||
-            !pendingToken || message.token !== pendingToken) return;
-
-        clearTimeout(timeoutId);
-        pendingToken = null;
-        const submitButton = document.getElementById('prayerSubmitButton');
-        submitButton.disabled = false;
-
-        if (message.success === true) {
-            form.reset();
-            status.textContent = 'Thank you for sharing your prayer request. It has been saved to the private inbox. Nothing is published automatically.';
-            status.classList.remove('is-not-connected');
-        } else {
-            status.textContent = 'We could not save your request. Please try again later.';
-        }
-    });
+    let submitting = false;
 
     form.addEventListener('submit', function(event) {
         event.preventDefault();
-        if (!form.reportValidity() || pendingToken) return;
+        if (!form.reportValidity() || submitting) return;
 
         const submitButton = document.getElementById('prayerSubmitButton');
         const data = new FormData(form);
@@ -161,7 +142,7 @@ function configurePrayerForm() {
             return;
         }
 
-        pendingToken = payload.token;
+        submitting = true;
         submitButton.disabled = true;
         status.textContent = 'Sending your request…';
 
@@ -177,15 +158,21 @@ function configurePrayerForm() {
         payloadField.value = JSON.stringify(payload);
         postForm.appendChild(payloadField);
         document.body.appendChild(postForm);
-        postForm.submit();
-        postForm.remove();
 
-        timeoutId = setTimeout(function() {
-            if (!pendingToken) return;
-            pendingToken = null;
+        try {
+            postForm.submit();
+            postForm.remove();
+
+            // Apps Script accepts and processes the POST, but its cross-origin
+            // response cannot be reliably read by this GitHub Pages site.
+            // Avoid falsely telling visitors that a request failed.
+            status.textContent = 'Thank you. Your request has been sent for review. This page cannot independently confirm that it was saved, and nothing is published automatically.';
+            form.reset();
+        } catch (error) {
+            status.textContent = 'We could not send your request from this page. Please try again later.';
+            submitting = false;
             submitButton.disabled = false;
-            status.textContent = 'We could not confirm that your request was saved. Please try again later and check with the site administrator if this continues.';
-        }, 30000);
+        }
     });
 }
 
